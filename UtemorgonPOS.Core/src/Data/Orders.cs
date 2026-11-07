@@ -4,6 +4,8 @@
 	EG: Orders[] _ = Data.Orders.GettAllOrdersForCustomer(12); // 12 = a customer id. 
 */
 
+namespace UtemorgonPOS.Core;
+
 public class Orders
 {
 	// TODO: Add things like GetAllOrdersForCustomer(int customerId)
