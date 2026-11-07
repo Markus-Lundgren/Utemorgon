@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="UtemorgonPOS.Core/UtemorgonPOS.Core.csproj" />
+  <Project Path="UtemorgonPOS.CustomerDisplay/UtemorgonPOS.CustomerDisplay.csproj" />
+  <Project Path="UtemorgonPOS.Terminal/UtemorgonPOS.Terminal.csproj" />
+</Solution>

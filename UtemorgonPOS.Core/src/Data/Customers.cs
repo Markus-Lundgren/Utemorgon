@@ -1,0 +1,10 @@
+/*
+	This is the customers part of the Data.
+	This is accessed using Data.Customers
+	EG: Customer _ = Data.Customers.GetCustomer(12); // 12 = a customer id. 
+*/
+
+public class Customers
+{
+	// TODO: Add stuff like GetLateRentals(int customerId) which routes to Data.Orders.GetLateRentals(/*filter on customer*/)
+}

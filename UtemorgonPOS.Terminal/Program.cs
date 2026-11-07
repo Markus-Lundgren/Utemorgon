@@ -1,4 +1,6 @@
-﻿namespace Utemorgon;
+﻿using System;
+
+namespace UtemorgonPOS.Terminal;
 
 class Program
 {
