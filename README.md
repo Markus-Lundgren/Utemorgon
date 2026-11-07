@@ -2,6 +2,19 @@
 
 A 3 student school project utilizing MariaDB, Dapper and C# to create a Terminal based Point of Sale system.
 
+## The environment variables
+
+In order to connect to the database, we need an Ip, port, username and password.  
+These must be placed in a `.env` file at the root of the project.  
+The `.env` file must contain exactly 1 key-value-pair per row, and split them using an equals sign.  
+There is no need for citations `"` to define strings.
+
+To fetch env variables in code, use the `EasyEnv` wrapper:
+
+```csharp
+int port = EasyEnv.Get<int>("port"); // Case insensitive.
+```
+
 ## Program flow
 
 TODO: Expand this to provide some actual usable information
