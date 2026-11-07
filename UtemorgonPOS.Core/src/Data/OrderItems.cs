@@ -9,7 +9,7 @@
 	Note that an order items total price also depends on price modifiers.
 */
 
-public static class OrderItems
+public class OrderItems
 {
 	// TODO: Add business logic mumbo jumbo...
 }

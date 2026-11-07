@@ -4,7 +4,7 @@
 	EG: Orders[] _ = Data.Orders.GettAllOrdersForCustomer(12); // 12 = a customer id. 
 */
 
-public static class Orders
+public class Orders
 {
 	// TODO: Add things like GetAllOrdersForCustomer(int customerId)
 
