@@ -9,6 +9,8 @@
 	Note that an order items total price also depends on price modifiers.
 */
 
+namespace UtemorgonPOS.Core;
+
 public class OrderItems
 {
 	// TODO: Add business logic mumbo jumbo...

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
+namespace UtemorgonPOS.Core;
+
 public static class EasyEnv
 {
 	static Dictionary<string, string>? _envs = null;

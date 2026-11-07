@@ -2,6 +2,9 @@
 	This is the root data class. This handles things like the mariadb connection and lazy initialization.
 	It is made partial so that nesting of Data.Customers, Data.Orders etc is easier and more intuitive. 
 */
+
+namespace UtemorgonPOS.Core;
+
 public static class Data
 {
 	// TODO: Add MariaDB connector with login inside a .env file.
