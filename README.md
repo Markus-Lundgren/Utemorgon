@@ -1,8 +1,195 @@
-## Order flow
+# Utemorgon 🎬🍿
 
+A 3 student school project utilizing MariaDB, Dapper and C# to create a Terminal based Point of Sale system.
+
+## Program flow
+
+TODO: Expand this to provide some actual usable information
 From the admin terminal, the cashier can choose "Start transaction".
 
-## Transaction view
+## Diagrams and designs 📊
+
+### Database
+
+A note on **denomarlization**:  
+We are purposefully not introducing denormalization, even though it would make sense in a large scale application.
+This is to keep the normalization somewhat pure and academic for learning purposes, but also to decrease scope and possible point of failures.
+
+_Where denormalization **could** be applied_:
+
+- TotalPrice & TotalPayed in **Order**
+- MerchandiseType in Product
+  This would remove the implicit flow of `stock = null AND ProductType = 'Rental'` / `stock = null AND ProductType = 'Service'`
+
+#### Entity relations diagram
+
+```mermaid
+erDiagram
+    Customer ||--o{ Order : places
+    ProductType ||--o{ ProductType : contains
+    ProductType ||--o{ Product : categorizes
+    Product ||--o{ BarcodeToProduct : has
+    Order ||--o{ PaymentToOrder : has
+    Order ||--o{ OrderPriceModifier : has
+    Order ||--o{ OrderItem : includes
+    BarcodeToProduct ||--o{ OrderItem : identifies
+    OrderItem ||--o{ OrderItemModifier : has
+
+    Customer {
+        INT Id PK
+        CHAR(12) SocialNumber
+        VARCHAR(128) FName
+        VARCHAR(128) LName
+        VARCHAR(128) Address
+        VARCHAR(20) PhoneNumber
+    }
+
+    ProductType {
+        INT Id PK
+        INT ProductTypeId FK
+        VARCHAR(128) Name
+        DECIMAL Price
+    }
+
+    Product {
+        INT Id PK
+        INT ProductTypeId FK
+        VARCHAR(64) Name
+        DECIMAL PriceOverride
+        INT Stock
+        BOOL IsRemoved
+    }
+
+    Order {
+        INT Id PK
+        INT CustomerId FK
+        DATETIME CreationDate
+    }
+
+    PaymentToOrder {
+        INT Id PK
+        INT OrderId FK
+        DECIMAL Amount
+        DATETIME ReceivedDate
+    }
+
+    OrderPriceModifier {
+        INT Id PK
+        INT OrderId FK
+        DECIMAL Amount
+        VARCHAR(64) Reason
+    }
+
+    BarcodeToProduct {
+        INT Id PK
+        INT ProductId FK
+        CHAR(13) Barcode UK
+    }
+
+    OrderItem {
+        INT Id PK
+        INT OrderId FK
+        CHAR(13) Barcode FK
+        VARCHAR(128) Name
+        DECIMAL Price
+        INT Quantity
+        DATETIME ExpectedReturnDate
+        DATETIME ReturnedDate
+    }
+
+    OrderItemModifier {
+        INT Id PK
+        INT OrderItemId FK
+        DECIMAL Amount
+        VARCHAR(64) Reason
+    }
+```
+
+#### Arrow diagram
+
+_Note: Mermaid doesn't allow for neat diagrams. Instead see the arrow diagram on the designated arrow-diagram tool: [SQL Visualizer](https://trangius.se/sql_visualizer/)._
+
+Open the link and post the following:
+
+```js
+# Utemorgon videorek.
+
+# All Customer data is 2-way Encrypted with a key.
+Customer
+  Id
+  SocialNumber char(12) unique
+  FName
+  LName
+  Address
+  PhoneNumber vc(20)
+
+# Id used to create rental barcodes by accessing sequence (?) and inserting: "R0000..ID"
+BarcodeToProduct
+  Id
+  ProductId -> Product.Id
+  Barcode char(13) unique
+
+# Filtering
+ProductType
+  Id
+  ProductTypeId null -> ProductType.Id
+  Name
+  Price decimal(10,2)
+
+# Soft removal using bool so that legacy META will never be tainted.
+# When stuck is nul, the product is implicitly a rental product.
+# Services, such as "Late Fee" or "Ruined Property" also have stock as null, however, they are of product type "Services", meaning rental movies must filter out that type to be accurate.
+Product
+  Id
+  ProductTypeId -> ProductType.Id
+  Name vc(64)
+  PriceOverride decimal(10,2) null
+  Stock int null
+  IsRemoved bool
+
+
+# Orders are always paid in full at the register.
+Order
+  Id
+  CustomerId -> Customer.Id
+  CreationDate datetime
+
+PaymentToOrder
+  Id
+  OrderId -> Order.Id
+  Amount decimal(10,2)
+  ReceivedDate datetime
+
+# (Replaces rented product and BoughtProduct)
+OrderItem
+  Id
+  # Customer ID moves to order...
+  OrderId -> Order.Id
+  Barcode -> BarcodeToProduct.Barcode
+  # -- Receipt onligatiods
+  Name vc(128)
+  Price decimal(10,2)
+  Quantity int
+  # -- Rental meta (null if IsRental is false)
+  ExpectedReturnDate datetime null
+  ReturnedDate datetime null
+  unique(OrderId, Barcode)
+
+# Individual discount per item, eg: Ät snart, 3 för 2, sötnosrabatt osv..
+OrderItemModifier
+  Id
+  OrderItemId -> OrderItem.Id
+  Amount decimal(10,2)
+  Reason vc(64)
+
+OrderPriceModifier
+  Id
+  OrderId -> Order.Id
+  Amount decimal(10,2)
+  Reason vc(64)
+```
+
+### Transaction view
 
 This view is presented when the cashier chooses "Enter transaction" from the main menu.  
 If there are no transactions, a new one is automatically created.  
