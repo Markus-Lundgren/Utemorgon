@@ -41,6 +41,7 @@ erDiagram
     Customer ||--o{ Order : places
     ProductType ||--o{ ProductType : contains
     ProductType ||--o{ Product : categorizes
+	MerchandiseType ||--o{ Product : defines
     Product ||--o{ BarcodeToProduct : has
     Order ||--o{ PaymentToOrder : has
     Order ||--o{ OrderPriceModifier : has
@@ -64,9 +65,15 @@ erDiagram
         DECIMAL Price
     }
 
+	MerchandiseType {
+		INT Id PK
+		VARCHAR(64) Name
+	}
+
     Product {
         INT Id PK
         INT ProductTypeId FK
+		INT MerchandiseTypeId FK
         VARCHAR(64) Name
         DECIMAL PriceOverride
         INT Stock
@@ -120,87 +127,11 @@ erDiagram
 
 #### Arrow diagram
 
-_Note: Mermaid doesn't allow for neat diagrams. Instead see the arrow diagram on the designated arrow-diagram tool: [SQL Visualizer](https://trangius.se/sql_visualizer/)._
+_Note: Mermaid doesn't allow for neat diagrams. Instead see the attached image._
 
-Open the link and post the following:
+[![SQL Visualizer](/repo-media/utemorgon_arrowdiagram.svg)]
 
-```js
-# Utemorgon videorek.
-
-# All Customer data is 2-way Encrypted with a key.
-Customer
-  Id
-  SocialNumber char(12) unique
-  FName
-  LName
-  Address
-  PhoneNumber vc(20)
-
-# Id used to create rental barcodes by accessing sequence (?) and inserting: "R0000..ID"
-BarcodeToProduct
-  Id
-  ProductId -> Product.Id
-  Barcode char(13) unique
-
-# Filtering
-ProductType
-  Id
-  ProductTypeId null -> ProductType.Id
-  Name
-  Price decimal(10,2)
-
-# Soft removal using bool so that legacy META will never be tainted.
-# When stuck is nul, the product is implicitly a rental product.
-# Services, such as "Late Fee" or "Ruined Property" also have stock as null, however, they are of product type "Services", meaning rental movies must filter out that type to be accurate.
-Product
-  Id
-  ProductTypeId -> ProductType.Id
-  Name vc(64)
-  PriceOverride decimal(10,2) null
-  Stock int null
-  IsRemoved bool
-
-
-# Orders are always paid in full at the register.
-Order
-  Id
-  CustomerId -> Customer.Id
-  CreationDate datetime
-
-PaymentToOrder
-  Id
-  OrderId -> Order.Id
-  Amount decimal(10,2)
-  ReceivedDate datetime
-
-# (Replaces rented product and BoughtProduct)
-OrderItem
-  Id
-  # Customer ID moves to order...
-  OrderId -> Order.Id
-  Barcode -> BarcodeToProduct.Barcode
-  # -- Receipt onligatiods
-  Name vc(128)
-  Price decimal(10,2)
-  Quantity int
-  # -- Rental meta (null if IsRental is false)
-  ExpectedReturnDate datetime null
-  ReturnedDate datetime null
-  unique(OrderId, Barcode)
-
-# Individual discount per item, eg: Ät snart, 3 för 2, sötnosrabatt osv..
-OrderItemModifier
-  Id
-  OrderItemId -> OrderItem.Id
-  Amount decimal(10,2)
-  Reason vc(64)
-
-OrderPriceModifier
-  Id
-  OrderId -> Order.Id
-  Amount decimal(10,2)
-  Reason vc(64)
-```
+If you want to see the raw definitions for the arrow diagram, please see [SQL Visualizer (Hashlink)](https://trangius.se/sql_visualizer/#d=lVbNbts4EH6VD-qhDqAYSbpYLAJsF2nj7hpoftZJ0YsuY3JsEaFIlaScGMXe9pn6An2xxVCSkzotir0YFEcczvczI38uXHFafEjc-LD2riiLpjgtEj-koixicVq8wC6IjdHsA99NK1e5FzizFm-7mHzDAZoSwUScHN7TFjOnwrZNrHFvUg3CHW-ncmZ8P6LpYsKSUVPQh4Ebv6Gl5Sk-1uxAUGNiE5GjrEsoyxRA1iLVbAJWhq2OIKcROQ2bjhoGRZzP3s9uZ-d4--Hm9upitpiiLzpxcJTMhu0WXaspcc74eKGOWPmAVJu42y1hXH-xVBlLJI_WG5dACQTNlgXtLsmSImOyCrQ2lg8qN-KuHDDX8nvjlSF72TVLDlA1hcnxyQE6Zz51LPF3l9TkxftxcaZ14BhleV17x8PZjZqcHB30ksw1ushaqlOBBVpgl8hiSUF5zRHLLUgpjtG4NSJ_6tgpxuSPg8yicZFDMm59iqpYHB0dHU2n8_OqqNybPsGtvw5edyo9Ahk25hqHr8eHaR8aDg3wXj3Ck1rfGZHCuHXlhlO325af5ZXNuYbrrH1ygewOl4z0XAejGJqVachOjo_Kk4GUjxS4xCITUeKGw8YolsBftBEWstD80FqjTBrMFsVMcMw6e0H5prX8gE8dByNBj-iDvCxJRwfmxBGr4Bu0XVA1RXEL2r7mWOZu8F2C9Zl_fmjJaVoaa1LfH7M_T2FWiMmrO_yOlwL7Jc4uz58Cl8CV1T2il7ha7Acv-X4MTqfTyl2wFOO0ifwtxz13cvGNXw3YyaLL1S29t4geqaYEy2tSW1zMbs9wb6yF4434nJHIuMQ6l5-bN6ZO3Unfus6WmceBANkzTc-z3YJGcw7hnGGQJ5aInaqlj6vivRj5HXNVwAcxZmccawHdckjbqgDZ6FHThgfmKF9uS9T-XurMZWxBgeFXu3KS0FUV45VVUaJhcoJ9qKzxG5E7z6pV9itEvsxIPp28UEBKdYEST3dW_pGNv-vgPXn6176jmagl7f7rLwc7w19tOASj94yf0ecpk-mQOTXuzOOiH6dZ3178q6BlJAs9ZO9pG9GSkWmAlbSdgK1llKxNTBymlcsHHjGO062vfHwa0L2VQWS8OxcVZdwm05vumrYNu3Tr97Llxz5VXg55zhrfubTf4MCCFZsN6738yON-suDWknSlKMp6p7107Bvfres06HEwoJonbn5ayzjYDl9jfzBOhw157QUOD_v62gTvrFkLEzo-FfP45LdHNZ-j-7sjl0zaioZPUvbu5ESY5MloVlnYvG0iVmSjfHaA2UPLKrFecOrCtxrsLNHH9hjcRfuZPRmYKEfAOXv-5jhtNkZ3ZKFNVFmkVr6jiZsSvD7F138ToqOQSrzC6uuXgJMS8euX5HwMtKSU4ONGBtVOgQuvzco8d0Xi5oka8vhTd1CUvy67rhkuyXT_6Jb_4b0n2Yt__gM)
 
 ### Transaction view
 
