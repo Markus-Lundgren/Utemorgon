@@ -179,7 +179,7 @@ flowchart TD
         Action -- "Scan new" --> ScanMenu
 
         %% Sending state is a broadcast triggered by the Scan Menu updates
-        ScanMenu -. "State Broadcast" .-> SendState([SEND NEW STATE]):::redOval
+        ScanMenu -. "State Broadcast" .-> SendState([SEND STATE TO<br />NAMED PIPE]):::redOval
     end
 
     %% Contextual UI Mockups
@@ -194,5 +194,5 @@ flowchart TD
     end
 
     %% Connect the state broadcast to the UI updates
-    SendState -. "Renders Contextual View" .-> UI
+    ScanMenu -. "Renders Contextual View" .-> UI
 ```
