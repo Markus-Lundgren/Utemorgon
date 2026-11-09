@@ -3,10 +3,10 @@ using RiverScenes;
 
 class SMain : IScene
 {
-	SceneTransition? _deferredTransition;
+	static SceneTransition? _deferredTransition;
 
 	Menu _menu = new([
-		new(ConsoleKey.P, "Product menu", () => {}),
+		new(ConsoleKey.P, "Product menu", () => { _deferredTransition = new SceneTransition.Push(SceneRepository.ProductMain); }),
 		new(ConsoleKey.C, "Customer menu", () => {}),
 		new(ConsoleKey.T, "Enter transaction", () => {}),
 		new(ConsoleKey.R, "Rental menu", () => {}),
