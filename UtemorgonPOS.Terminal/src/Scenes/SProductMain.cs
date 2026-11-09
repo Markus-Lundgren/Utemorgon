@@ -6,10 +6,10 @@ class SProductMain : IScene
 	static SceneTransition? _deferredTransition;
 
 	Menu _menu = new([
-		new(ConsoleKey.N, "New product", () => {}),
-		new(ConsoleKey.I, "Products info", () => {}), // Find, Check stock, Attach / remove barcode, remove, update etc
-		new(ConsoleKey.C, "Product category info", () => {}), // Edit prices, parents, etc for product categories
-		new(ConsoleKey.B, "Back", () => {_deferredTransition = new SceneTransition.Pop(); }),
+	new(ConsoleKey.N, "New product", () => {}),
+	new(ConsoleKey.I, "Products info", () => {}), // Find, Check stock, Attach / remove barcode, remove, update etc
+	new(ConsoleKey.C, "Product category info", () => {}), // Edit prices, parents, etc for product categories
+	new(ConsoleKey.B, "Back", () => {_deferredTransition = new SceneTransition.Pop(); }),
 	]);
 
 	public void Enter()
