@@ -10,6 +10,7 @@ class SMain : IScene
 		new(ConsoleKey.C, "Customer menu", () => {}),
 		new(ConsoleKey.T, "Enter transaction", () => {}),
 		new(ConsoleKey.R, "Rental menu", () => {}),
+		new(ConsoleKey.B, "Manage barcodes", () => {}),
 	]);
 
 	public void Enter()
