@@ -2,7 +2,7 @@ namespace UtemorgonPOS.Core;
 
 public static partial class Data
 {
-	public class Rental
+	public static class Rentals
 	{
 		// TODO: Add things
 	}

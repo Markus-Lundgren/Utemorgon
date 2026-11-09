@@ -4,13 +4,18 @@
 	EG: Customer _ = Data.Customers.GetCustomer(12); // 12 = a customer id. 
 */
 
+using Dapper;
+
 namespace UtemorgonPOS.Core;
 
 public static partial class Data
 {
-	public class Customer
+	public static class Customers
 	{
-
-		// TODO: Add stuff like GetLateRentals(int customerId) which routes to Data.Orders.GetLateRentals(/*filter on customer*/)
+		public static Customer[] GetAll()
+		{
+			using var db = GetConnectionObject();
+			return [.. db.Query<Customer>("SELECT * FROM Customer;")];
+		}
 	}
 }
