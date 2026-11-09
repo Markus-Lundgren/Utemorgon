@@ -6,6 +6,11 @@ public static partial class Data
 {
 	public static class Products
 	{
+		public static Product[] GetProducts()
+		{
+			using var db = GetConnectionObject();
+			return [.. db.Query<Product>("SELECT * FROM Product;")];
+		}
 		public static void AddProduct()
 		{
 
