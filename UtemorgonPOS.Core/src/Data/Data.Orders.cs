@@ -16,10 +16,12 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			return [.. db.Query<Order>("SELECT * FROM Customer;")];
 		}
-		public static Order[] GetFromId(Order Id)
+		public static Order GetFromId(int id)
 		{
+
 			using var db = GetConnectionObject();
-			return [.. db.Query<Order>($"SELECT * FROM Customer where Id = @Id;")];
+
+			return db.QuerySingle<Order>("SELECT Customer.Id, Customer.Fname, Customer.Lname, Order.Id FROM `Order` JOIN Customer On CustomerId = Customer.Id where Customer.Id = @id;", new { Id = id });
 		}
 	}
 }
