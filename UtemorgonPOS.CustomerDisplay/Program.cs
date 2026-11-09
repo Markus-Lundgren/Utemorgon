@@ -6,8 +6,9 @@ class Program
 {
 	static void Main(string[] args)
 	{
-		var name = EasyEnv.Get<string>("kalle");
-		var age = EasyEnv.Get<int>("age") + 10;
-		Console.WriteLine($"{name}: {age} år.");
+		var customers = Data.Customers.GetAll();
+
+		foreach (var c in customers)
+			Console.WriteLine($"{c.SSNFormated}: {c.FullName}");
 	}
 }
