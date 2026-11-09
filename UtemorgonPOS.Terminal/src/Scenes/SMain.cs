@@ -6,9 +6,9 @@ class SMain : IScene
 	static SceneTransition? _deferredTransition;
 
 	Menu _menu = new([
-		new(ConsoleKey.T, "Enter transaction", () => {}),
+		new(ConsoleKey.T, "Enter transaction", () => { _deferredTransition = new SceneTransition.Push(SceneRepository.Transaction.Main); }),
 		new(ConsoleKey.C, "Customers", () => {}),
-		new(ConsoleKey.P, "Products", () => { _deferredTransition = new SceneTransition.Push(SceneRepository.ProductMain); }),
+		new(ConsoleKey.P, "Products", () => { _deferredTransition = new SceneTransition.Push(SceneRepository.Products.Main); }),
 		new(ConsoleKey.R, "Rentals", () => {}),
 		new(ConsoleKey.B, "Barcodes", () => {}),
 	]);
