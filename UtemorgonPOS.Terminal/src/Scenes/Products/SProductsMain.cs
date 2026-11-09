@@ -1,7 +1,7 @@
 using System;
 using RiverScenes;
 
-class SProductMain : IScene
+class SProductsMain : IScene
 {
 	static SceneTransition? _deferredTransition;
 
