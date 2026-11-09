@@ -13,7 +13,7 @@ namespace UtemorgonPOS.Core;
 
 public static partial class Data
 {
-	public class OrderItem
+	public static class OrderItem
 	{
 		// TODO: Add business logic mumbo jumbo...
 	}

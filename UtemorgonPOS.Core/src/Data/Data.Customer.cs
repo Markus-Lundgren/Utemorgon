@@ -8,7 +8,7 @@ namespace UtemorgonPOS.Core;
 
 public static partial class Data
 {
-	public class Customer
+	public static class Customer
 	{
 
 		// TODO: Add stuff like GetLateRentals(int customerId) which routes to Data.Orders.GetLateRentals(/*filter on customer*/)
