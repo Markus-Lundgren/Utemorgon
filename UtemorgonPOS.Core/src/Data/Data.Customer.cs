@@ -6,7 +6,11 @@
 
 namespace UtemorgonPOS.Core;
 
-public class Customers
+public static partial class Data
 {
-	// TODO: Add stuff like GetLateRentals(int customerId) which routes to Data.Orders.GetLateRentals(/*filter on customer*/)
+	public class Customer
+	{
+
+		// TODO: Add stuff like GetLateRentals(int customerId) which routes to Data.Orders.GetLateRentals(/*filter on customer*/)
+	}
 }
