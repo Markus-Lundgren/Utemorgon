@@ -14,7 +14,7 @@ class STransactionMain : IScene
 	new(ConsoleKey.C, "Add customer", () => {}),
 	new(ConsoleKey.O, "Add order modifier", () => {}),
 	new(ConsoleKey.F, "Finalize order", () => {}),
-	new(ConsoleKey.S, "Save order and exit", () => {Console.WriteLine("Order saved (not rly)"); _deferredTransition = new SceneTransition.Pop(); }),
+	new(ConsoleKey.S, "Save order and exit", () => {Console.WriteLine("Order saved (not rly)"); Console.ReadKey(); _deferredTransition = new SceneTransition.Pop(); }),
 	new(ConsoleKey.A, "Abort transaction", () => {_deferredTransition = new SceneTransition.Pop(); }),
 	]);
 
