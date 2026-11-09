@@ -16,5 +16,10 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			return [.. db.Query<Order>("SELECT * FROM Customer;")];
 		}
+		public static Order[] GetFromId(Order Id)
+		{
+			using var db = GetConnectionObject();
+			return [.. db.Query<Order>($"SELECT * FROM Customer where Id = @Id;")];
+		}
 	}
 }
