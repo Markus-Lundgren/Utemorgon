@@ -2,6 +2,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UtemorgonPOS.Core\UtemorgonPOS.Core.csproj" />
+  
+  	<Reference Include="RiverScenes">
+    	<HintPath>../lib/RiverScenes.dll</HintPath>
+  	</Reference>
+
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console" Version="0.57.2" />
   </ItemGroup>
 
   <PropertyGroup>
