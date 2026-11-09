@@ -17,5 +17,22 @@ public static partial class Data
 			string query = "INSERT INTO Product(CategoryId, ProductTypeId, Name, PriceOverride, Stock, IsRemoved) VALUES();";
 			db.Execute(query);
 		}
+
+		/*
+		- Add product
+		-   - Must specify product type etc
+		- Create barcode (R-Code using sequence ID. Intermediate / Hard!)
+		- Get product from barcode
+		- Check stock
+		- Update ProductCategory price
+		- Add barcode to product
+		- UPDATE PRODUCT
+		-   - Name
+		-   - PriceOverride
+		-   - Category (type)
+		-   - Stock
+		- Remove (soft-delete)
+		- Remove barcode from product
+		*/
 	}
 }
