@@ -19,7 +19,7 @@ public static class EasyEnv
 	// It's a quick and dirty way to just get this working for the debug environment, it's not critical code.
 	static Dictionary<string, string> InitializeEnv()
 	{
-		Dictionary<string, string> kvps = [];
+		Dictionary<string, string> kvps = new(StringComparer.InvariantCultureIgnoreCase);
 		var lines = File.ReadAllLines(GetEnvFilePath());
 
 		foreach (var l in lines)
