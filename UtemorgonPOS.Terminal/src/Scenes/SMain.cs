@@ -28,6 +28,7 @@ class SMain : IScene
 		{
 			Console.Clear();
 			Console.WriteLine("=====~* UTEMORGON *~=====");
+			Console.WriteLine("Main menu");
 			Console.WriteLine(_menu.MenuRows);
 
 			var a = _menu.GetAction(Console.ReadKey(intercept: true).Key);
