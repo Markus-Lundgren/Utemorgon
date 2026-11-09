@@ -6,8 +6,11 @@
 
 namespace UtemorgonPOS.Core;
 
-public class Orders
+public static partial class Data
 {
-	// TODO: Add things like GetAllOrdersForCustomer(int customerId)
+	public class Order
+	{
+		// TODO: Add things like GetAllOrdersForCustomer(int customerId)
 
+	}
 }
