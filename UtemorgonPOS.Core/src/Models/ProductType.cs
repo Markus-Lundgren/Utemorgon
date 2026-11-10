@@ -1,4 +1,4 @@
-enum ProductType
+public enum ProductType
 {
 
 }
