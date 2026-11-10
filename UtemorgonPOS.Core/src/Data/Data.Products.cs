@@ -11,10 +11,13 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			return [.. db.Query<Product>("SELECT * FROM Product;")];
 		}
-		public static void AddProduct(string name, int stock)
+		public static void AddProduct(ProductCategory category, ProductType type, string name, int? priceOverride, int stock)
 		{
 			using var db = GetConnectionObject();
-			string query = "INSERT INTO Product(CategoryId, ProductTypeId, Name, PriceOverride, Stock, IsRemoved) VALUES();";
+			string query = """
+			INSERT INTO Product(CategoryId, ProductTypeId, Name, PriceOverride, Stock, IsRemoved) 
+				VALUES(@CategoryId, @ProductId, @Name, @PriceOverride, @Stock, False);
+			""";
 			db.Execute(query);
 		}
 		///<summary>Returns the stock of a single product using Id as search parameter</summary>
