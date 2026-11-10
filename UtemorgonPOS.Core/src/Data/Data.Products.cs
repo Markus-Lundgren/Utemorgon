@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Dapper;
 
 namespace UtemorgonPOS.Core;
@@ -15,11 +14,6 @@ public static partial class Data
 			string query = "SELECT * FROM Product p";
 
 			var products = db.Query<Product>(query).AsList();
-			foreach (var p in products)
-			{
-				p.Category = db.QueryFirstOrDefault<ProductCategory>("SELECT * FROM Category WHERE Id = @Id", new { Id = p.CategoryId });
-				p.SetType();
-			}
 
 			return products.ToArray();
 		}
@@ -27,15 +21,13 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 			string query = """
-			INSERT INTO Product(CategoryId, ProductTypeId, Name, PriceOverride, Stock, IsRemoved) 
-				VALUES(@CategoryId, @ProductTypeId, @Name, @PriceOverride, @Stock, False);
+			INSERT INTO Product(Name, PriceOverride, Stock, IsRemoved) 
+				VALUES(@Name, @PriceOverride, @Stock, False);
 			""";
 			db.Execute(query, new
 			{
-				CategoryId = product.Category.Id,
-				ProductTypeId = 0,
 				Name = product.Name,
-				PriceOverride = product.PriceOverride,
+				PriceOverride = product.Price,
 				Stock = product.Stock
 			});
 		}
@@ -68,7 +60,7 @@ public static partial class Data
 				Console.WriteLine("Something went wrong");
 			}
 
-			p.Category = db.QueryFirstOrDefault<ProductCategory>("SELECT * FROM Category WHERE Id = @Id", new { Id = p.CategoryId }); ;
+			//p.Category = db.QueryFirstOrDefault<ProductCategory>("SELECT * FROM Category WHERE Id = @Id", new { Id = p.CategoryId }); ;
 			return p;
 		}
 
