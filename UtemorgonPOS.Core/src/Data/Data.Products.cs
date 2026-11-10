@@ -26,6 +26,13 @@ public static partial class Data
 			return stock;
 		}
 
+		public static void DeleteProduct(int id)
+		{
+			using var db = GetConnectionObject();
+			string query = "UPDATE Product Set IsRemoved = True WHERE Id = @Id";
+			db.Execute(query, new { Id = id });
+		}
+
 		/*
 		- Add product
 		-   - Must specify product type etc
