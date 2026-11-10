@@ -19,4 +19,15 @@ public class Product
 		}
 		return Category?.Price ?? 0m;
 	}
+
+	public void SetType()
+	{
+		TypeInfo = ProductTypeId switch
+		{
+			1 => ProductType.Ware,
+			2 => ProductType.Rental,
+			3 => ProductType.Service,
+			_ => ProductType.None
+		};
+	}
 }
