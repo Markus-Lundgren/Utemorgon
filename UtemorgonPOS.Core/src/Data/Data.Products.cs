@@ -11,7 +11,7 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			return [.. db.Query<Product>("SELECT * FROM Product;")];
 		}
-		public static void AddProduct(ProductCategory category, ProductType type, string name, int? priceOverride, int stock)
+		public static void AddProduct(Product product)
 		{
 			using var db = GetConnectionObject();
 			string query = """
@@ -32,7 +32,7 @@ public static partial class Data
 		public static void DeleteProduct(int id)
 		{
 			using var db = GetConnectionObject();
-			string query = "UPDATE Product Set IsRemoved = True WHERE Id = @Id";
+			string query = "UPDATE Product Set IsRemoved = True WHERE Id = @Id;";
 			db.Execute(query, new { Id = id });
 		}
 
