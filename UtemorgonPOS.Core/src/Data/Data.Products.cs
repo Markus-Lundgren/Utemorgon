@@ -94,6 +94,12 @@ public static partial class Data
 			p.Stock -= amount;
 		}
 
+		public static void ChangePrice(int id, decimal amount)
+		{
+			using var db = GetConnectionObject();
+			db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
+		}
+
 		/*
 		- Add product
 		-   - Must specify product type etc
