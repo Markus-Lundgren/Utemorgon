@@ -16,9 +16,16 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			string query = """
 			INSERT INTO Product(CategoryId, ProductTypeId, Name, PriceOverride, Stock, IsRemoved) 
-				VALUES(@CategoryId, @ProductId, @Name, @PriceOverride, @Stock, False);
+				VALUES(@CategoryId, @ProductTypeId, @Name, @PriceOverride, @Stock, False);
 			""";
-			db.Execute(query);
+			db.Execute(query, new
+			{
+				CategoryId = product.Category.Id,
+				ProductTypeId = 0,
+				Name = product.Name,
+				PriceOverride = product.PriceOverride,
+				Stock = product.Stock
+			});
 		}
 		///<summary>Returns the stock of a single product using Id as search parameter</summary>
 		public static int? CheckStock(int id)
