@@ -47,12 +47,11 @@ public static partial class Data
 
 		public static Product CreateProductFromId(int id)
 		{
-			Product p = new();
 			using var db = GetConnectionObject();
 
 			string query = "SELECT * FROM Product p WHERE Id = @Id";
 
-			p = db.QueryFirstOrDefault<Product>(query, new { Id = id });
+			var p = db.QueryFirstOrDefault<Product>(query, new { Id = id });
 
 			if (p == null)
 			{
