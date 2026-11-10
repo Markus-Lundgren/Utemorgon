@@ -3,7 +3,7 @@ namespace UtemorgonPOS.Core;
 public class Product
 {
 	public int Id { get; set; }
-	public ProductType TypeInfo { get; set; }
+	public ProductType TypeInfo { get; private set; }
 	public int CategoryId { get; set; }
 	public int ProductTypeId { get; set; }
 	public string Name { get; set; }
