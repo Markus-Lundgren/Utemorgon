@@ -13,12 +13,12 @@ class Program
 		// 	Console.WriteLine($"{c.SSNFormated}: {c.FullName}");
 		while (true)
 		{
-			Console.WriteLine($"{"Id",-5} | {"Name",-55} | {"Price",-10:C} | {"Lager",-10} | {"Borttagen",-10} | {"Kategori",-15} | {"Type",-15}");
+			Console.WriteLine($"{"Id",-5} | {"Name",-55} | {"Price",-10:C} | {"Lager",-10} | {"Borttagen",-10}");
 			Console.WriteLine(new string('-', 125));
 			var products = Data.Products.GetProducts();
 			foreach (var p in products)
 			{
-				Console.WriteLine($"{p.Id,-5} | {p.Name,-55} | {p.GetPrice(),-10:C} | {p.Stock,-10} | {p.IsRemoved,-10} | {p.Category.Name,-15} | {p.TypeInfo,-15}");
+				Console.WriteLine($"{p.Id,-5} | {p.Name,-55} | {p.Price,-10:C} | {p.Stock,-10} | {p.IsRemoved,-10}");
 			}
 
 			Console.Write("Välj product du vill köpa/hyra: ");
@@ -27,9 +27,5 @@ class Program
 			int amount = int.Parse(Console.ReadLine());
 			Data.Products.ProductTransaction(id, amount);
 		}
-
-		// Data.Products.DeleteProduct(id);
-
-
 	}
 }
