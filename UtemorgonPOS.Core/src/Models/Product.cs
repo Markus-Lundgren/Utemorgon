@@ -17,6 +17,6 @@ public class Product
 		{
 			return (decimal)PriceOverride;
 		}
-		return Category.Price;
+		return Category?.Price ?? 0m;
 	}
 }
