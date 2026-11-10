@@ -72,6 +72,36 @@ public static partial class Data
 			return p;
 		}
 
+		public static void ProductTransaction(int id, int amount)
+		{
+			using var db = GetConnectionObject();
+			var p = db.QueryFirstOrDefault<Product>("SELECT * FROM Product WHERE Id = @Id", new { Id = id });
+
+			if (p == null)
+			{
+				Console.WriteLine("Denna produkt finns inte");
+				return;
+			}
+			if (amount < 1)
+			{
+				Console.WriteLine("Du måste välja minst en");
+				return;
+			}
+			if (p.Stock < 1 || p.Stock == null)
+			{
+				Console.WriteLine($"{p.Name} är tyvärr slut i lagret!");
+				return;
+			}
+			if (p.Stock < amount)
+			{
+				Console.WriteLine("Det finns inte så många av denna produkt i lagret");
+				return;
+			}
+
+			db.Execute("UPDATE Product SET Stock = @Stock WHERE Id = @Id", new { Stock = p.Stock - amount, Id = id });
+			p.Stock -= amount;
+		}
+
 		/*
 		- Add product
 		-   - Must specify product type etc
