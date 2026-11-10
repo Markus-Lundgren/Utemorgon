@@ -43,6 +43,13 @@ public static partial class Data
 			db.Execute(query, new { Id = id });
 		}
 
+		public static Product CreateProductFromId(int id)
+		{
+			Product p = new();
+
+			return p;
+		}
+
 		/*
 		- Add product
 		-   - Must specify product type etc
