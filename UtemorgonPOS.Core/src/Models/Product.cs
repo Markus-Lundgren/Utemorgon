@@ -6,7 +6,7 @@ public class Product
 	public ProductType ProductType { get; set; }
 	public ProductCategory Category { get; set; }
 	public string Name { get; set; }
-	public int Price { get; set; }
+	public int? PriceOverride { get; set; }
 	public int Stock { get; set; }
 
 	//TODO: Fastställ hur kategori och product type sätts in
