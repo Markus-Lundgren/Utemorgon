@@ -7,7 +7,7 @@ public class Product
 	public ProductCategory Category { get; set; }
 	public string Name { get; set; }
 	public decimal? PriceOverride { get; set; }
-	public int Stock { get; set; }
+	public int? Stock { get; set; }
 	public bool IsRemoved { get; set; }
 
 	public decimal GetPrice()
