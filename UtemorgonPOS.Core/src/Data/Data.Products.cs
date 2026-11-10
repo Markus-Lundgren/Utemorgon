@@ -11,7 +11,17 @@ public static partial class Data
 		public static Product[] GetProducts()
 		{
 			using var db = GetConnectionObject();
-			return [.. db.Query<Product>("SELECT * FROM Product;")];
+
+			string query = "SELECT * FROM Product p";
+
+			var products = db.Query<Product>(query).AsList();
+			foreach (var p in products)
+			{
+				p.Category = db.QueryFirstOrDefault<ProductCategory>("SELECT * FROM Category WHERE Id = @Id", new { Id = p.CategoryId });
+				p.SetType();
+			}
+
+			return products.ToArray();
 		}
 		public static void AddProduct(Product product)
 		{
