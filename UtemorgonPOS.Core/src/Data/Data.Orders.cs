@@ -14,14 +14,26 @@ public static partial class Data
 		public static Order[] GetAll()
 		{
 			using var db = GetConnectionObject();
-			return [.. db.Query<Order>("SELECT * FROM Customer;")];
+			return [.. db.Query<Order>("SELECT * FROM `Order`;")];
 		}
-		public static Order GetFromId(int id)
+		public static Order GetFromId(int customerId)
 		{
 
 			using var db = GetConnectionObject();
 
-			return db.QuerySingle<Order>("SELECT Customer.Id, Customer.Fname, Customer.Lname, Order.Id FROM `Order` JOIN Customer On CustomerId = Customer.Id where Customer.Id = @id;", new { Id = id });
+			return db.QuerySingle<Order>("""
+			 SELECT * FROM `Order`
+			 WHERE Order.Id = @customerId
+			 LIMIT 1;
+			 """, new { customerId });
 		}
+
+		// public OrderPriceModifier[] CreateOrderObject()
+		// {
+		// 	using var db = GetConnectionObject();
+
+		// 	return [.. db.Query<OrderPriceModifier>("SELECT")];
+		// }
+
 	}
 }
