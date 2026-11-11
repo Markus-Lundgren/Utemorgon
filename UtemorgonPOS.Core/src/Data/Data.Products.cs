@@ -101,8 +101,19 @@ public static partial class Data
 			if (amount < 1)
 			{
 				Console.WriteLine($"Du kan inte sätta {amount} som pris");
+				return;
 			}
 			db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
+		}
+		public static void ChangeName(int id, string name)
+		{
+			using var db = GetConnectionObject();
+			if (string.IsNullOrWhiteSpace(name))
+			{
+				Console.WriteLine($"Name can't be empty");
+				return;
+			}
+			db.Execute("UPDATE Product SET Name = @Name WHERE Id = @Id", new { Name = name, Id = id });
 		}
 
 		/*
@@ -113,6 +124,7 @@ public static partial class Data
 		- Check stock - FINISHED
 		- Update ProductCategory price
 		- Add barcode to product
+		- Rent or buy product - FINISHED
 		- UPDATE PRODUCT
 		-   - Name
 		-   - Price - FINISHED
