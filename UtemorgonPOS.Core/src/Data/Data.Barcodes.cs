@@ -6,6 +6,11 @@ public static partial class Data
 {
 	public static class Barcodes
 	{
+		/// <summary>
+		/// Return a product from the barcode
+		/// </summary>
+		/// <param name="barcode"></param>
+		/// <returns></returns>
 		public static Product GetProductFromBarcode(string barcode)
 		{
 			using var db = GetConnectionObject();
