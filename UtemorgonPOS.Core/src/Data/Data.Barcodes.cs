@@ -3,6 +3,27 @@ public static partial class Data
 {
 	public static class Barcodes
 	{
+		public static Product GetProductFromBarcode(string barcode)
+		{
+			using var db = GetConnectionObject();
+			string query = """
+			SELECT * 
+			FROM Product p 
+			JOIN BarcodeToProduct b ON b.ProductId = p.Id
+			WHERE Barcode = @Barcode
+			""";
+
+			Product p = db.QueryFirstOrDefault<Product>(query, new { Barcode = barcode });
+
+			if (p == null)
+			{
+				Console.WriteLine("Hittade ingen produkt");
+				p = new();
+			}
+
+			return p;
+		}
+
 
 	}
 	/*
