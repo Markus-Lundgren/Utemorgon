@@ -12,5 +12,6 @@ public enum ProductType
 	Rental_Game = 10,
 	Rental_Console = 11,
 	Game = 12,
-	Console = 13
+	Console = 13,
+	Snacks = 14
 }
