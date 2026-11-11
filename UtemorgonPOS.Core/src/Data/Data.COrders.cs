@@ -13,6 +13,18 @@ public static partial class Data
 	public static class COrders
 	{
 		// TODO: Add things like GetAllOrdersForCustomer(int customerId)
+		public static void CreateOrder(int customerId, DateTime creationDate)
+		{
+			using var db = GetConnectionObject();
+			string sql = """
+				INSERT INTO COrder(CustomerId, CreationDate)
+				VALUES(@CustomerId, @CreationDate)
+				""";
+			db.Execute(
+				sql, new { CustomerId = customerId, CreationDate = creationDate }
+			);
+			Console.WriteLine($"Inserted {customerId} at {creationDate}");
+		}
 		public static COrder[] GetAll()
 		{
 			using var db = GetConnectionObject();
@@ -28,18 +40,6 @@ public static partial class Data
 			 WHERE COrder.Id = @customerId
 			 LIMIT 1;
 			 """, new { customerId });
-		}
-		public static void CreateOrder(int customerId, DateTime creationDate)
-		{
-			using var db = GetConnectionObject();
-			string sql = """
-				INSERT INTO COrder(CustomerId, CreationDate)
-				VALUES(@CustomerId, @CreationDate)
-				""";
-			db.Execute(
-				sql, new { CustomerId = customerId, CreationDate = creationDate }
-			);
-			Console.WriteLine($"Inserted {customerId} at {creationDate}");
 		}
 		/*
 		 public int Id { get; set; }
