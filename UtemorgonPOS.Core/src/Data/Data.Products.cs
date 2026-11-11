@@ -15,6 +15,11 @@ public static partial class Data
 
 			var products = db.Query<Product>(query).AsList();
 
+			foreach (var p in products)
+			{
+				p.SetType();
+			}
+
 			return products.ToArray();
 		}
 		public static void AddProduct(Product product)
@@ -126,7 +131,7 @@ public static partial class Data
 		- Add barcode to product
 		- Rent or buy product - FINISHED
 		- UPDATE PRODUCT
-		-   - Name
+		-   - Name - FINISHED
 		-   - Price - FINISHED
 		-   - Category (type)
 		-   - Stock
