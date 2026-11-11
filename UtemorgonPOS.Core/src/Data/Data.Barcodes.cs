@@ -54,7 +54,37 @@ public static partial class Data
 			return barcodes;
 		}
 
+		//ProductID kanske ska tillåta att vara null
+		/// <summary>
+		/// Add a barcode to a product
+		/// </summary>
+		/// <param name="product"></param>
+		/// <param name="code"></param>
+		public static void AddBarcodeToProduct(Product product, string code)
+		{
+			using var db = GetConnectionObject();
+			var exist = db.QueryFirstOrDefault<Barcode>("SELECT * FROM BarcodeToProduct WHERE Barcode = @Code", new { Code = code });
+			if (exist != null)
+			{
+				var existProduct = db.QueryFirstOrDefault<Product>("SELECT Name FROM Product WHERE Id = @Id", new { Id = exist.ProductId });
+				Console.WriteLine($"Koden är redan registrerad till: {existProduct.Name}");
+				return;
+			}
 
+			int? stock = product.Stock ?? 0;
+			var barcodeCount = db.ExecuteScalar<int>("SELECT COUNT(*) FROM BarcodeToProduct WHERE ProductId = @Id", new { Id = product.Id });
+
+			if (barcodeCount >= stock)
+			{
+				Console.WriteLine("Alla dessa produkter har redan en barcode");
+				return;
+			}
+
+			string query = """
+			INSERT INTO BarcodeToProduct(ProductId, Barcode, IsArchived) VALUES(@ProductId, @BarCode, False);
+			""";
+			db.Execute(query, new { ProductId = product.Id, BarCode = code });
+		}
 	}
 	/*
 	 - Create barcode (R-Code using sequence ID. Intermediate / Hard!)
