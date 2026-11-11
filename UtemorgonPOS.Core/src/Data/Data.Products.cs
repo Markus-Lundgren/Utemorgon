@@ -17,7 +17,7 @@ public static partial class Data
 
 			foreach (var p in products)
 			{
-				p.SetType();
+				p.SetProductType();
 			}
 
 			return products.ToArray();
@@ -26,7 +26,7 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 			string query = """
-			INSERT INTO Product(ProductTypeId, Name, Price, Stock, IsRemoved) 
+			INSERT INTO Product(ProductTypeId, Name, Price, Stock, IsArchived) 
 				VALUES(@ProductTypeId, @Name, @Price, @Stock, False);
 			""";
 			db.Execute(query, new
@@ -49,7 +49,7 @@ public static partial class Data
 		public static void DeleteProduct(int id)
 		{
 			using var db = GetConnectionObject();
-			string query = "UPDATE Product Set IsRemoved = True WHERE Id = @Id;";
+			string query = "UPDATE Product Set IsArchived = True WHERE Id = @Id;";
 			db.Execute(query, new { Id = id });
 		}
 
