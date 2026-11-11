@@ -15,6 +15,8 @@ class Program
 			Console.WriteLine("1. Visa produkter");
 			Console.WriteLine("2. Lägg till produkt");
 			Console.WriteLine("3. Uppdatera pris för kategori");
+			Console.WriteLine("4. Visa produkter med barcodes");
+			Console.WriteLine("5. Hämnta produkt från barcode");
 
 			int choice = int.Parse(Console.ReadLine());
 
@@ -26,7 +28,7 @@ class Program
 					var products = Data.Products.GetProducts();
 					foreach (var p in products)
 					{
-						Console.WriteLine($"{p.Id,-5} | {p.Name,-55} | {p.Price,-10:C} | {p.Stock,-10} | {p.IsRemoved,-10} | {p.TypeInfo,-15}");
+						Console.WriteLine($"{p.Id,-5} | {p.Name,-55} | {p.Price,-10:C} | {p.Stock,-10} | {p.IsArchived,-10} | {p.TypeInfo,-15}");
 					}
 					break;
 				case 2:
@@ -59,7 +61,28 @@ class Program
 					int amount = int.Parse(Console.ReadLine());
 					Data.Products.UpdateProductCategoryPrice(id, amount);
 					break;
+				case 4:
+					Console.WriteLine($"{"Name",-55} | {"Barcode",-25}");
+					Console.WriteLine(new string('-', 90));
+					var barcodes = Data.Barcodes.GetAllProductsWithBarcode();
 
+					foreach (var b in barcodes)
+					{
+						Console.WriteLine($"{b.Product.Name,-55} | {b.BarCode,-25}");
+					}
+					break;
+
+				case 5:
+					Console.Write("Välj barcode att söka produkt efter: ");
+					string code = Console.ReadLine();
+
+					Product pr = Data.Barcodes.GetProductFromBarcode(code);
+
+					Console.WriteLine($"{"Id",-5} | {"Name",-55} | {"Price",-10:C} | {"Lager",-10} | {"Borttagen",-10} | {"Type",-15}");
+					Console.WriteLine(new string('-', 125));
+					Console.WriteLine($"{pr.Id,-5} | {pr.Name,-55} | {pr.Price,-10:C} | {pr.Stock,-10} | {pr.IsArchived,-10} | {pr.TypeInfo,-15}");
+					Console.WriteLine(new string('-', 125));
+					break;
 			}
 
 		}
