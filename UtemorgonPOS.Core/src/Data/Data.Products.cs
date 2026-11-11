@@ -65,8 +65,7 @@ public static partial class Data
 			{
 				Console.WriteLine("Something went wrong");
 			}
-
-			//p.Category = db.QueryFirstOrDefault<ProductCategory>("SELECT * FROM Category WHERE Id = @Id", new { Id = p.CategoryId });
+			p.SetProductType();
 			return p;
 		}
 
