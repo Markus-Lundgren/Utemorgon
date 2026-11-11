@@ -26,6 +26,7 @@ public class Product
 			11 => ProductType.Rental_Console,
 			12 => ProductType.Game,
 			13 => ProductType.Console,
+			14 => ProductType.Snacks,
 			_ => ProductType.None
 		};
 	}
