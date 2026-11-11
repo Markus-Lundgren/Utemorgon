@@ -10,7 +10,7 @@ public class Product
 	public int? Stock { get; set; }
 	public bool IsRemoved { get; set; }
 
-	public void SetType()
+	public void SetProductType()
 	{
 		TypeInfo = ProductTypeId switch
 		{
