@@ -31,7 +31,7 @@ public static partial class Data
 			""";
 			db.Execute(query, new
 			{
-				ProductTypeId = product.ProductTypeId,
+				ProductTypeId = (int)product.TypeInfo,
 				Name = product.Name,
 				Price = product.Price,
 				Stock = product.Stock
