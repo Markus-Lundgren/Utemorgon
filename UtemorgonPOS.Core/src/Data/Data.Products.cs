@@ -26,8 +26,9 @@ public static partial class Data
 			""";
 			db.Execute(query, new
 			{
+				ProductTypeId = product.ProductTypeId,
 				Name = product.Name,
-				PriceOverride = product.Price,
+				Price = product.Price,
 				Stock = product.Stock
 			});
 		}
@@ -60,7 +61,7 @@ public static partial class Data
 				Console.WriteLine("Something went wrong");
 			}
 
-			//p.Category = db.QueryFirstOrDefault<ProductCategory>("SELECT * FROM Category WHERE Id = @Id", new { Id = p.CategoryId }); ;
+			//p.Category = db.QueryFirstOrDefault<ProductCategory>("SELECT * FROM Category WHERE Id = @Id", new { Id = p.CategoryId });
 			return p;
 		}
 
