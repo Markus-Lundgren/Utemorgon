@@ -70,7 +70,7 @@ public static partial class Data
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns>Product object</returns>
-		public static Product CreateProductFromId(int id)
+		public static Product GetProductFromId(int id)
 		{
 			using var db = GetConnectionObject();
 
