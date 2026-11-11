@@ -41,17 +41,12 @@ public static partial class Data
 			 LIMIT 1;
 			 """, new { customerId });
 		}
-		/*
-		 public int Id { get; set; }
-			public int CustomerId { get; set; }
-			public DateTime CreationDate { get; set; }
-		*/
-		// public OrderPriceModifier[] CreateOrderObject()
-		// {
-		// 	using var db = GetConnectionObject();
 
-		// 	return [.. db.Query<OrderPriceModifier>("SELECT")];
-		// }
+		public static COrder[] GetFromDate(DateOnly creationdate)
+		{
+			using var db = GetConnectionObject();
+			return [.. db.Query<COrder>("Select * from COrder where CAST(CreationDate AS DATE) = @CreationDate ", new { CreationDate = creationdate })];
+		}
 
 	}
 }

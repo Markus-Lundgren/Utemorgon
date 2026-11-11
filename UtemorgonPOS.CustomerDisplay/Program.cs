@@ -8,7 +8,11 @@ class Program
 	{
 		var customers = Data.Customers.GetAll();
 
-		foreach (var c in customers)
-			Console.WriteLine($"{c.SSNFormated}: {c.FullName}");
+		var ord = Data.COrders.GetFromDate(DateOnly.FromDateTime(DateTime.Now));
+
+		foreach (var o in ord)
+		{
+			Console.WriteLine(o.CreationDate);
+		}
 	}
 }
