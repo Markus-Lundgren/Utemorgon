@@ -7,6 +7,10 @@ public static partial class Data
 {
 	public static class Products
 	{
+		/// <summary>
+		/// Get an array of all Product items from database
+		/// </summary>
+		/// <returns>Product[]</returns>
 		public static Product[] GetProducts()
 		{
 			using var db = GetConnectionObject();
@@ -22,6 +26,10 @@ public static partial class Data
 
 			return products.ToArray();
 		}
+		/// <summary>
+		/// Add product to database using an object of Product
+		/// </summary>
+		/// <param name="product"></param>
 		public static void AddProduct(Product product)
 		{
 			using var db = GetConnectionObject();
@@ -46,6 +54,10 @@ public static partial class Data
 			return stock;
 		}
 
+		/// <summary>
+		/// Soft delete a product from the database
+		/// </summary>
+		/// <param name="id"></param>
 		public static void DeleteProduct(int id)
 		{
 			using var db = GetConnectionObject();
@@ -53,6 +65,11 @@ public static partial class Data
 			db.Execute(query, new { Id = id });
 		}
 
+		/// <summary>
+		/// Get product from database using Id
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns>Product object</returns>
 		public static Product CreateProductFromId(int id)
 		{
 			using var db = GetConnectionObject();
@@ -69,6 +86,11 @@ public static partial class Data
 			return p;
 		}
 
+		/// <summary>
+		/// Product transaction, either rent or buy. Will subtract from stock.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="amount"></param>
 		public static void ProductTransaction(int id, int amount)
 		{
 			using var db = GetConnectionObject();
@@ -99,6 +121,11 @@ public static partial class Data
 			p.Stock -= amount;
 		}
 
+		/// <summary>
+		/// Update price on a product using Id
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="amount"></param>
 		public static void ChangePrice(int id, decimal amount)
 		{
 			using var db = GetConnectionObject();
@@ -109,6 +136,11 @@ public static partial class Data
 			}
 			db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
 		}
+		/// <summary>
+		/// Update name of a product using id
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="name"></param>
 		public static void ChangeName(int id, string name)
 		{
 			using var db = GetConnectionObject();
@@ -119,13 +151,23 @@ public static partial class Data
 			}
 			db.Execute("UPDATE Product SET Name = @Name WHERE Id = @Id", new { Name = name, Id = id });
 		}
-		public static void ChangeType(int id, ProductType type)
+		/// <summary>
+		/// Change product type of a product using id
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="type"></param>
+		public static void ChangeProductType(int id, ProductType type)
 		{
 			using var db = GetConnectionObject();
 
 			db.Execute("UPDATE Product SET ProductTypeId = @TypeId WHERE Id = @Id", new { TypeId = (int)type, Id = id });
 		}
 
+		/// <summary>
+		/// Update price for a product category using the id of the category
+		/// </summary>
+		/// <param name="categoryId"></param>
+		/// <param name="amount"></param>
 		public static void UpdateProductCategoryPrice(int categoryId, int amount)
 		{
 			using var db = GetConnectionObject();
