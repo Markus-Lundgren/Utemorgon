@@ -98,6 +98,10 @@ public static partial class Data
 		public static void ChangePrice(int id, decimal amount)
 		{
 			using var db = GetConnectionObject();
+			if (amount < 1)
+			{
+				Console.WriteLine($"Du kan inte sätta {amount} som pris");
+			}
 			db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
 		}
 
@@ -106,15 +110,15 @@ public static partial class Data
 		-   - Must specify product type etc
 		- Create barcode (R-Code using sequence ID. Intermediate / Hard!)
 		- Get product from barcode
-		- Check stock
+		- Check stock - FINISHED
 		- Update ProductCategory price
 		- Add barcode to product
 		- UPDATE PRODUCT
 		-   - Name
-		-   - PriceOverride
+		-   - Price - FINISHED
 		-   - Category (type)
 		-   - Stock
-		- Remove (soft-delete)
+		- Remove (soft-delete) - FINISHED
 		- Remove barcode from product
 		*/
 	}
