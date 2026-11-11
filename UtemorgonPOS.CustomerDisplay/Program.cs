@@ -17,6 +17,7 @@ class Program
 			Console.WriteLine("3. Uppdatera pris för kategori");
 			Console.WriteLine("4. Visa produkter med barcodes");
 			Console.WriteLine("5. Hämnta produkt från barcode");
+			Console.WriteLine("6. Lägg till en barcode till en produkt");
 
 			int choice = int.Parse(Console.ReadLine());
 
@@ -82,6 +83,15 @@ class Program
 					Console.WriteLine(new string('-', 125));
 					Console.WriteLine($"{pr.Id,-5} | {pr.Name,-55} | {pr.Price,-10:C} | {pr.Stock,-10} | {pr.IsArchived,-10} | {pr.TypeInfo,-15}");
 					Console.WriteLine(new string('-', 125));
+					break;
+				case 6:
+					Console.Write("Välj id: ");
+					Product pro = Data.Products.GetProductFromId(int.Parse(Console.ReadLine()));
+
+					Console.Write("Skriv in barcode: ");
+					string barCode = Console.ReadLine();
+
+					Data.Barcodes.AddBarcodeToProduct(pro, barCode);
 					break;
 			}
 
