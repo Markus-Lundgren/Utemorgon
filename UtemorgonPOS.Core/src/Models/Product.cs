@@ -3,7 +3,7 @@ namespace UtemorgonPOS.Core;
 public class Product
 {
 	public int Id { get; set; }
-	public ProductType TypeInfo { get; private set; }
+	public ProductType TypeInfo { get; set; }
 	public int ProductTypeId { get; set; }
 	public string Name { get; set; }
 	public decimal Price { get; set; }
@@ -31,9 +31,9 @@ public class Product
 		};
 	}
 
-	public ProductType GetProductType()
+	public static ProductType GetProductType(int id)
 	{
-		ProductType type = ProductTypeId switch
+		ProductType type = id switch
 		{
 			2 => ProductType.Rental_Old_VHS,
 			3 => ProductType.Rental_New_VHS,
