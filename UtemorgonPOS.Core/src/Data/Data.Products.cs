@@ -126,13 +126,21 @@ public static partial class Data
 			db.Execute("UPDATE Product SET ProductTypeId = @TypeId WHERE Id = @Id", new { TypeId = (int)type, Id = id });
 		}
 
+		public static void UpdateProductCategoryPrice(int categoryId, int amount)
+		{
+			using var db = GetConnectionObject();
+
+			db.Execute("UPDATE Product SET Price = @Amount WHERE ProductTypeId = @CategoryId",
+						new { categoryId = categoryId, Amount = amount });
+		}
+
 		/*
-		- Add product
+		- Add product - FINISHED
 		-   - Must specify product type etc
 		- Create barcode (R-Code using sequence ID. Intermediate / Hard!)
 		- Get product from barcode
 		- Check stock - FINISHED
-		- Update ProductCategory price
+		- Update ProductCategory price - FINISHED
 		- Add barcode to product
 		- Rent or buy product - FINISHED
 		- UPDATE PRODUCT
