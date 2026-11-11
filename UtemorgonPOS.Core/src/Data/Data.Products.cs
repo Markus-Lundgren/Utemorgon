@@ -21,8 +21,8 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 			string query = """
-			INSERT INTO Product(Name, PriceOverride, Stock, IsRemoved) 
-				VALUES(@Name, @PriceOverride, @Stock, False);
+			INSERT INTO Product(ProductTypeId, Name, Price, Stock, IsRemoved) 
+				VALUES(@ProductTypeId, @Name, @Price, @Stock, False);
 			""";
 			db.Execute(query, new
 			{
