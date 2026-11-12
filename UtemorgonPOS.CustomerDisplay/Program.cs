@@ -18,6 +18,7 @@ class Program
 			Console.WriteLine("4. Visa produkter med barcodes");
 			Console.WriteLine("5. Hämnta produkt från barcode");
 			Console.WriteLine("6. Lägg till en barcode till en produkt");
+			Console.WriteLine("7. Return rented product");
 
 			int choice = int.Parse(Console.ReadLine());
 
@@ -70,6 +71,11 @@ class Program
 					foreach (var b in barcodes)
 					{
 						Console.WriteLine($"{b.Product.Id,-5} | {b.Product.Name,-55} | {b.BarCode,-25}");
+						if (Data.Barcodes.GetRentedStatus(b))
+						{
+							Console.WriteLine("Rented ^^^^^");
+							//7312345000051
+						}
 					}
 					break;
 
@@ -77,7 +83,7 @@ class Program
 					Console.Write("Välj barcode att söka produkt efter: ");
 					string code = Console.ReadLine();
 
-					Product pr = Data.Barcodes.GetProductFromBarcode(code);
+					Product pr = Data.Barcodes.GetBarcodeFromString(code).Product;
 
 					Console.WriteLine($"{"Id",-5} | {"Name",-55} | {"Price",-10:C} | {"Lager",-10} | {"Borttagen",-10} | {"Type",-15}");
 					Console.WriteLine(new string('-', 125));
@@ -109,6 +115,20 @@ class Program
 					}
 
 					Data.Barcodes.AddBarcodeToProduct(pro, barCode);
+					break;
+				case 7:
+					Console.Write("Välj barcode att returnera: ");
+					string bcode = Console.ReadLine();
+					Barcode ba = Data.Barcodes.GetBarcodeFromString(bcode);
+
+					if (Data.Barcodes.TryReturnSingleProduct(ba))
+					{
+						Console.WriteLine("Success");
+					}
+					else
+					{
+						Console.WriteLine("Fail");
+					}
 					break;
 			}
 
