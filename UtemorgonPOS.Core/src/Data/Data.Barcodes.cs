@@ -65,8 +65,7 @@ public static partial class Data
 			//var exist = db.QueryFirstOrDefault<Barcode>("SELECT * FROM BarcodeToProduct WHERE Barcode = @Code", new { Code = code });
 			if (CheckExists(code))
 			{
-				var existProduct = db.QueryFirstOrDefault<Product>("SELECT Name FROM Product WHERE Id = @Id", new { Id = exist.ProductId });
-				Console.WriteLine($"Koden är redan registrerad till: {existProduct.Name}");
+				Console.WriteLine($"Koden är redan registrerad");
 				return;
 			}
 
@@ -106,7 +105,7 @@ public static partial class Data
 		/// Checks if a barcode is connected to a currently rented product
 		/// </summary>
 		/// <param name="barcode"></param>
-		/// <returns></returns>
+		/// <returns>True if rented, False if not</returns>
 		public static bool GetRentedStatus(Barcode barcode)
 		{
 			using var db = GetConnectionObject();
@@ -134,11 +133,15 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 
+			if (!CheckExists(barcode.BarCode)) return false;
+			if (!GetRentedStatus(barcode)) return false;
+
 			barcode.Product.Stock += 1;
 
 			string query = "UPDATE Product SET Stock = @NewStock WHERE Id = @Id";
 
 			db.Execute(query, new { NewStock = barcode.Product.Stock, Id = barcode.ProductId });
+			return true;
 		}
 	}
 	/*
