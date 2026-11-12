@@ -70,7 +70,7 @@ public static partial class Data
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns>Product object</returns>
-		public static Product GetProductFromId(int id)
+		public static Product? GetProductFromId(int id)
 		{
 			using var db = GetConnectionObject();
 
@@ -78,11 +78,11 @@ public static partial class Data
 
 			var p = db.QueryFirstOrDefault<Product>(query, new { Id = id });
 
-			if (p == null)
-			{
-				Console.WriteLine("Something went wrong");
-			}
-			p.SetProductType();
+			// if (p == null)
+			// {
+			// 	Console.WriteLine("Something went wrong");
+			// }
+			// Use outside method instead...p.SetProductType();
 			return p;
 		}
 
