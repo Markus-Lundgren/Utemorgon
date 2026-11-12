@@ -111,10 +111,10 @@ public static partial class Data
 			using var db = GetConnectionObject();
 
 			string query = """
-				SELECT COUNT(*) FROM OrderRow or
+				SELECT COUNT(*) FROM OrderRow orderRow
 				JOIN BarcodeToProduct b ON or.Barcode = b.Barcode
-				JOIN RentalRow r ON r.OrderRowId = or.Id
-				WHERE or.Barcode = @Code AND r.ReturnedDate IS NULL
+				JOIN RentalRow r ON r.OrderRowId = orderRow.Id
+				WHERE orderRow.Barcode = @Code AND r.ReturnedDate IS NULL
 			""";
 
 			var rented = db.ExecuteScalar<int>(query, new { Code = barcode.BarCode });
