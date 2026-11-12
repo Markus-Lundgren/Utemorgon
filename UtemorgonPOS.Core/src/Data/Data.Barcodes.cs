@@ -6,30 +6,7 @@ public static partial class Data
 {
 	public static class Barcodes
 	{
-		// /// <summary>
-		// /// Return a product from 
-		// /// </summary>
-		// /// <param name="barcode"></param>
-		// /// <returns></returns>
-		// public static Product? GetProductFromBarcode(string barcode)
-		// {
-		// 	using var db = GetConnectionObject();
-		// 	string query = """
-		// 	SELECT * 
-		// 	FROM Product p 
-		// 	JOIN BarcodeToProduct b ON b.ProductId = p.Id
-		// 	WHERE Barcode = @Barcode
-		// 	""";
-
-		// 	Product? p = db.QueryFirstOrDefault<Product>(query, new { Barcode = barcode });
-
-		// 	return p;
-		// }
-
-		/// <summary>
-		/// Return a Barcode object using a string as search parameter
-		/// </summary>
-		/// <param name="barcode"></param>
+		/// <summary>Return a Barcode object using a string as search parameter</summary>
 		/// <returns>Barcode object</returns>
 		public static Barcode? GetBarcodeFromString(string barcode)
 		{
@@ -57,10 +34,8 @@ public static partial class Data
 			return b;
 		}
 
-		/// <summary>
-		/// Fetches all barcodes and their products
-		/// </summary>
-		/// <returns></returns>
+		/// <summary>Fetches all barcodes and their products</summary>
+		/// <returns>Array of Barcode objects</returns>
 		public static Barcode[] GetAllProductsWithBarcode()
 		{
 			using var db = GetConnectionObject();
@@ -85,11 +60,7 @@ public static partial class Data
 		}
 
 		//ProductID kanske ska tillåta att vara null
-		/// <summary>
-		/// Add a barcode to a product
-		/// </summary>
-		/// <param name="product"></param>
-		/// <param name="code"></param>
+		/// <summary>Add a barcode to a product</summary>
 		public static void AddBarcodeToProduct(Product product, string code)
 		{
 			using var db = GetConnectionObject();
@@ -115,10 +86,7 @@ public static partial class Data
 			db.Execute(query, new { ProductId = product.Id, BarCode = code });
 		}
 
-		/// <summary>
-		/// Checks if barcode exists
-		/// </summary>
-		/// <param name="code"></param>
+		/// <summary>Checks if barcode exists</summary>
 		/// <returns>True if it exists, False if not</returns>
 		public static bool CheckExists(string code)
 		{
@@ -126,10 +94,7 @@ public static partial class Data
 			return db.ExecuteScalar<int>("SELECT COUNT(*) FROM BarcodeToProduct WHERE Barcode = @Code", new { Code = code }) > 0;
 		}
 
-		/// <summary>
-		/// Checks if a barcode is connected to a currently rented product
-		/// </summary>
-		/// <param name="barcode"></param>
+		/// <summary>Checks if a barcode is connected to a currently rented product </summary>
 		/// <returns>True if rented, False if not</returns>
 		public static bool GetRentedStatus(Barcode barcode)
 		{
@@ -147,11 +112,8 @@ public static partial class Data
 			return rented > 0;
 		}
 
-		///<summary>
-		/// Returns a single product
-		/// Adds one to stock
-		/// NOTE: NEEDS to know if product is rented
-		/// Currently only adds one to stock
+		///<summary>Returns a single product<br/>
+		///Adds one to stock and sets returned date to now
 		///</summary>
 		/// <returns>True on success, else False</returns>
 		public static bool TryReturnSingleProduct(Barcode barcode)
