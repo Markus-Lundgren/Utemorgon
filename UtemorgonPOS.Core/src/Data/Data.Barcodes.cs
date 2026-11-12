@@ -81,6 +81,27 @@ public static partial class Data
 			db.Execute(query, new { ProductId = product.Id, BarCode = code });
 		}
 
+		/// <summary>
+		/// Checks if a barcode is connected to a currently rented product
+		/// </summary>
+		/// <param name="barcode"></param>
+		/// <returns></returns>
+		public static bool GetRentedStatus(Barcode barcode)
+		{
+			using var db = GetConnectionObject();
+
+			string query = """
+				SELECT COUNT(*) FROM OrderRow or
+				JOIN BarcodeToProduct b ON or.Barcode = b.Barcode
+				JOIN RentalRow r ON r.OrderRowId = or.Id
+				WHERE or.Barcode = @Code AND r.ReturnedDate IS NULL
+			""";
+
+			var rented = db.ExecuteScalar<int>(query, new { Code = barcode.BarCode });
+
+			return rented > 0;
+		}
+
 		///<summary>
 		/// Returns a single product
 		/// Adds one to stock
