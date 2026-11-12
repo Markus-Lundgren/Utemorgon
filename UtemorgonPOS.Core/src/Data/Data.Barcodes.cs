@@ -80,6 +80,23 @@ public static partial class Data
 			""";
 			db.Execute(query, new { ProductId = product.Id, BarCode = code });
 		}
+
+		///<summary>
+		/// Returns a single product
+		/// Adds one to stock
+		/// NOTE: NEEDS to know if product is rented
+		/// Currently only adds one to stock
+		///</summary>
+		public static void ReturnSingleProduct(Barcode barcode)
+		{
+			using var db = GetConnectionObject();
+
+			barcode.Product.Stock += 1;
+
+			string query = "UPDATE Product SET Stock = @NewStock WHERE Id = @Id";
+
+			db.Execute(query, new { NewStock = barcode.Product.Stock, Id = barcode.ProductId });
+		}
 	}
 	/*
 	 - Create barcode (R-Code using sequence ID. Intermediate / Hard!)
