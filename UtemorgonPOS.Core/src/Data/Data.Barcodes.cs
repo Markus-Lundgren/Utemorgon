@@ -135,6 +135,14 @@ public static partial class Data
 			string query = "UPDATE Product SET Stock = @NewStock WHERE Id = @Id";
 
 			db.Execute(query, new { NewStock = barcode.Product.Stock, Id = barcode.ProductId });
+
+			query = """
+			UPDATE RentalRow r
+			JOIN OrderRow o ON r.OrderRowId = o.Id
+			SET r.ReturnedDate = NOW()
+			WHERE o.Barcode = @Code AND r.ReturnedDate IS NULL
+			""";
+			db.Execute(query, new { Code = barcode.BarCode });
 			return true;
 		}
 	}
