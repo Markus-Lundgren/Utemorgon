@@ -6,6 +6,26 @@ public static partial class Data
 {
 	public static class Barcodes
 	{
+		// /// <summary>
+		// /// Return a product from 
+		// /// </summary>
+		// /// <param name="barcode"></param>
+		// /// <returns></returns>
+		// public static Product? GetProductFromBarcode(string barcode)
+		// {
+		// 	using var db = GetConnectionObject();
+		// 	string query = """
+		// 	SELECT * 
+		// 	FROM Product p 
+		// 	JOIN BarcodeToProduct b ON b.ProductId = p.Id
+		// 	WHERE Barcode = @Barcode
+		// 	""";
+
+		// 	Product? p = db.QueryFirstOrDefault<Product>(query, new { Barcode = barcode });
+
+		// 	return p;
+		// }
+
 		/// <summary>
 		/// Return a product from the barcode
 		/// </summary>
