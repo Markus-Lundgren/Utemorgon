@@ -129,7 +129,8 @@ public static partial class Data
 		/// NOTE: NEEDS to know if product is rented
 		/// Currently only adds one to stock
 		///</summary>
-		public static void ReturnSingleProduct(Barcode barcode)
+		/// <returns>True on success, else False</returns>
+		public static bool TryReturnSingleProduct(Barcode barcode)
 		{
 			using var db = GetConnectionObject();
 
