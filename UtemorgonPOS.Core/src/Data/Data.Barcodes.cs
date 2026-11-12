@@ -106,7 +106,7 @@ public static partial class Data
 
 			string query = """
 				SELECT COUNT(*) FROM OrderRow orderRow
-				JOIN BarcodeToProduct b ON or.Barcode = b.Barcode
+				JOIN BarcodeToProduct b ON orderRow.Barcode = b.Barcode
 				JOIN RentalRow r ON r.OrderRowId = orderRow.Id
 				WHERE orderRow.Barcode = @Code AND r.ReturnedDate IS NULL
 			""";
