@@ -169,6 +169,23 @@ public static partial class Data
 			return 0;
 		}
 
+		///<summary>
+		/// Returns a single product
+		/// Adds one to stock
+		/// NOTE: NEEDS to know if product is rented
+		/// Currently only adds one to stock
+		///</summary>
+		public static void ReturnSingleProduct(Product product)
+		{
+			using var db = GetConnectionObject();
+
+			product.Stock += 1;
+
+			string query = "UPDATE Product SET Stock = @NewStock WHERE Id = @Id";
+
+			db.Execute(query, new { NewStock = product.Stock, Id = product.Id });
+		}
+
 		/// <summary>
 		/// Update price on a product using Id
 		/// </summary>
@@ -236,8 +253,8 @@ public static partial class Data
 		- UPDATE PRODUCT
 		-   - Name - FINISHED
 		-   - Price - FINISHED
-		-   - Category (type)
-		-   - Stock
+		-   - Category (type) - FINISHED
+		-   - Stock - FINISHED
 		- Remove (soft-delete) - FINISHED
 		- Remove barcode from product
 		*/
