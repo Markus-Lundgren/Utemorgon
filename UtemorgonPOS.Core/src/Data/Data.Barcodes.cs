@@ -92,13 +92,7 @@ public static partial class Data
 		public static bool CheckExists(string code)
 		{
 			using var db = GetConnectionObject();
-
-			var exist = db.QueryFirstOrDefault<Barcode>("SELECT * FROM BarcodeToProduct WHERE Barcode = @Code", new { Code = code });
-			if (exist != null)
-			{
-				return true;
-			}
-			return false;
+			return db.ExecuteScalar<int>("SELECT COUNT(*) FROM BarcodeToProduct WHERE Barcode = @Code", new { Code = code }) > 0;
 		}
 
 		/// <summary>
