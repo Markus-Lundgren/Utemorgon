@@ -9,5 +9,6 @@ public class COrder
     public DateTime CreationDate { get; set; }
 
     public OrderPriceModifier[] PriceModifiers;
+    public OrderRow OrderRow;
 
 }
