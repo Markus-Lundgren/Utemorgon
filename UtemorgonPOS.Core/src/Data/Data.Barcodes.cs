@@ -62,8 +62,8 @@ public static partial class Data
 		public static void AddBarcodeToProduct(Product product, string code)
 		{
 			using var db = GetConnectionObject();
-			var exist = db.QueryFirstOrDefault<Barcode>("SELECT * FROM BarcodeToProduct WHERE Barcode = @Code", new { Code = code });
-			if (exist != null)
+			//var exist = db.QueryFirstOrDefault<Barcode>("SELECT * FROM BarcodeToProduct WHERE Barcode = @Code", new { Code = code });
+			if (CheckExists(code))
 			{
 				var existProduct = db.QueryFirstOrDefault<Product>("SELECT Name FROM Product WHERE Id = @Id", new { Id = exist.ProductId });
 				Console.WriteLine($"Koden är redan registrerad till: {existProduct.Name}");
@@ -83,6 +83,23 @@ public static partial class Data
 			INSERT INTO BarcodeToProduct(ProductId, Barcode, IsArchived) VALUES(@ProductId, @BarCode, False);
 			""";
 			db.Execute(query, new { ProductId = product.Id, BarCode = code });
+		}
+
+		/// <summary>
+		/// Checks if barcode exists
+		/// </summary>
+		/// <param name="code"></param>
+		/// <returns>True if it exists, False if not</returns>
+		public static bool CheckExists(string code)
+		{
+			using var db = GetConnectionObject();
+
+			var exist = db.QueryFirstOrDefault<Barcode>("SELECT * FROM BarcodeToProduct WHERE Barcode = @Code", new { Code = code });
+			if (exist != null)
+			{
+				return true;
+			}
+			return false;
 		}
 
 		/// <summary>
