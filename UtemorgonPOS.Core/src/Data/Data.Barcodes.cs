@@ -26,6 +26,10 @@ public static partial class Data
 			return p;
 		}
 
+		/// <summary>
+		/// Fetches all barcodes and their products
+		/// </summary>
+		/// <returns></returns>
 		public static Barcode[] GetAllProductsWithBarcode()
 		{
 			using var db = GetConnectionObject();
