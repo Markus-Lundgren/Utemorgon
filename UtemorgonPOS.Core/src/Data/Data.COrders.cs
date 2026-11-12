@@ -47,6 +47,45 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			return [.. db.Query<COrder>("Select * from COrder where CAST(CreationDate AS DATE) = @CreationDate ", new { CreationDate = creationdate })];
 		}
+		public static COrder GetLate()
+		{
+			using var db = GetConnectionObject();
+			string Query =
+			"""
+				SELECT CO.*,RR.*, O.*
+				FROM COrder CO
+				JOIN OrderRow O on CO.Id = O.COrderId
+				JOIN RentalRow RR on O.Id = RR.OrderRowId
+				where RR.ReturnedDate > RR.ExpectedReturnDate
+				order by CO.Id;
+			""";
+			var lateReturns = db.Query<COrder, OrderRow, COrder>(Query, (COrder, OrderRow) =>
+			{
+				COrder.OrderRow = OrderRow;
+				return COrder;
+			}, splitOn: "Id").AsList().ToArray();
+
+		}
 
 	}
 }
+/*
+using var db = GetConnectionObject();
+            string query = """
+                        SELECT b.*, p.* 
+                        FROM Product p 
+                        JOIN BarcodeToProduct b ON b.ProductId = p.Id
+                        ORDER BY p.Id
+                        """;
+
+            var barcodes = db.Query<Barcode, Product, Barcode>(
+                query,
+                (barcode, product) =>
+                {
+                    barcode.Product = product;
+                    return barcode;
+                },
+                splitOn: "Id"
+            ).AsList().ToArray();
+
+*/
