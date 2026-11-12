@@ -45,6 +45,27 @@ public static partial class Data
 
 			return products.ToArray();
 		}
+
+		/// <summary>
+		/// Get an array of all Product items from database
+		/// Filters by archived status
+		/// </summary>
+		/// <returns>Product[]</returns>
+		public static Product[] GetProducts(bool isArchived)
+		{
+			using var db = GetConnectionObject();
+
+			string query = "SELECT * FROM Product p WHERE IsArchived = @IsArchived";
+
+			var products = db.Query<Product>(query, new { IsArchived = isArchived }).AsList();
+
+			foreach (var p in products)
+			{
+				p.SetProductType();
+			}
+
+			return products.ToArray();
+		}
 		/// <summary>
 		/// Add product to database using an object of Product
 		/// </summary>
