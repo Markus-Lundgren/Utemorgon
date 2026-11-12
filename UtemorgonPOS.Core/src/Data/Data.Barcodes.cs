@@ -84,7 +84,7 @@ public static partial class Data
 	/*
 	 - Create barcode (R-Code using sequence ID. Intermediate / Hard!)
 	 - Get product from barcode - FINITO
-	 - Add barcode to product
+	 - Add barcode to product - FINISHED
 	 - Remove barcode from product
 	 */
 }
