@@ -63,13 +63,13 @@ class Program
 					Data.Products.UpdateProductCategoryPrice(id, amount);
 					break;
 				case 4:
-					Console.WriteLine($"{"Name",-55} | {"Barcode",-25}");
+					Console.WriteLine($"{"Id",-5} | {"Name",-55} | {"Barcode",-25}");
 					Console.WriteLine(new string('-', 90));
 					var barcodes = Data.Barcodes.GetAllProductsWithBarcode();
 
 					foreach (var b in barcodes)
 					{
-						Console.WriteLine($"{b.Product.Name,-55} | {b.BarCode,-25}");
+						Console.WriteLine($"{b.Product.Id,-5} | {b.Product.Name,-55} | {b.BarCode,-25}");
 					}
 					break;
 
@@ -86,10 +86,27 @@ class Program
 					break;
 				case 6:
 					Console.Write("Välj id: ");
+					//Timmy får fixa input validation...
 					Product pro = Data.Products.GetProductFromId(int.Parse(Console.ReadLine()));
 
-					Console.Write("Skriv in barcode: ");
-					string barCode = Console.ReadLine();
+					if (pro == null)
+					{
+						Console.WriteLine("Hittade ingen produkt med detta Id");
+						continue;
+					}
+
+					Console.Write("Skriv in barcode(13 karaktärer): ");
+					string barCode = Console.ReadLine()!;
+					if (string.IsNullOrWhiteSpace(barCode))
+					{
+						Console.WriteLine("Du måste skriva något!");
+						continue;
+					}
+					if (barCode.Length != 13)
+					{
+						Console.WriteLine("Barcode måste innehålle exakt 13 karaktärer!");
+						continue;
+					}
 
 					Data.Barcodes.AddBarcodeToProduct(pro, barCode);
 					break;

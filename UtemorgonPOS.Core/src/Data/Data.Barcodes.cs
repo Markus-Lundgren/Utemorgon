@@ -33,6 +33,7 @@ public static partial class Data
 						SELECT b.*, p.* 
 						FROM Product p 
 						JOIN BarcodeToProduct b ON b.ProductId = p.Id
+						ORDER BY p.Id
 						""";
 
 			var barcodes = db.Query<Barcode, Product, Barcode>(
