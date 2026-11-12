@@ -11,7 +11,7 @@ public static partial class Data
 		/// </summary>
 		/// <param name="barcode"></param>
 		/// <returns></returns>
-		public static Product GetProductFromBarcode(string barcode)
+		public static Product? GetProductFromBarcode(string barcode)
 		{
 			using var db = GetConnectionObject();
 			string query = """
@@ -21,13 +21,7 @@ public static partial class Data
 			WHERE Barcode = @Barcode
 			""";
 
-			Product p = db.QueryFirstOrDefault<Product>(query, new { Barcode = barcode });
-
-			if (p == null)
-			{
-				Console.WriteLine("Hittade ingen produkt");
-				p = new();
-			}
+			Product? p = db.QueryFirstOrDefault<Product>(query, new { Barcode = barcode });
 
 			return p;
 		}
