@@ -91,34 +91,42 @@ public static partial class Data
 		/// </summary>
 		/// <param name="id"></param>
 		/// <param name="amount"></param>
-		public static void ProductTransaction(int id, int amount)
+		/// <returns>Numerical code
+		/// 0: Success -
+		/// 1: Product does not exist -
+		/// 2: Amount too low -
+		/// 3: Product out of stock -
+		/// 4: Product stock is lower than amount
+		/// </returns>
+		public static int ProductTransaction(int id, int amount)
 		{
 			using var db = GetConnectionObject();
 			var p = db.QueryFirstOrDefault<Product>("SELECT * FROM Product WHERE Id = @Id", new { Id = id });
 
 			if (p == null)
 			{
-				Console.WriteLine("Denna produkt finns inte");
-				return;
+				//Console.WriteLine("Denna produkt finns inte");
+				return 1;
 			}
 			if (amount < 1)
 			{
-				Console.WriteLine("Du måste välja minst en");
-				return;
+				//Console.WriteLine("Du måste välja minst en");
+				return 2;
 			}
 			if (p.Stock < 1 || p.Stock == null)
 			{
-				Console.WriteLine($"{p.Name} är tyvärr slut i lagret!");
-				return;
+				//Console.WriteLine($"{p.Name} är tyvärr slut i lagret!");
+				return 3;
 			}
 			if (p.Stock < amount)
 			{
-				Console.WriteLine("Det finns inte så många av denna produkt i lagret");
-				return;
+				//Console.WriteLine("Det finns inte så många av denna produkt i lagret");
+				return 4;
 			}
 
 			db.Execute("UPDATE Product SET Stock = @Stock WHERE Id = @Id", new { Stock = p.Stock - amount, Id = id });
 			p.Stock -= amount;
+			return 0;
 		}
 
 		/// <summary>
