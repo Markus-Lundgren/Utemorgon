@@ -27,6 +27,25 @@ public static partial class Data
 			return products.ToArray();
 		}
 		/// <summary>
+		/// Get an array of all Product items from database with the given name
+		/// </summary>
+		/// <returns>Product[]</returns>
+		public static Product[] GetProducts(string name)
+		{
+			using var db = GetConnectionObject();
+
+			string query = "SELECT * FROM Product p WHERE Name = @Name";
+
+			var products = db.Query<Product>(query, new { Name = name }).AsList();
+
+			foreach (var p in products)
+			{
+				p.SetProductType();
+			}
+
+			return products.ToArray();
+		}
+		/// <summary>
 		/// Add product to database using an object of Product
 		/// </summary>
 		/// <param name="product"></param>
