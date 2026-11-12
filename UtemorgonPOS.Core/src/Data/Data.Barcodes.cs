@@ -27,23 +27,34 @@ public static partial class Data
 		// }
 
 		/// <summary>
-		/// Return a product from the barcode
+		/// Return a Barcode object using a string as search parameter
 		/// </summary>
 		/// <param name="barcode"></param>
-		/// <returns></returns>
-		public static Product? GetProductFromBarcode(string barcode)
+		/// <returns>Barcode object</returns>
+		public static Barcode? GetBarcodeFromString(string barcode)
 		{
 			using var db = GetConnectionObject();
 			string query = """
 			SELECT * 
-			FROM Product p 
-			JOIN BarcodeToProduct b ON b.ProductId = p.Id
+			FROM BarcodeToProduct b
+			JOIN Product p ON b.ProductId = p.Id
 			WHERE Barcode = @Barcode
 			""";
 
-			Product? p = db.QueryFirstOrDefault<Product>(query, new { Barcode = barcode });
+			Barcode? b = null;
+			db.Query<Barcode, Product, Barcode>(
+				query,
+				(barcode, product) =>
+				{
+					barcode.Product = product;
+					b = barcode;
+					return b;
+				},
+				new { Barcode = barcode },
+				splitOn: "Id"
+			);
 
-			return p;
+			return b;
 		}
 
 		/// <summary>
