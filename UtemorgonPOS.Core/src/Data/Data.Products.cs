@@ -127,33 +127,27 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 			var p = db.QueryFirstOrDefault<Product>("SELECT * FROM Product WHERE Id = @Id", new { Id = id });
-			Response r;
 
 			if (p == null)
 			{
-				r = new(1, "Denna produkt finns inte");
-				return r;
+				return new(1, "Denna produkt finns inte"); ;
 			}
 			if (amount < 1)
 			{
-				r = new(2, "Du måste välja minst en");
-				return r;
+				return new(2, "Du måste välja minst en"); ;
 			}
 			if (p.Stock < 1 || p.Stock == null)
 			{
-				r = new(3, $"{p.Name} är tyvärr slut i lagret!");
-				return r;
+				return new(3, $"{p.Name} är tyvärr slut i lagret!"); ;
 			}
 			if (p.Stock < amount)
 			{
-				r = new(4, "Det finns inte så många av denna produkt i lagret");
-				return r;
+				return new(4, "Det finns inte så många av denna produkt i lagret");
 			}
 
 			db.Execute("UPDATE Product SET Stock = @Stock WHERE Id = @Id", new { Stock = p.Stock - amount, Id = id });
 			p.Stock -= amount;
-			r = new(0, "Success");
-			return r;
+			return new(0, "Success"); ;
 		}
 
 		/// <summary>Update price on a product using Id</summary>
