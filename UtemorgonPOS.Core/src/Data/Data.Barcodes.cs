@@ -59,16 +59,20 @@ public static partial class Data
 			return barcodes;
 		}
 
-		//ProductID kanske ska tillåta att vara null
-		/// <summary>Add a barcode to a product</summary>
-		public static void AddBarcodeToProduct(Product product, string code)
+		/// <summary>Add a barcode to a product<br/>
+		/// 0: Success<br/>
+		/// 1: Code is already registered<br/>
+		/// 2: All these products already have have a code<br/>
+		/// </summary>
+		/// <returns></returns>
+		public static Response AddBarcodeToProduct(Product product, string code)
 		{
 			using var db = GetConnectionObject();
-			//var exist = db.QueryFirstOrDefault<Barcode>("SELECT * FROM BarcodeToProduct WHERE Barcode = @Code", new { Code = code });
+			Response r;
 			if (CheckExists(code))
 			{
-				Console.WriteLine($"Koden är redan registrerad");
-				return;
+				r = new(1, "Koden är redan registrerad!");
+				return r;
 			}
 
 			int? stock = product.Stock ?? 0;
@@ -76,14 +80,16 @@ public static partial class Data
 
 			if (barcodeCount >= stock)
 			{
-				Console.WriteLine("Alla dessa produkter har redan en barcode");
-				return;
+				r = new(2, "Alla dessa produkter har redan en barcode");
+				return r;
 			}
 
 			string query = """
 			INSERT INTO BarcodeToProduct(ProductId, Barcode, IsArchived) VALUES(@ProductId, @BarCode, False);
 			""";
 			db.Execute(query, new { ProductId = product.Id, BarCode = code });
+			r = new(0, "Success");
+			return r;
 		}
 
 		/// <summary>Checks if barcode exists</summary>
