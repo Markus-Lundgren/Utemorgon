@@ -25,12 +25,12 @@ class Program
 			switch (choice)
 			{
 				case 1:
-					Console.WriteLine($"{"Id",-5} | {"Name",-55} | {"Price",-10:C} | {"Lager",-10} | {"Borttagen",-10} | {"Type",-15}");
+					Console.WriteLine($"{"Id",-3} | {"Name",-55} | {"Price",-15} | {"Lager",-10} | {"Borttagen",-10} | {"Type",-15}");
 					Console.WriteLine(new string('-', 125));
 					var products = Data.Products.GetProducts();
 					foreach (var p in products)
 					{
-						Console.WriteLine($"{p.Id,-5} | {p.Name,-55} | {p.Price,-10:C} | {p.Stock,-10} | {p.IsArchived,-10} | {p.TypeInfo,-15}");
+						Console.WriteLine($"{p.Id,-3} | {p.Name,-55} | {p.Price + " SEK",-15} | {p.Stock,-10} | {p.IsArchived,-10} | {p.TypeInfo,-15}");
 					}
 					break;
 				case 2:
