@@ -68,11 +68,9 @@ public static partial class Data
 		public static Response AddBarcodeToProduct(Product product, string code)
 		{
 			using var db = GetConnectionObject();
-			Response r;
 			if (CheckExists(code))
 			{
-				r = new(1, "Koden är redan registrerad!");
-				return r;
+				return new(1, "Koden är redan registrerad!"); ;
 			}
 
 			int? stock = product.Stock ?? 0;
@@ -80,16 +78,14 @@ public static partial class Data
 
 			if (barcodeCount >= stock)
 			{
-				r = new(2, "Alla dessa produkter har redan en barcode");
-				return r;
+				return new(2, "Alla dessa produkter har redan en barcode");
 			}
 
 			string query = """
 			INSERT INTO BarcodeToProduct(ProductId, Barcode, IsArchived) VALUES(@ProductId, @BarCode, False);
 			""";
 			db.Execute(query, new { ProductId = product.Id, BarCode = code });
-			r = new(0, "Success");
-			return r;
+			return new(0, "Success"); ;
 		}
 
 		/// <summary>Checks if barcode exists</summary>
