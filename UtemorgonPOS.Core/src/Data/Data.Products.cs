@@ -115,7 +115,7 @@ public static partial class Data
 			return p;
 		}
 
-		/// <summary>Product transaction, either rent or buy. Will subtract from stock.</summary>
+		/// <summary>Product transaction. Will subtract from stock.</summary>
 		/// <returns>Numerical code<br/>
 		/// 0: Success<br/>
 		/// 1: Product does not exist<br/>
@@ -158,22 +158,12 @@ public static partial class Data
 		public static void ChangePrice(int id, decimal amount)
 		{
 			using var db = GetConnectionObject();
-			if (amount < 1)
-			{
-				Console.WriteLine($"Du kan inte sätta {amount} som pris");
-				return;
-			}
 			db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
 		}
 		/// <summary>Update name of a product using id</summary>
 		public static void ChangeName(int id, string name)
 		{
 			using var db = GetConnectionObject();
-			if (string.IsNullOrWhiteSpace(name))
-			{
-				Console.WriteLine($"Name can't be empty");
-				return;
-			}
 			db.Execute("UPDATE Product SET Name = @Name WHERE Id = @Id", new { Name = name, Id = id });
 		}
 		/// <summary>Change product type of a product using id</summary>
