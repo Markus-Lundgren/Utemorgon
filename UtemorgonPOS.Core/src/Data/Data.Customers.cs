@@ -17,5 +17,15 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			return [.. db.Query<Customer>("SELECT * FROM Customer;")];
 		}
+
+		// fetch customer by id
+		public static Customer? GetCustomer(int id)
+		{
+			using var db = GetConnectionObject();
+			return db.QuerySingleOrDefault<Customer>(
+				"SELECT * FROM Customer WHERE Id = @Id;",
+				new { Id = id }
+			);
+		}
 	}
 }
