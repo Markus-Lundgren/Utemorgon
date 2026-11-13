@@ -27,5 +27,15 @@ public static partial class Data
 				new { Id = id }
 			);
 		}
+
+		// fetch customer with ssn
+		public static Customer? GetCustomerBySocialNumber(string ssn)
+		{
+			using var db = GetConnectionObject();
+			return db.QuerySingleOrDefault<Customer>(
+				"SELECT * FROM Customer WHERE SocialNumber = @SocialNumber",
+				new { SocialNumber = ssn }
+			);
+		}
 	}
 }
