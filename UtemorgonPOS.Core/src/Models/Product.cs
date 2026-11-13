@@ -8,7 +8,7 @@ public class Product
 	public string Name { get; set; }
 	public decimal Price { get; set; }
 	public int? Stock { get; set; }
-	public bool IsRemoved { get; set; }
+	public bool IsArchived { get; set; }
 
 	public void SetProductType()
 	{

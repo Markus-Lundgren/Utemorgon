@@ -1,3 +1,5 @@
+namespace UtemorgonPOS.Core;
+
 public enum ProductType
 {
 	None = 1,
