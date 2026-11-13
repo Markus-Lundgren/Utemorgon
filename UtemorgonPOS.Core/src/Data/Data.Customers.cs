@@ -66,7 +66,7 @@ public static partial class Data
 			return [.. db.Query<Customer>(sql, parameters)];
 		}
 
-		// Add customer
+		// add customer
 		public static void AddCustomer(Customer addCustomer)
 		{
 			using var db = GetConnectionObject();
@@ -78,6 +78,26 @@ public static partial class Data
 				""";
 
 			db.Execute(sql, addCustomer);
+		}
+
+		// update customer
+		public static void UpdateCustomer(Customer updateCustomer)
+		{
+			using var db = GetConnectionObject();
+
+			db.Execute(
+				"""
+					UPDATE Customer 
+					SET 
+					SocialNumber = @SocialNumber,
+					FName = @FName,
+					LName = @LName,
+					Address = @Address,
+					PhoneNumber = @PhoneNumber
+					WHERE Id = @Id;
+				""",
+				updateCustomer
+			);
 		}
 	}
 }
