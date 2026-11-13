@@ -65,5 +65,19 @@ public static partial class Data
 
 			return [.. db.Query<Customer>(sql, parameters)];
 		}
+
+		// Add customer
+		public static void AddCustomer(Customer addCustomer)
+		{
+			using var db = GetConnectionObject();
+
+			string sql =
+				"""
+					INSERT INTO Customer (SocialNumber, FName, LName, Address, PhoneNumber)
+					VALUES (@SocialNumber, @FName, @LName, @Address, @PhoneNumber)
+				""";
+
+			db.Execute(sql, addCustomer);
+		}
 	}
 }
