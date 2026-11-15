@@ -4,6 +4,7 @@
 	EG: Customer _ = Data.Customers.GetCustomer(12); // 12 = a customer id. 
 */
 
+using System;
 using System.Collections.Generic;
 using Dapper;
 
@@ -121,6 +122,53 @@ public static partial class Data
 			""";
 
 			return [.. db.Query<LateRental>(sql)];
+		}
+
+		// delete customer
+		public static void DeleteCustomer(int id)
+		{
+			// protect DELETED CUSTOMER
+			if (id == 1)
+				throw new ArgumentException("Cannot delete the DELETED CUSTOMER.");
+			;
+
+			using var db = GetConnectionObject();
+			db.Open();
+
+			using var transaction = db.BeginTransaction();
+
+			try
+			{
+				// Move customers order to DELETED CUSTOMER
+				db.Execute(
+					"""
+						UPDATE COrder
+						SET CustomerId = 1
+						WHERE CustomerID = @Id;
+					""",
+					new { Id = id },
+					transaction
+				);
+
+				// Delete customer
+				db.Execute(
+					"""
+						DELETE FROM Customer
+						WHERE Id = @Id;
+					""",
+					new { Id = id },
+					transaction
+				);
+
+				// Save both changes
+				transaction.Commit();
+			}
+			catch (System.Exception)
+			{
+				// Undo the changes if somtething goes wrong
+				transaction.Rollback();
+				throw;
+			}
 		}
 	}
 }
