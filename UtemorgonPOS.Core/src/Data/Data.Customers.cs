@@ -99,5 +99,28 @@ public static partial class Data
 				updateCustomer
 			);
 		}
+
+		// fetch customers with late rentals
+		public static LateRental[] GetCustomersWithLateRentals()
+		{
+			using var db = GetConnectionObject();
+
+			var sql =
+			"""
+				SELECT 
+					CONCAT(Customer.FName, ' ', Customer.LName) AS FullName,
+					Customer.PhoneNumber,
+					OrderRow.Name AS MovieName,
+					RentalRow.ExpectedReturnDate
+				FROM Customer
+				JOIN COrder ON Customer.Id = COrder.CustomerId
+				JOIN OrderRow ON COrder.Id = OrderRow.COrderId
+				JOIN RentalRow ON OrderRow.Id = RentalRow.OrderRowId
+				WHERE RentalRow.ExpectedReturnDate < NOW()
+					AND RentalRow.ReturnedDate IS NULL
+			""";
+
+			return [.. db.Query<LateRental>(sql)];
+		}
 	}
 }
