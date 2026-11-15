@@ -30,16 +30,6 @@ public static partial class Data
 			);
 		}
 
-		// fetch customer with ssn
-		public static Customer? GetCustomerBySocialNumber(string ssn)
-		{
-			using var db = GetConnectionObject();
-			return db.QuerySingleOrDefault<Customer>(
-				"SELECT * FROM Customer WHERE SocialNumber = @SocialNumber",
-				new { SocialNumber = ssn }
-			);
-		}
-
 		// fetch customer by multiple ids
 		public static Customer[] GetCustomersByMultipleIds(IEnumerable<int> ids)
 		{
@@ -65,6 +55,37 @@ public static partial class Data
 			var sql = $"SELECT * FROM Customer WHERE {string.Join(" OR ", conditions)}";
 
 			return [.. db.Query<Customer>(sql, parameters)];
+		}
+
+		// fetch customer with ssn
+		public static Customer? GetCustomerBySocialNumber(string ssn)
+		{
+			using var db = GetConnectionObject();
+			return db.QuerySingleOrDefault<Customer>(
+				"SELECT * FROM Customer WHERE SocialNumber = @SocialNumber",
+				new { SocialNumber = ssn }
+			);
+		}
+
+		// fetch customer by name
+		public static Customer[] GetCustomersByName(string name)
+		{
+			if (string.IsNullOrWhiteSpace(name)) return [];
+
+			using var db = GetConnectionObject();
+
+			var searchPattern = $"%{name.Trim()}%";
+
+			return [.. db.Query<Customer>(
+				"""
+					SELECT *
+					FROM Customer
+					WHERE FName LIKE @SearchTerm
+					OR LName LIKE @SearchTerm
+					OR CONCAT(FName, ' ', LName) LIKE @SearchTerm;
+				""",
+				new { SearchTerm = searchPattern }
+			)];
 		}
 
 		// add customer
