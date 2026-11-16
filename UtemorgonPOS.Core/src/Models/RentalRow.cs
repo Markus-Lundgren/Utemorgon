@@ -14,9 +14,9 @@ public class RentalRow
 	// Note: These values originate from OrderRow.
 
 	/// <summary>13 character barcode. May include letters and symbols.</summary>
-	public string Barcode { get; set; }
+	public required string Barcode { get; set; }
 	/// <summary>Name of product at point of sale.</summary>
-	public string Name { get; set; }
+	public required string Name { get; set; }
 	/// <summary>Price of product at point of sale.</summary>
 	public decimal Price { get; set; }
 
