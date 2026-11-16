@@ -19,7 +19,7 @@ public static partial class Data
 
 			foreach (var p in products)
 			{
-				p.SetProductType();
+				p.SetProductType(p.ProductTypeId);
 			}
 
 			return products.ToArray();
@@ -36,7 +36,7 @@ public static partial class Data
 
 			foreach (var p in products)
 			{
-				p.SetProductType();
+				p.SetProductType(p.ProductTypeId);
 			}
 
 			return products.ToArray();
@@ -57,7 +57,7 @@ public static partial class Data
 
 			foreach (var p in products)
 			{
-				p.SetProductType();
+				p.SetProductType(p.ProductTypeId);
 			}
 
 			return products.ToArray();
@@ -73,7 +73,7 @@ public static partial class Data
 			""";
 			db.Execute(query, new
 			{
-				ProductTypeId = (int)product.TypeInfo,
+				ProductTypeId = (int)product.ProductType,
 				Name = product.Name,
 				Price = product.Price,
 				Stock = product.Stock
