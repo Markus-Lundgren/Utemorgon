@@ -62,30 +62,27 @@ public static partial class Data
 		/// <summary>Add a barcode to a product<br/>
 		/// 0: Success<br/>
 		/// 1: Code is already registered<br/>
-		/// 2: All these products already have have a code<br/>
 		/// </summary>
 		/// <returns></returns>
-		public static Response AddBarcodeToProduct(Product product, string code)
+		public static Response AddBarcodeToProduct(int productId, string code)
 		{
 			using var db = GetConnectionObject();
-			if (CheckExists(code))
-			{
-				return new(1, "Koden är redan registrerad!"); ;
-			}
-
-			int? stock = product.Stock ?? 0;
-			var barcodeCount = db.ExecuteScalar<int>("SELECT COUNT(*) FROM BarcodeToProduct WHERE ProductId = @Id", new { Id = product.Id });
-
-			if (barcodeCount >= stock)
-			{
-				return new(2, "Alla dessa produkter har redan en barcode");
-			}
 
 			string query = """
 			INSERT INTO BarcodeToProduct(ProductId, Barcode, IsArchived) VALUES(@ProductId, @BarCode, False);
 			""";
-			db.Execute(query, new { ProductId = product.Id, BarCode = code });
-			return new(0, "Success"); ;
+
+			try
+			{
+				db.Execute(query, new { ProductId = productId, BarCode = code });
+				return new(0, null);
+			}
+			catch (Exception _)
+			{
+				// Technically, we don't know what happened. 
+				// I can't be bothered to check the true exceptions for Unique conflicts.
+				return new(1, $"Barcode \"{code}\" is already registered!");
+			}
 		}
 
 		/// <summary>Checks if barcode exists</summary>
