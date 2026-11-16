@@ -4,13 +4,18 @@ namespace UtemorgonPOS.Core;
 
 public class OrderRow
 {
-    public int Id { get; set; }
-    public int COrderId { get; set; }
-    public int Barcode { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public decimal Price { get; set; }
-    public int Quantity { get; set; }
+	public int Id { get; set; }
+	public int COrderId { get; set; }
 
-    public ICollection<COrder> Orders { get; set; }
+	/// <summary>13 character barcode. May include letters and symbols.</summary>
+	public required string Barcode { get; set; }
 
+	/// <summary>Name of product at point of sale.</summary>
+	public required string Name { get; set; }
+
+	/// <summary>Price of product at point of sale.</summary>
+	public decimal Price { get; set; }
+
+	/// <summary>The amount of products bought at point of sale.</summary>
+	public int Quantity { get; set; }
 }
