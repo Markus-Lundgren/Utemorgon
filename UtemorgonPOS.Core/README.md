@@ -22,52 +22,53 @@ instead we opt for centralized queries to be used in pure C#.
 - Add customer
 - Fetch customer with ID
 - Fetch customers with IDs (Returns a collection of Customer)
--   - Append all with SQL "OR id = ..." (Procedural queries)
--   -   - Use "string.Join()"
+- - Append all with SQL "OR id = ..." (Procedural queries)
+- - - Use "string.Join()"
 - Fetch customer with SSN
+- Fetch customer with name
 - Fetch customers with late rentals
 - Update customer (any field except ID)
 - Delete customer FLOW
--   - Point all current orders to DELETED CUSTOMER (Id: 1)
--   - Delete row
+- - Point all current orders to DELETED CUSTOMER (Id: 1)
+- - Delete row
 
 #### Order
 
 - Create new order
 - Get all orders for Customer.
--   - FromDate?
--   - ToDate?
--   - Get all unpaid orders
--   -   - CustomerId?
+- - FromDate?
+- - ToDate?
+- - Get all unpaid orders
+- - - CustomerId?
 - Update order (only Customer ID)
 
 #### Product
 
 - Create product
--   - Must specify product type etc
+- - Must specify product type etc
 - Create barcode (R-Code using sequence ID. Intermediate / Hard!)
 - Get product from barcode
 - Check stock
 - Update ProductCategory price
 - Add barcode to product
 - UPDATE PRODUCT
--   - Name
--   - PriceOverride
--   - Category (type)
--   - Stock
+- - Name
+- - PriceOverride
+- - Category (type)
+- - Stock
 - Remove (soft-delete)
 - Remove barcode from product
 
 ##### Rental
 
 - Fetch all
--   - FILTERS
--   -   - Rented?
--   -   - Late?
--   -   - ProductName?
--   - In general
--   - For customer (ID)
--   - (Shows with barcode)
+- - FILTERS
+- - - Rented?
+- - - Late?
+- - - ProductName?
+- - In general
+- - For customer (ID)
+- - (Shows with barcode)
 
 ## Example usages
 
