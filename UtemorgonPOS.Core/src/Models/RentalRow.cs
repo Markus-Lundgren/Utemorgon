@@ -11,7 +11,7 @@ public class RentalRow
 	public int OrderRowId { get; set; }
 	public int OrderId { get; set; }
 	public DateTime ExpectedReturnDate { get; set; }
-	public DateTime ReturnedDate { get; set; }
+	public DateTime? ReturnedDate { get; set; }
 
 	// Explicit OrderRow injection into the RentalRow object.
 	// Note: These values originate from OrderRow.
