@@ -29,7 +29,7 @@ public class RentalRow
 
 	public decimal GetTotalPrice()
 	{
-		decimal agg = 0;
+		decimal agg = Price;
 		foreach (var pm in PriceModifiers)
 			agg += pm.PriceDelta;
 
