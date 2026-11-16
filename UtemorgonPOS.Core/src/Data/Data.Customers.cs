@@ -103,23 +103,50 @@ public static partial class Data
 		}
 
 		// update customer
-		public static void UpdateCustomer(Customer updateCustomer)
+		public static void UpdateCustomer(Customer originalCustomer, Customer updatedCustomer)
 		{
 			using var db = GetConnectionObject();
 
-			db.Execute(
-				"""
-					UPDATE Customer 
-					SET 
-					SocialNumber = @SocialNumber,
-					FName = @FName,
-					LName = @LName,
-					Address = @Address,
-					PhoneNumber = @PhoneNumber
-					WHERE Id = @Id;
-				""",
-				updateCustomer
-			);
+			var updates = new List<string>();
+			var parameters = new DynamicParameters();
+
+			parameters.Add("Id", originalCustomer.Id);
+
+			if (originalCustomer.SocialNumber != updatedCustomer.SocialNumber)
+			{
+				updates.Add("SocialNumber = @SocialNumber");
+				parameters.Add("SocialNumber", updatedCustomer.SocialNumber);
+			}
+
+			if (originalCustomer.FName != updatedCustomer.FName)
+			{
+				updates.Add("FName = @FName");
+				parameters.Add("FName", updatedCustomer.FName);
+			}
+
+			if (originalCustomer.LName != updatedCustomer.LName)
+			{
+				updates.Add("LName = @LName");
+				parameters.Add("LName", updatedCustomer.LName);
+			}
+
+			if (originalCustomer.Address != updatedCustomer.Address)
+			{
+				updates.Add("Address = @Address");
+				parameters.Add("Address", updatedCustomer.Address);
+			}
+
+			if (originalCustomer.PhoneNumber != updatedCustomer.PhoneNumber)
+			{
+				updates.Add("PhoneNumber = @PhoneNumber");
+				parameters.Add("PhoneNumber", updatedCustomer.PhoneNumber);
+			}
+
+			if (updates.Count == 0) return;
+
+			string sql = $"UPDATE Customer SET {string.Join(", ", updates)} WHERE Id = @Id;";
+
+			db.Execute(sql, parameters);
 		}
 
 		// fetch customers with late rentals
