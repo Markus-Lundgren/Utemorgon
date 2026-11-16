@@ -15,8 +15,8 @@ public static partial class Data
 		/// </summary>
 		const string ROOT_QUERY = """ 
 			SELECT 
-				rr.Id, rr.OrderRowId, rr.ExpectedReturnDate, rr.ReturnedDate, 
-				odrr.COrderId as OrderId, odrr.Barcode, odrr.Name, odrr.Price,
+				odrr.Id, odrr.COrderId AS OrderId, odrr.Barcode, odrr.Name, odrr.Price,
+				rr.Id AS RentalRowId, rr.OrderRowId, rr.ExpectedReturnDate, rr.ReturnedDate, 
 				pm.Id, pm.OrderRowId, pm.PriceDelta, pm.Reason
 			FROM RentalRow rr
 				INNER JOIN OrderRow odrr ON rr.OrderRowId = odrr.Id
@@ -48,6 +48,39 @@ public static partial class Data
 				new { Id = rentalRowId },
 				splitOn: "Id"
 			).FirstOrDefault();
+		}
+
+		public static RentalRow[] GetRentalRowsForOrder(int orderId)
+		{
+			using var db = GetConnectionObject();
+
+			var rentalRowDict = new Dictionary<int, RentalRow>();
+
+			// Note: This query runs, and uses the map methoid to collect unique rows.
+			// This eliminates the need to run distinct, or to even cache the results.
+			db.Query<RentalRow, RowPriceModifier, RentalRow>(
+				$"{ROOT_QUERY} WHERE odrr.COrderId = @OrderId",
+				(rentalRow, modifier) =>
+				{
+					// If this row is not accounted for, add it.
+					if (!rentalRowDict.TryGetValue(rentalRow.Id, out var currentRentalRow))
+					{
+						currentRentalRow = rentalRow;
+						rentalRowDict.Add(currentRentalRow.Id, currentRentalRow);
+					}
+					// If a modifier exists, meaning the LEFT JOIN is not full of nulls, we add it.
+					if (modifier is not null)
+						currentRentalRow.PriceModifiers.Add(modifier);
+
+					return currentRentalRow;
+				},
+				new { OrderId = orderId },
+				splitOn: "Id"
+			);
+
+			// Since we already mapped all of the rentalrows into the dictionary, we can just return all the objects.
+			// Weird mix of confusing and kinda self explanatory...
+			return [.. rentalRowDict.Values];
 		}
 	}
 }
