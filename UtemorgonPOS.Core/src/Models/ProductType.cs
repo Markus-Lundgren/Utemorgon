@@ -2,18 +2,18 @@ namespace UtemorgonPOS.Core;
 
 public enum ProductType
 {
-	None = 1,
-	Rental_Old_VHS = 2,
-	Rental_New_VHS = 3,
-	Rental_Old_DVD = 4,
-	Rental_New_DVD = 5,
-	Old_VHS = 6,
-	New_VHS = 7,
-	Old_DVD = 8,
-	New_DVD = 9,
-	Rental_Game = 10,
-	Rental_Console = 11,
-	Game = 12,
-	Console = 13,
-	Snacks = 14
+	None = 0,
+	Rental_Old_VHS = 1,
+	Rental_New_VHS = 2,
+	Rental_Old_DVD = 3,
+	Rental_New_DVD = 4,
+	Old_VHS = 5,
+	New_VHS = 6,
+	Old_DVD = 7,
+	New_DVD = 8,
+	Rental_Game = 9,
+	Rental_Console = 10,
+	Game = 11,
+	Console = 12,
+	Snacks = 13
 }

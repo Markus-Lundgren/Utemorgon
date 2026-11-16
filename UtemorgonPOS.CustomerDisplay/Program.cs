@@ -30,7 +30,7 @@ class Program
 					var products = Data.Products.GetProducts();
 					foreach (var p in products)
 					{
-						Console.WriteLine($"{p.Id,-3} | {p.Name,-55} | {p.Price + " SEK",-15} | {p.Stock,-10} | {p.IsArchived,-10} | {p.TypeInfo,-15}");
+						Console.WriteLine($"{p.Id,-3} | {p.Name,-55} | {p.Price + " SEK",-15} | {p.Stock,-10} | {p.IsArchived,-10} | {p.ProductType,-15}");
 					}
 					break;
 				case 2:
@@ -43,7 +43,7 @@ class Program
 						Console.WriteLine($"{count++}. {e.ToString()}");
 					}
 					Console.Write("Välj kategori från listan: ");
-					product.TypeInfo = (ProductType)int.Parse(Console.ReadLine());
+					product.ProductType = (ProductType)int.Parse(Console.ReadLine());
 					Console.Write("Välj pris: ");
 					product.Price = int.Parse(Console.ReadLine());
 					Console.Write("Skriv in lagersaldo: ");
@@ -87,7 +87,7 @@ class Program
 
 					Console.WriteLine($"{"Id",-5} | {"Name",-55} | {"Price",-10:C} | {"Lager",-10} | {"Borttagen",-10} | {"Type",-15}");
 					Console.WriteLine(new string('-', 125));
-					Console.WriteLine($"{pr.Id,-5} | {pr.Name,-55} | {pr.Price,-10:C} | {pr.Stock,-10} | {pr.IsArchived,-10} | {pr.TypeInfo,-15}");
+					Console.WriteLine($"{pr.Id,-5} | {pr.Name,-55} | {pr.Price,-10:C} | {pr.Stock,-10} | {pr.IsArchived,-10} | {pr.ProductType,-15}");
 					Console.WriteLine(new string('-', 125));
 					break;
 				case 6:
@@ -114,7 +114,7 @@ class Program
 						continue;
 					}
 
-					Data.Barcodes.AddBarcodeToProduct(pro, barCode);
+					Data.Barcodes.AddBarcodeToProduct(pro.Id, barCode);
 					break;
 				case 7:
 					Console.Write("Välj barcode att returnera: ");

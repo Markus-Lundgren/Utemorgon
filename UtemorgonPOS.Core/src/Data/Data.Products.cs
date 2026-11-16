@@ -17,11 +17,6 @@ public static partial class Data
 
 			var products = db.Query<Product>(query).AsList();
 
-			foreach (var p in products)
-			{
-				p.SetProductType();
-			}
-
 			return products.ToArray();
 		}
 		/// <summary>Get an array of all Product items from database with the given name</summary>
@@ -33,11 +28,6 @@ public static partial class Data
 			string query = "SELECT * FROM Product p WHERE Name = @Name";
 
 			var products = db.Query<Product>(query, new { Name = name }).AsList();
-
-			foreach (var p in products)
-			{
-				p.SetProductType();
-			}
 
 			return products.ToArray();
 		}
@@ -55,11 +45,6 @@ public static partial class Data
 
 			var products = db.Query<Product>(query, new { IsArchived = isArchived }).AsList();
 
-			foreach (var p in products)
-			{
-				p.SetProductType();
-			}
-
 			return products.ToArray();
 		}
 		/// <summary>Add product to database using an object of Product</summary>
@@ -73,7 +58,7 @@ public static partial class Data
 			""";
 			db.Execute(query, new
 			{
-				ProductTypeId = (int)product.TypeInfo,
+				ProductTypeId = (int)product.ProductType,
 				Name = product.Name,
 				Price = product.Price,
 				Stock = product.Stock
