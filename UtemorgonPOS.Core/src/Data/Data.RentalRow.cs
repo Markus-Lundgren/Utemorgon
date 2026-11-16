@@ -16,7 +16,7 @@ public static partial class Data
 		const string ROOT_QUERY = """ 
 			SELECT 
 				rr.Id, rr.OrderRowId, rr.ExpectedReturnDate, rr.ReturnedDate, 
-				odrr.Barcode, odrr.Name, odrr.Price,
+				odrr.COrderId as OrderId, odrr.Barcode, odrr.Name, odrr.Price,
 				pm.Id, pm.OrderRowId, pm.PriceDelta, pm.Reason
 			FROM RentalRow rr
 				INNER JOIN OrderRow odrr ON rr.OrderRowId = odrr.Id
