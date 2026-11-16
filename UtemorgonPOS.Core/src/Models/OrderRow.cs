@@ -18,4 +18,6 @@ public class OrderRow
 
 	/// <summary>The amount of products bought at point of sale.</summary>
 	public int Quantity { get; set; }
+
+	public List<RowPriceModifier> PriceModifiers { get; set; } = [];
 }

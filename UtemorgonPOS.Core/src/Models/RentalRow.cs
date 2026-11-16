@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace UtemorgonPOS.Core;
 
@@ -20,7 +21,7 @@ public class RentalRow
 	/// <summary>Price of product at point of sale.</summary>
 	public decimal Price { get; set; }
 
-	public RowPriceModifier[] PriceModifiers { get; set; } = [];
+	public List<RowPriceModifier> PriceModifiers { get; set; } = [];
 
 	/// <summary>The amount of products bought at point of sale.</summary>
 	/// <remarks>On a rental product, this is implityly always 1.</remarks>
