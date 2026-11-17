@@ -137,6 +137,20 @@ public static partial class Data
 			db.Execute(query, new { Code = barcode.BarCode });
 			return true;
 		}
+
+		public static Response ReturnRental(string barcode)
+		{
+			using var db = GetConnectionObject();
+			string query = """
+			UPDATE RentalRow r
+			JOIN OrderRow o ON r.OrderRowId = o.Id
+			SET r.ReturnedDate = NOW()
+			WHERE o.Barcode = @Code AND r.ReturnedDate IS NULL
+			""";
+			db.Execute(query, new { Code = barcode });
+
+			return new(0, null);
+		}
 	}
 	/*
 	 - Create barcode (R-Code using sequence ID. Intermediate / Hard!)
