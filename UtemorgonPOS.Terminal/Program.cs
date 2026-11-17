@@ -11,6 +11,13 @@ class Program
 		Console.Clear();
 		SceneManager sm = new();
 
+		Console.WriteLine($"SENT TO LABEL PRINTER: {Data.Barcodes.AddBarcodeToRental(2)}");
+
+		Console.WriteLine($"Press any key to continue.");
+		Console.ReadKey();
+
+
+
 		Console.WriteLine($"------------------ All rows (grouped by order) ------------------");
 		int i = 1;
 		while (i++ > 0)
