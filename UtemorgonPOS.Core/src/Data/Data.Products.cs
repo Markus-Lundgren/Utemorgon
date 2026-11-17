@@ -132,7 +132,7 @@ public static partial class Data
 
 			db.Execute("UPDATE Product SET Stock = @Stock WHERE Id = @Id", new { Stock = p.Stock - amount, Id = id });
 			p.Stock -= amount;
-			return new(0, "Success"); ;
+			return new(0, null); ;
 		}
 
 		/// <summary>Update price on a product using Id</summary>
