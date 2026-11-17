@@ -93,21 +93,18 @@ public static partial class Data
 			return db.ExecuteScalar<int>("SELECT COUNT(*) FROM BarcodeToProduct WHERE Barcode = @Code", new { Code = code }) > 0;
 		}
 
-		///<summary>Returns rented product
-		///</summary>
-		/// <returns>Response object</returns>
-		public static Response ReturnRental(string barcode)
+		public static void ApplyBarcodeToRental(int productId)
+			=> ApplySpecialBarcode("R", productId);
+
+		public static void ApplyBarcodeToService(int productId)
+			=> ApplySpecialBarcode("S", productId);
+
+		static void ApplySpecialBarcode(string prefix, int productId)
 		{
 			using var db = GetConnectionObject();
-			string query = """
-			UPDATE RentalRow r
-			JOIN OrderRow o ON r.OrderRowId = o.Id
-			SET r.ReturnedDate = NOW()
-			WHERE o.Barcode = @Code AND r.ReturnedDate IS NULL
-			""";
-			db.Execute(query, new { Code = barcode });
 
-			return new(0, null);
+			// No guardrails because we do not fetch user input.
+			db.Query($"CALL AddSpecialBarcodeToProduct('{prefix}', {productId})");
 		}
 	}
 	/*
