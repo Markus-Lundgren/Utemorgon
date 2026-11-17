@@ -93,51 +93,9 @@ public static partial class Data
 			return db.ExecuteScalar<int>("SELECT COUNT(*) FROM BarcodeToProduct WHERE Barcode = @Code", new { Code = code }) > 0;
 		}
 
-		/// <summary>Checks if a barcode is connected to a currently rented product </summary>
-		/// <returns>True if rented, False if not</returns>
-		public static bool GetRentedStatus(Barcode barcode)
-		{
-			using var db = GetConnectionObject();
-
-			string query = """
-				SELECT COUNT(*) FROM OrderRow orderRow
-				JOIN BarcodeToProduct b ON orderRow.Barcode = b.Barcode
-				JOIN RentalRow r ON r.OrderRowId = orderRow.Id
-				WHERE orderRow.Barcode = @Code AND r.ReturnedDate IS NULL
-			""";
-
-			var rented = db.ExecuteScalar<int>(query, new { Code = barcode.BarCode });
-
-			return rented > 0;
-		}
-
-		///<summary>Returns a single product<br/>
-		///Adds one to stock and sets returned date to now
+		///<summary>Returns rented product
 		///</summary>
-		/// <returns>True on success, else False</returns>
-		public static bool TryReturnSingleProduct(Barcode barcode)
-		{
-			using var db = GetConnectionObject();
-
-			if (!CheckExists(barcode.BarCode)) return false;
-			if (!GetRentedStatus(barcode)) return false;
-
-			barcode.Product.Stock += 1;
-
-			string query = "UPDATE Product SET Stock = @NewStock WHERE Id = @Id";
-
-			db.Execute(query, new { NewStock = barcode.Product.Stock, Id = barcode.ProductId });
-
-			query = """
-			UPDATE RentalRow r
-			JOIN OrderRow o ON r.OrderRowId = o.Id
-			SET r.ReturnedDate = NOW()
-			WHERE o.Barcode = @Code AND r.ReturnedDate IS NULL
-			""";
-			db.Execute(query, new { Code = barcode.BarCode });
-			return true;
-		}
-
+		/// <returns>Response object</returns>
 		public static Response ReturnRental(string barcode)
 		{
 			using var db = GetConnectionObject();
