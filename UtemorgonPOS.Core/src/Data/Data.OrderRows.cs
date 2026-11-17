@@ -99,5 +99,24 @@ public static partial class Data
 			// Weird mix of confusing and kinda self explanatory...
 			return [.. rentalRowDict.Values];
 		}
+
+		// TODO: If time allows, check if return was successfull
+
+		///<summary>Returns rented product
+		///</summary>
+		/// <returns>Response object</returns>
+		public static Response ReturnRental(string barcode)
+		{
+			using var db = GetConnectionObject();
+			string query = """
+			UPDATE RentalRow r
+			JOIN OrderRow o ON r.OrderRowId = o.Id
+			SET r.ReturnedDate = NOW()
+			WHERE o.Barcode = @Code AND r.ReturnedDate IS NULL
+			""";
+			db.Execute(query, new { Code = barcode });
+
+			return new(0, null);
+		}
 	}
 }
