@@ -16,6 +16,7 @@ class SProductInfo : IScene
 	{
 	}
 
+	// Find, Check stock, Attach / remove barcode, remove, update etc
 	public SceneTransition Run()
 	{
 		Console.Clear();
@@ -31,6 +32,62 @@ class SProductInfo : IScene
 
 		Product? p = null;
 		Barcode? b = null;
+
+		Console.WriteLine("\nPress B handle barcodes, or E to edit product.");
+
+		if (Console.ReadKey(intercept: true).Key == ConsoleKey.B)
+		{
+			Console.WriteLine("\nPress A to attach a barcode to a product, or R to remove a barcode.");
+			if (Console.ReadKey(intercept: true).Key == ConsoleKey.A)
+			{
+				int id;
+				do
+				{
+					Console.Write("Enter product id: ");
+				}
+				while (!int.TryParse(Console.ReadLine(), out id));
+
+				string barcode = null;
+				while (string.IsNullOrEmpty(barcode))
+				{
+					Console.Write("Scan or enter barcode: ");
+					barcode = Console.ReadLine() ?? "";
+
+					if (barcode.Length != 13)
+					{
+						barcode = null;
+						continue;
+					}
+				}
+				Response r = Data.Barcodes.AddBarcodeToProduct(id, barcode);
+				if (r.Code == 1)
+				{
+					Console.WriteLine(r.Message);
+				}
+			}
+			else if (Console.ReadKey(intercept: true).Key == ConsoleKey.R)
+			{
+				string barcode = null;
+				while (string.IsNullOrEmpty(barcode))
+				{
+					Console.Write("Scan or enter barcode: ");
+					barcode = Console.ReadLine() ?? "";
+
+					if (barcode.Length != 13)
+					{
+						barcode = null;
+						continue;
+					}
+				}
+				Response r = Data.Barcodes.ArchiveBarcode(barcode);
+				if (r.Code == 1)
+				{
+					Console.WriteLine(r.Message);
+				}
+			}
+		}
+
+
 
 		return new SceneTransition.Pop();
 	}
