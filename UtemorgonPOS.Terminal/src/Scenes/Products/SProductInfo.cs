@@ -34,11 +34,13 @@ class SProductInfo : IScene
 		Barcode? b = null;
 
 		Console.WriteLine("\nPress B handle barcodes, or E to edit product.");
+		var pressedKey = Console.ReadKey(intercept: true).Key;
 
-		if (Console.ReadKey(intercept: true).Key == ConsoleKey.B)
+		if (pressedKey == ConsoleKey.B)
 		{
 			Console.WriteLine("\nPress A to attach a barcode to a product, or R to remove a barcode.");
-			if (Console.ReadKey(intercept: true).Key == ConsoleKey.A)
+			pressedKey = Console.ReadKey(intercept: true).Key;
+			if (pressedKey == ConsoleKey.A)
 			{
 				int id = GetId();
 
@@ -56,7 +58,7 @@ class SProductInfo : IScene
 					}
 				}
 			}
-			else if (Console.ReadKey(intercept: true).Key == ConsoleKey.R)
+			else if (pressedKey == ConsoleKey.R)
 			{
 				Response r = Data.Barcodes.ArchiveBarcode(GetBarcode());
 				if (r.Code == 1)
@@ -65,21 +67,21 @@ class SProductInfo : IScene
 				}
 			}
 		}
-
-		if (Console.ReadKey(intercept: true).Key == ConsoleKey.E)
+		else if (pressedKey == ConsoleKey.E)
 		{
 			Console.WriteLine("\nPress R to remove a product, or U to update a product.");
-
-			if (Console.ReadKey(intercept: true).Key == ConsoleKey.R)
+			pressedKey = Console.ReadKey(intercept: true).Key;
+			if (pressedKey == ConsoleKey.R)
 			{
 				Response r = Data.Products.DeleteProduct(GetId());
 
 				if (r.Code == 1) Console.WriteLine(r.Message);
 			}
-			else if (Console.ReadKey(intercept: true).Key == ConsoleKey.U)
+			else if (pressedKey == ConsoleKey.U)
 			{
 				Console.WriteLine("\nPress S to update stock, N to rename a product, and T to change product category");
-				if (Console.ReadKey(intercept: true).Key == ConsoleKey.S)
+				pressedKey = Console.ReadKey(intercept: true).Key;
+				if (pressedKey == ConsoleKey.S)
 				{
 					int id = GetId();
 					int amount;
@@ -91,7 +93,7 @@ class SProductInfo : IScene
 
 					Data.Products.UpdateStock(id, amount);
 				}
-				else if (Console.ReadKey(intercept: true).Key == ConsoleKey.N)
+				else if (pressedKey == ConsoleKey.N)
 				{
 					int id = GetId();
 
@@ -106,7 +108,7 @@ class SProductInfo : IScene
 
 					Data.Products.ChangeName(id, name);
 				}
-				else if (Console.ReadKey(intercept: true).Key == ConsoleKey.T)
+				else if (pressedKey == ConsoleKey.T)
 				{
 					int count = 0;
 					foreach (ProductType e in Enum.GetValues<ProductType>())
