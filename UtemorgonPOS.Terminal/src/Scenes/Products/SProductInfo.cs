@@ -22,12 +22,16 @@ class SProductInfo : IScene
 		Console.Clear();
 		Console.Write(_accumulativeMenu.ToString());
 
-		Console.WriteLine($"{"Id",-3} | {"Name",-55} | {"Price",-15} | {"Lager",-10} | {"Borttagen",-10} | {"Type",-15}");
+		Console.WriteLine($"{"Id",-3} | {"Name",-55} | {"Price",-15} | {"Lager",-10} | {"Borttagen",-10} | {"Type",-15} | {"Arkiverad",-10}");
 		Console.WriteLine(new string('-', 125));
 		var products = Data.Products.GetProducts();
 		foreach (var pr in products)
 		{
-			Console.WriteLine($"{pr.Id,-3} | {pr.Name,-55} | {pr.Price + " SEK",-15} | {pr.Stock,-10} | {pr.IsArchived,-10} | {pr.ProductType,-15}");
+			// This line can be removed. Its only purpose is to filter out the removed products. 
+			// However if one wants to see all products, including the archived ones, simply remove this
+			if (pr.IsArchived) continue;
+
+			Console.WriteLine($"{pr.Id,-3} | {pr.Name,-55} | {pr.Price + " SEK",-15} | {pr.Stock,-10} | {pr.IsArchived,-10} | {pr.ProductType,-15} | {pr.IsArchived,-10}");
 		}
 
 		Product? p = null;
@@ -73,9 +77,11 @@ class SProductInfo : IScene
 			pressedKey = Console.ReadKey(intercept: true).Key;
 			if (pressedKey == ConsoleKey.R)
 			{
+				int id = GetId();
 				Response r = Data.Products.DeleteProduct(GetId());
 
 				if (r.Code == 1) Console.WriteLine(r.Message);
+				Console.ReadKey();
 			}
 			else if (pressedKey == ConsoleKey.U)
 			{
