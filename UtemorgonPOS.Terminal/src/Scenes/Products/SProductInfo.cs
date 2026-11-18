@@ -79,7 +79,7 @@ class SProductInfo : IScene
 			}
 			else if (pressedKey == ConsoleKey.U)
 			{
-				Console.WriteLine("\nPress S to update stock, N to rename a product, and T to change product category");
+				Console.WriteLine("\nPress S to update stock, N to rename a product, T to change product category, and C to change price");
 				pressedKey = Console.ReadKey(intercept: true).Key;
 				if (pressedKey == ConsoleKey.S)
 				{
@@ -127,6 +127,18 @@ class SProductInfo : IScene
 
 					Response r = Data.Products.ChangeProductType(id, (ProductType)productId);
 					if (r.Code == 1) Console.WriteLine(r.Message);
+				}
+				else if (pressedKey == ConsoleKey.C)
+				{
+					int id = GetId();
+					decimal price;
+					do
+					{
+						Console.Write("Enter new price: ");
+					}
+					while (!decimal.TryParse(Console.ReadLine(), out price));
+
+					Response r = Data.Products.ChangePrice(id, price);
 				}
 			}
 		}

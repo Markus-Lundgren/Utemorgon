@@ -151,10 +151,12 @@ public static partial class Data
 		}
 
 		/// <summary>Update price on a product using Id</summary>
-		public static void ChangePrice(int id, decimal amount)
+		public static Response ChangePrice(int id, decimal amount)
 		{
 			using var db = GetConnectionObject();
-			db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
+			int affectedRows = db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
+			if (affectedRows < 1) return new(1, $"Hittade inte produkt med id: {id}");
+			return new(0, null);
 		}
 		/// <summary>Update name of a product using id</summary>
 		public static void ChangeName(int id, string name)
