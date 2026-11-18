@@ -81,6 +81,7 @@ class SProductInfo : IScene
 				Console.WriteLine("\nPress S to update stock, or N to rename a product.");
 				if (Console.ReadKey(intercept: true).Key == ConsoleKey.S)
 				{
+					int id = GetId();
 					int amount;
 					do
 					{
@@ -88,7 +89,22 @@ class SProductInfo : IScene
 					}
 					while (!int.TryParse(Console.ReadLine(), out amount));
 
-					Data.Products.UpdateStock(GetId(), amount);
+					Data.Products.UpdateStock(id, amount);
+				}
+				else if (Console.ReadKey(intercept: true).Key == ConsoleKey.N)
+				{
+					int id = GetId();
+
+					string name = null;
+
+					while (string.IsNullOrEmpty(name))
+					{
+
+						Console.Write("Enter new product name: ");
+						name = Console.ReadLine() ?? "";
+					}
+
+					Data.Products.ChangeName(id, name);
 				}
 			}
 		}
