@@ -139,6 +139,7 @@ class SProductInfo : IScene
 					while (!decimal.TryParse(Console.ReadLine(), out price));
 
 					Response r = Data.Products.ChangePrice(id, price);
+					if (r.Code == 1) Console.WriteLine(r.Message);
 				}
 			}
 		}
