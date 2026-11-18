@@ -21,66 +21,74 @@ class SProductInfo : IScene
 		Console.Clear();
 		Console.Write(_accumulativeMenu.ToString());
 
+		Console.WriteLine($"{"Id",-3} | {"Name",-55} | {"Price",-15} | {"Lager",-10} | {"Borttagen",-10} | {"Type",-15}");
+		Console.WriteLine(new string('-', 125));
+		var products = Data.Products.GetProducts();
+		foreach (var pr in products)
+		{
+			Console.WriteLine($"{pr.Id,-3} | {pr.Name,-55} | {pr.Price + " SEK",-15} | {pr.Stock,-10} | {pr.IsArchived,-10} | {pr.ProductType,-15}");
+		}
+
 		Product? p = null;
 		Barcode? b = null;
 
-		Console.WriteLine("\nPress B to search by barcode, or I to search by id.");
-
-		if (Console.ReadKey(intercept: true).Key == ConsoleKey.B)
-		{
-			string? barcode = null;
-			while (string.IsNullOrEmpty(barcode))
-			{
-				Console.Write("Scan or enter barcode: ");
-				barcode = Console.ReadLine() ?? "";
-
-				if (barcode.Length != 13)
-				{
-					barcode = null;
-					continue;
-				}
-			}
-			b = Data.Barcodes.GetBarcodeFromString(barcode);
-			p = b.Product;
-		}
-		else if (Console.ReadKey(intercept: true).Key == ConsoleKey.I)
-		{
-			int id = 0;
-
-			while (id == 0)
-			{
-				Console.Write("Enter id: ");
-				if (!int.TryParse(Console.ReadLine(), out id))
-				{
-					continue;
-				}
-			}
-
-			p = Data.Products.GetProductFromId(id);
-		}
-
-		if (p == null)
-		{
-			Console.WriteLine("====== PRODUCT NOT FOUND ======");
-		}
-		else
-		{
-			Console.Clear();
-			Console.WriteLine("====== PRODUCT INFORMATION ======");
-			Console.WriteLine($"Id: {p.Id}");
-			Console.WriteLine($"{p.Name} ({p.ProductType})");
-			Console.WriteLine($"Price: {p.Price} SEK");
-			if (!p.ProductType.ToString().StartsWith("Rental_", StringComparison.InvariantCultureIgnoreCase) &&
-			!p.ProductType.ToString().StartsWith("Service_", StringComparison.InvariantCultureIgnoreCase))
-				Console.WriteLine($"Stock: {p.Stock}");
-			if (b != null)
-				Console.WriteLine($"Barcode: {b.BarCode}");
-			Console.WriteLine("=================================");
-
-			Console.WriteLine("\nPress any key to exit.");
-			Console.ReadKey();
-
-		}
 		return new SceneTransition.Pop();
 	}
+	// Console.WriteLine("\nPress B to search by barcode, or I to search by id.");
+
+	// if (Console.ReadKey(intercept: true).Key == ConsoleKey.B)
+	// {
+	// 	string? barcode = null;
+	// 	while (string.IsNullOrEmpty(barcode))
+	// 	{
+	// 		Console.Write("Scan or enter barcode: ");
+	// 		barcode = Console.ReadLine() ?? "";
+
+	// 		if (barcode.Length != 13)
+	// 		{
+	// 			barcode = null;
+	// 			continue;
+	// 		}
+	// 	}
+	// 	b = Data.Barcodes.GetBarcodeFromString(barcode);
+	// p = b.Product;
+	// }
+	// else if (Console.ReadKey(intercept: true).Key == ConsoleKey.I)
+	// {
+	// int id = 0;
+
+	// while (id == 0)
+	// {
+	// 	Console.Write("Enter id: ");
+	// 	if (!int.TryParse(Console.ReadLine(), out id))
+	// 	{
+	// 		continue;
+	// 	}
+	// }
+
+	// p = Data.Products.GetProductFromId(id);
+	// }
+
+	// if (p == null)
+	// {
+	// Console.WriteLine("====== PRODUCT NOT FOUND ======");
+	// }
+	// else
+	// {
+	// Console.Clear();
+	// Console.WriteLine("====== PRODUCT INFORMATION ======");
+	// Console.WriteLine($"Id: {p.Id}");
+	// Console.WriteLine($"{p.Name} ({p.ProductType})");
+	// Console.WriteLine($"Price: {p.Price} SEK");
+	// if (!p.ProductType.ToString().StartsWith("Rental_", StringComparison.InvariantCultureIgnoreCase) &&
+	// !p.ProductType.ToString().StartsWith("Service_", StringComparison.InvariantCultureIgnoreCase))
+	// 	Console.WriteLine($"Stock: {p.Stock}");
+	// if (b != null)
+	// 	Console.WriteLine($"Barcode: {b.BarCode}");
+	// Console.WriteLine("=================================");
+
+	// Console.WriteLine("\nPress any key to exit.");
+	// Console.ReadKey();
+
+	// }
 }
