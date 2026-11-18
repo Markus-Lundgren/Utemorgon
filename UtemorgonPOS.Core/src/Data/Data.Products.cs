@@ -73,6 +73,19 @@ public static partial class Data
 			return stock;
 		}
 
+		/// <summary>Update stock from product</summary>
+		/// <param name="id"></param>
+		/// <param name="amount"></param>
+		/// <returns>Response object with code and message</returns>
+		public static Response UpdateStock(int id, int amount)
+		{
+			using var db = GetConnectionObject();
+			string query = "UPDATE Product SET Stock = @Amount WHERE Id = @Id and Stock IS NOT NULL";
+			int affectedRows = db.Execute(query, new { Amount = amount, Id = id });
+			if (affectedRows < 1) return new(1, $"Kunde inte uppdatera produkt med id: {id}");
+			return new(0, null);
+		}
+
 		/// <summary>Soft delete a product from the database</summary>
 		/// <param name="id"></param>
 		public static Response DeleteProduct(int id)
