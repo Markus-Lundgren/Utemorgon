@@ -78,7 +78,7 @@ class SProductInfo : IScene
 			}
 			else if (Console.ReadKey(intercept: true).Key == ConsoleKey.U)
 			{
-				Console.WriteLine("\nPress S to update stock, or N to rename a product.");
+				Console.WriteLine("\nPress S to update stock, N to rename a product, and T to change product category");
 				if (Console.ReadKey(intercept: true).Key == ConsoleKey.S)
 				{
 					int id = GetId();
@@ -105,6 +105,26 @@ class SProductInfo : IScene
 					}
 
 					Data.Products.ChangeName(id, name);
+				}
+				else if (Console.ReadKey(intercept: true).Key == ConsoleKey.T)
+				{
+					int count = 0;
+					foreach (ProductType e in Enum.GetValues<ProductType>())
+					{
+						Console.WriteLine($"{count++}. {e}");
+					}
+
+					int id = GetId();
+
+					int productId;
+					do
+					{
+						Console.Write("Enter product category id: ");
+					}
+					while (!int.TryParse(Console.ReadLine(), out productId));
+
+					Response r = Data.Products.ChangeProductType(id, (ProductType)productId);
+					if (r.Code == 1) Console.WriteLine(r.Message);
 				}
 			}
 		}
