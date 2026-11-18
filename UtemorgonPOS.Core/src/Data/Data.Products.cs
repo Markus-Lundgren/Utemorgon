@@ -75,11 +75,13 @@ public static partial class Data
 
 		/// <summary>Soft delete a product from the database</summary>
 		/// <param name="id"></param>
-		public static void DeleteProduct(int id)
+		public static Response DeleteProduct(int id)
 		{
 			using var db = GetConnectionObject();
 			string query = "UPDATE Product Set IsArchived = True WHERE Id = @Id;";
-			db.Execute(query, new { Id = id });
+			int affectedRows = db.Execute(query, new { Id = id });
+			if (affectedRows < 1) return new(1, $"Produkt med id: {id} existerar inte");
+			return new(0, null);
 		}
 
 		/// <summary>Get product from database using Id</summary>
