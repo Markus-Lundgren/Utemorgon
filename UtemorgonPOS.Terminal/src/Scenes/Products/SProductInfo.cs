@@ -40,46 +40,25 @@ class SProductInfo : IScene
 			Console.WriteLine("\nPress A to attach a barcode to a product, or R to remove a barcode.");
 			if (Console.ReadKey(intercept: true).Key == ConsoleKey.A)
 			{
-				int id;
-				do
+				int id = GetId();
+
+				Console.WriteLine("\nPress R to attach a rental barcode, or W to attach a normal barcode.");
+				if (Console.ReadKey(intercept: true).Key == ConsoleKey.R)
 				{
-					Console.Write("Enter product id: ");
+					Data.Barcodes.AddBarcodeToRental(id);
 				}
-				while (!int.TryParse(Console.ReadLine(), out id));
-
-				string barcode = null;
-				while (string.IsNullOrEmpty(barcode))
+				else
 				{
-					Console.Write("Scan or enter barcode: ");
-					barcode = Console.ReadLine() ?? "";
-
-					if (barcode.Length != 13)
+					Response r = Data.Barcodes.AddBarcodeToProduct(id, GetBarcode());
+					if (r.Code == 1)
 					{
-						barcode = null;
-						continue;
+						Console.WriteLine(r.Message);
 					}
-				}
-				Response r = Data.Barcodes.AddBarcodeToProduct(id, barcode);
-				if (r.Code == 1)
-				{
-					Console.WriteLine(r.Message);
 				}
 			}
 			else if (Console.ReadKey(intercept: true).Key == ConsoleKey.R)
 			{
-				string barcode = null;
-				while (string.IsNullOrEmpty(barcode))
-				{
-					Console.Write("Scan or enter barcode: ");
-					barcode = Console.ReadLine() ?? "";
-
-					if (barcode.Length != 13)
-					{
-						barcode = null;
-						continue;
-					}
-				}
-				Response r = Data.Barcodes.ArchiveBarcode(barcode);
+				Response r = Data.Barcodes.ArchiveBarcode(GetBarcode());
 				if (r.Code == 1)
 				{
 					Console.WriteLine(r.Message);
@@ -87,9 +66,62 @@ class SProductInfo : IScene
 			}
 		}
 
+		if (Console.ReadKey(intercept: true).Key == ConsoleKey.E)
+		{
+			Console.WriteLine("\nPress R to remove a product, or U to update a product.");
 
+			if (Console.ReadKey(intercept: true).Key == ConsoleKey.R)
+			{
+				Response r = Data.Products.DeleteProduct(GetId());
+
+				if (r.Code == 1) Console.WriteLine(r.Message);
+			}
+			else if (Console.ReadKey(intercept: true).Key == ConsoleKey.U)
+			{
+				Console.WriteLine("\nPress S to update stock, or N to rename a product.");
+				if (Console.ReadKey(intercept: true).Key == ConsoleKey.S)
+				{
+					int amount;
+					do
+					{
+						Console.Write("Enter new amount: ");
+					}
+					while (!int.TryParse(Console.ReadLine(), out amount));
+
+					Data.Products.UpdateStock(GetId(), amount);
+				}
+			}
+		}
 
 		return new SceneTransition.Pop();
+	}
+
+	private int GetId()
+	{
+		int id;
+		do
+		{
+			Console.Write("Enter product id: ");
+		}
+		while (!int.TryParse(Console.ReadLine(), out id));
+
+		return id;
+	}
+	private string GetBarcode()
+	{
+		string barcode = null;
+		while (string.IsNullOrEmpty(barcode))
+		{
+			Console.Write("Scan or enter barcode: ");
+			barcode = Console.ReadLine() ?? "";
+
+			if (barcode.Length != 13)
+			{
+				barcode = null;
+				continue;
+			}
+		}
+		return barcode;
 	}
 	// Console.WriteLine("\nPress B to search by barcode, or I to search by id.");
 
