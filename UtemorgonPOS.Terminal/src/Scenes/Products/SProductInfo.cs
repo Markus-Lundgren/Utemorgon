@@ -56,19 +56,17 @@ class SProductInfo : IScene
 				else
 				{
 					Response r = Data.Barcodes.AddBarcodeToProduct(id, GetBarcode());
-					if (r.Code == 1)
-					{
-						Console.WriteLine(r.Message);
-					}
+					if (r.Code == 1) Console.WriteLine(r.Message);
+					Console.WriteLine("===Press any key to continue===");
+					Console.ReadKey();
 				}
 			}
 			else if (pressedKey == ConsoleKey.R)
 			{
 				Response r = Data.Barcodes.ArchiveBarcode(GetBarcode());
-				if (r.Code == 1)
-				{
-					Console.WriteLine(r.Message);
-				}
+				if (r.Code == 1) Console.WriteLine(r.Message);
+				Console.WriteLine("===Press any key to continue===");
+				Console.ReadKey();
 			}
 		}
 		else if (pressedKey == ConsoleKey.E)
@@ -81,6 +79,7 @@ class SProductInfo : IScene
 				Response r = Data.Products.DeleteProduct(GetId());
 
 				if (r.Code == 1) Console.WriteLine(r.Message);
+				Console.WriteLine("===Press any key to continue===");
 				Console.ReadKey();
 			}
 			else if (pressedKey == ConsoleKey.U)
@@ -97,7 +96,11 @@ class SProductInfo : IScene
 					}
 					while (!int.TryParse(Console.ReadLine(), out amount));
 
-					Data.Products.UpdateStock(id, amount);
+					Response r = Data.Products.UpdateStock(id, amount);
+					if (r.Code == 1) Console.WriteLine(r.Message);
+
+					Console.WriteLine("===Press any key to continue===");
+					Console.ReadKey();
 				}
 				else if (pressedKey == ConsoleKey.N)
 				{
@@ -112,7 +115,11 @@ class SProductInfo : IScene
 						name = Console.ReadLine() ?? "";
 					}
 
-					Data.Products.ChangeName(id, name);
+					Response r = Data.Products.ChangeName(id, name);
+					if (r.Code == 1) Console.WriteLine(r.Message);
+
+					Console.WriteLine("===Press any key to continue===");
+					Console.ReadKey();
 				}
 				else if (pressedKey == ConsoleKey.T)
 				{
@@ -133,6 +140,9 @@ class SProductInfo : IScene
 
 					Response r = Data.Products.ChangeProductType(id, (ProductType)productId);
 					if (r.Code == 1) Console.WriteLine(r.Message);
+
+					Console.WriteLine("===Press any key to continue===");
+					Console.ReadKey();
 				}
 				else if (pressedKey == ConsoleKey.C)
 				{
@@ -146,6 +156,9 @@ class SProductInfo : IScene
 
 					Response r = Data.Products.ChangePrice(id, price);
 					if (r.Code == 1) Console.WriteLine(r.Message);
+
+					Console.WriteLine("===Press any key to continue===");
+					Console.ReadKey();
 				}
 			}
 		}
