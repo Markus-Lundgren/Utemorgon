@@ -163,11 +163,13 @@ public static partial class Data
 			db.Execute("UPDATE Product SET Name = @Name WHERE Id = @Id", new { Name = name, Id = id });
 		}
 		/// <summary>Change product type of a product using id</summary>
-		public static void ChangeProductType(int id, ProductType type)
+		public static Response ChangeProductType(int id, ProductType type)
 		{
 			using var db = GetConnectionObject();
 
-			db.Execute("UPDATE Product SET ProductTypeId = @TypeId WHERE Id = @Id", new { TypeId = (int)type, Id = id });
+			int affectedRows = db.Execute("UPDATE Product SET ProductTypeId = @TypeId WHERE Id = @Id", new { TypeId = (int)type, Id = id });
+			if (affectedRows < 1) return new(1, $"Hittade inte produkt med id: {id}");
+			return new(0, null);
 		}
 
 		/// <summary>Update price for a product category using the id of the category</summary>
