@@ -77,7 +77,7 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			string query = "UPDATE Product SET Stock = @Amount WHERE Id = @Id and Stock IS NOT NULL";
 			int affectedRows = db.Execute(query, new { Amount = amount, Id = id });
-			if (affectedRows < 1) return new(1, $"Kunde inte uppdatera produkt med id: {id}");
+			if (affectedRows < 1) return new(1, $"Could not update product with id: {id}");
 			return new(0, null);
 		}
 
@@ -88,7 +88,7 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			string query = "UPDATE Product Set IsArchived = True WHERE Id = @Id;";
 			int affectedRows = db.Execute(query, new { Id = id });
-			if (affectedRows < 1) return new(1, $"Produkt med id: {id} existerar inte");
+			if (affectedRows < 1) return new(1, $"Product with id: {id} does not exist");
 			return new(0, null);
 		}
 
@@ -118,19 +118,19 @@ public static partial class Data
 
 			if (p == null)
 			{
-				return new(1, "Denna produkt finns inte"); ;
+				return new(1, "Product does not exist"); ;
 			}
 			if (amount < 1)
 			{
-				return new(2, "Du måste välja minst en"); ;
+				return new(2, "You must buy at least one"); ;
 			}
 			if (p.Stock < 1 || p.Stock == null)
 			{
-				return new(3, $"{p.Name} är tyvärr slut i lagret!"); ;
+				return new(3, $"{p.Name} is out of stock!"); ;
 			}
 			if (p.Stock < amount)
 			{
-				return new(4, "Det finns inte så många av denna produkt i lagret");
+				return new(4, "Insufficient stock");
 			}
 
 			db.Execute("UPDATE Product SET Stock = @Stock WHERE Id = @Id", new { Stock = p.Stock - amount, Id = id });
@@ -143,7 +143,7 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 			int affectedRows = db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
-			if (affectedRows < 1) return new(1, $"Hittade inte produkt med id: {id}");
+			if (affectedRows < 1) return new(1, $"Did not find product with id: {id}");
 			return new(0, null);
 		}
 		/// <summary>Update name of a product using id</summary>
@@ -151,7 +151,7 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 			int affectedRows = db.Execute("UPDATE Product SET Name = @Name WHERE Id = @Id", new { Name = name, Id = id });
-			if (affectedRows < 1) return new(1, $"Hittade inte produkt med id: {id}");
+			if (affectedRows < 1) return new(1, $"Did not find product with id: {id}");
 			return new(0, null);
 		}
 		/// <summary>Change product type of a product using id</summary>
@@ -160,7 +160,7 @@ public static partial class Data
 			using var db = GetConnectionObject();
 
 			int affectedRows = db.Execute("UPDATE Product SET ProductTypeId = @TypeId WHERE Id = @Id", new { TypeId = (int)type, Id = id });
-			if (affectedRows < 1) return new(1, $"Hittade inte produkt med id: {id}");
+			if (affectedRows < 1) return new(1, $"Did not find product with id: {id}");
 			return new(0, null);
 		}
 
@@ -171,7 +171,7 @@ public static partial class Data
 
 			int affectedRows = db.Execute("UPDATE Product SET Price = @Amount WHERE ProductTypeId = @CategoryId",
 						new { categoryId = categoryId, Amount = amount });
-			if (affectedRows < 1) return new(1, $"Hittade ingen produkt som har kategori id {categoryId} som id");
+			if (affectedRows < 1) return new(1, $"Did not find product with category id {categoryId}");
 			return new(0, null);
 		}
 

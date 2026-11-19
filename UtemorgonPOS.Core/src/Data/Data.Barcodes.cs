@@ -121,7 +121,7 @@ public static partial class Data
 
 			if (affectedRows < 1)
 			{
-				return new(1, $"Ingen produkt använder barcode: {barcode}");
+				return new(1, $"No product uses barcode: {barcode}");
 			}
 			return new(0, null);
 		}
