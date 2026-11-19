@@ -51,12 +51,17 @@ class SProductInfo : IScene
 				Console.WriteLine("\nPress R to attach a rental barcode, or W to attach a normal barcode.");
 				if (Console.ReadKey(intercept: true).Key == ConsoleKey.R)
 				{
-					Data.Barcodes.AddBarcodeToRental(id);
+					string barcode = Data.Barcodes.AddBarcodeToRental(id);
+					Console.WriteLine($"Attached barcode: {barcode} to product {id}");
+					Console.WriteLine("===Press any key to continue===");
+					Console.ReadKey();
 				}
 				else
 				{
-					Response r = Data.Barcodes.AddBarcodeToProduct(id, GetBarcode());
+					string barcode = GetBarcode();
+					Response r = Data.Barcodes.AddBarcodeToProduct(id, barcode);
 					if (r.Code == 1) Console.WriteLine(r.Message);
+					Console.WriteLine($"Attached barcode: {barcode} to product {id}");
 					Console.WriteLine("===Press any key to continue===");
 					Console.ReadKey();
 				}
