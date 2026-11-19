@@ -16,7 +16,7 @@ class SProductCategory : IScene
 	{
 	}
 
-	// Edit prices, parents, etc for product categories
+	// Edit prices etc for product categories
 	public SceneTransition Run()
 	{
 		Console.Clear();
@@ -25,74 +25,26 @@ class SProductCategory : IScene
 		int count = 0;
 		foreach (ProductType e in Enum.GetValues<ProductType>())
 		{
-			Console.WriteLine($"{count++}. {e}");
+			Console.WriteLine($"{(int)e}. {e}");
 		}
 
-		Console.WriteLine("\nPress B to, or E to.");
+		Console.WriteLine("\nPress E to edit category price or B to return");
 		var pressedKey = Console.ReadKey(intercept: true).Key;
 
-		if (pressedKey == ConsoleKey.B)
+		if (pressedKey == ConsoleKey.E)
 		{
-			Console.WriteLine("\nPress A to , or R to.");
-			pressedKey = Console.ReadKey(intercept: true).Key;
-			if (pressedKey == ConsoleKey.A)
+			int id = GetId();
+			decimal amount;
+			do
 			{
-				Console.WriteLine("\nPress R to , or W to.");
-				if (Console.ReadKey(intercept: true).Key == ConsoleKey.R)
-				{
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
-				else
-				{
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
+				Console.Write("Enter new category price: ");
 			}
-			else if (pressedKey == ConsoleKey.R)
-			{
-				Console.WriteLine("===Press any key to continue===");
-				Console.ReadKey();
-			}
-		}
-		else if (pressedKey == ConsoleKey.E)
-		{
-			Console.WriteLine("\nPress R to , or U to.");
-			pressedKey = Console.ReadKey(intercept: true).Key;
-			if (pressedKey == ConsoleKey.R)
-			{
-				Console.WriteLine("===Press any key to continue===");
-				Console.ReadKey();
-			}
-			else if (pressedKey == ConsoleKey.U)
-			{
-				Console.WriteLine("\nPress S to , N to , T to , and C to");
-				pressedKey = Console.ReadKey(intercept: true).Key;
-				if (pressedKey == ConsoleKey.S)
-				{
+			while (!decimal.TryParse(Console.ReadLine(), out amount));
 
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
-				else if (pressedKey == ConsoleKey.N)
-				{
-
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
-				else if (pressedKey == ConsoleKey.T)
-				{
-
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
-				else if (pressedKey == ConsoleKey.C)
-				{
-
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
-			}
+			var r = Data.Products.UpdateProductCategoryPrice(id, amount);
+			if (r.Code == 1) Console.WriteLine(r.Message);
+			Console.WriteLine("===Press any key to continue===");
+			Console.ReadKey();
 		}
 
 		return new SceneTransition.Pop();
