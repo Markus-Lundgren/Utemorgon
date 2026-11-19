@@ -177,12 +177,14 @@ public static partial class Data
 		}
 
 		/// <summary>Update price for a product category using the id of the category</summary>
-		public static void UpdateProductCategoryPrice(int categoryId, int amount)
+		public static Response UpdateProductCategoryPrice(int categoryId, int amount)
 		{
 			using var db = GetConnectionObject();
 
-			db.Execute("UPDATE Product SET Price = @Amount WHERE ProductTypeId = @CategoryId",
+			int affectedRows = db.Execute("UPDATE Product SET Price = @Amount WHERE ProductTypeId = @CategoryId",
 						new { categoryId = categoryId, Amount = amount });
+			if (affectedRows < 1) return new(1, $"Hittade ingen kategori med id {categoryId}");
+			return new(0, null);
 		}
 
 		/*
