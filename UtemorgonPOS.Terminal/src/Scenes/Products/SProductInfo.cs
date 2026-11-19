@@ -34,9 +34,6 @@ class SProductInfo : IScene
 			Console.WriteLine($"{pr.Id,-3} | {pr.Name,-55} | {pr.Price + " SEK",-15} | {pr.Stock,-10} | {pr.IsArchived,-10} | {pr.ProductType,-15} | {pr.IsArchived,-10}");
 		}
 
-		Product? p = null;
-		Barcode? b = null;
-
 		Console.WriteLine("\nPress B handle barcodes, or E to edit product.");
 		var pressedKey = Console.ReadKey(intercept: true).Key;
 
