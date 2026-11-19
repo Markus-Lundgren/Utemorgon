@@ -5,6 +5,7 @@ static class SceneRepository
 	{
 		public static SProductsMain Main = new();
 		public static SNewProduct New = new();
+		public static SProductInfo Info = new();
 	}
 
 	public static class Transaction

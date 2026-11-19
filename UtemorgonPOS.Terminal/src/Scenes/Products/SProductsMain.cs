@@ -7,7 +7,7 @@ class SProductsMain : IScene
 
 	Menu _menu = new([
 	new(ConsoleKey.N, "New product", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Products.New);}),
-	new(ConsoleKey.I, "Products info", () => {}), // Find, Check stock, Attach / remove barcode, remove, update etc
+	new(ConsoleKey.I, "Products info", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Products.Info);}), // Find, Check stock, Attach / remove barcode, remove, update etc
 	new(ConsoleKey.C, "Product category info", () => {}), // Edit prices, parents, etc for product categories
 	new(ConsoleKey.B, "Back", () => {_deferredTransition = new SceneTransition.Pop(); }),
 	]);

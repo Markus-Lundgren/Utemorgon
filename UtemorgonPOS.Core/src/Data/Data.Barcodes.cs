@@ -107,6 +107,24 @@ public static partial class Data
 			// No guardrails because we do not fetch user input.
 			return db.Query<string>($"CALL AddSpecialBarcodeToProduct('{prefix}', {productId})").FirstOrDefault();
 		}
+
+		/// <summary>Archives a barcode</summary>
+		/// <param name="barcode"></param>
+		/// <returns>Response object with code and message</returns>
+		public static Response ArchiveBarcode(string barcode)
+		{
+			using var db = GetConnectionObject();
+
+			string query = "UPDATE BarcodeToProduct SET IsArchived = 1 WHERE Barcode = @Code";
+
+			int affectedRows = db.Execute(query, new { Code = barcode });
+
+			if (affectedRows < 1)
+			{
+				return new(1, $"Ingen produkt använder barcode: {barcode}");
+			}
+			return new(0, null);
+		}
 	}
 	/*
 	 - Create barcode (R-Code using sequence ID. Intermediate / Hard!)

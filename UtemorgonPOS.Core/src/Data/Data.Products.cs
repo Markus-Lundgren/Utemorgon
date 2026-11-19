@@ -73,13 +73,28 @@ public static partial class Data
 			return stock;
 		}
 
+		/// <summary>Update stock from product</summary>
+		/// <param name="id"></param>
+		/// <param name="amount"></param>
+		/// <returns>Response object with code and message</returns>
+		public static Response UpdateStock(int id, int amount)
+		{
+			using var db = GetConnectionObject();
+			string query = "UPDATE Product SET Stock = @Amount WHERE Id = @Id and Stock IS NOT NULL";
+			int affectedRows = db.Execute(query, new { Amount = amount, Id = id });
+			if (affectedRows < 1) return new(1, $"Kunde inte uppdatera produkt med id: {id}");
+			return new(0, null);
+		}
+
 		/// <summary>Soft delete a product from the database</summary>
 		/// <param name="id"></param>
-		public static void DeleteProduct(int id)
+		public static Response DeleteProduct(int id)
 		{
 			using var db = GetConnectionObject();
 			string query = "UPDATE Product Set IsArchived = True WHERE Id = @Id;";
-			db.Execute(query, new { Id = id });
+			int affectedRows = db.Execute(query, new { Id = id });
+			if (affectedRows < 1) return new(1, $"Produkt med id: {id} existerar inte");
+			return new(0, null);
 		}
 
 		/// <summary>Get product from database using Id</summary>
@@ -136,23 +151,29 @@ public static partial class Data
 		}
 
 		/// <summary>Update price on a product using Id</summary>
-		public static void ChangePrice(int id, decimal amount)
+		public static Response ChangePrice(int id, decimal amount)
 		{
 			using var db = GetConnectionObject();
-			db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
+			int affectedRows = db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
+			if (affectedRows < 1) return new(1, $"Hittade inte produkt med id: {id}");
+			return new(0, null);
 		}
 		/// <summary>Update name of a product using id</summary>
-		public static void ChangeName(int id, string name)
+		public static Response ChangeName(int id, string name)
 		{
 			using var db = GetConnectionObject();
-			db.Execute("UPDATE Product SET Name = @Name WHERE Id = @Id", new { Name = name, Id = id });
+			int affectedRows = db.Execute("UPDATE Product SET Name = @Name WHERE Id = @Id", new { Name = name, Id = id });
+			if (affectedRows < 1) return new(1, $"Hittade inte produkt med id: {id}");
+			return new(0, null);
 		}
 		/// <summary>Change product type of a product using id</summary>
-		public static void ChangeProductType(int id, ProductType type)
+		public static Response ChangeProductType(int id, ProductType type)
 		{
 			using var db = GetConnectionObject();
 
-			db.Execute("UPDATE Product SET ProductTypeId = @TypeId WHERE Id = @Id", new { TypeId = (int)type, Id = id });
+			int affectedRows = db.Execute("UPDATE Product SET ProductTypeId = @TypeId WHERE Id = @Id", new { TypeId = (int)type, Id = id });
+			if (affectedRows < 1) return new(1, $"Hittade inte produkt med id: {id}");
+			return new(0, null);
 		}
 
 		/// <summary>Update price for a product category using the id of the category</summary>
