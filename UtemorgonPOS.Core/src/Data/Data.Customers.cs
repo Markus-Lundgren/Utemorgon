@@ -173,50 +173,23 @@ public static partial class Data
 		}
 
 		// delete customer
+		///<remarks>This scrambles the columns, it does not delete a row in the database.</remarks>
 		public static void DeleteCustomer(int id)
 		{
-			// protect DELETED CUSTOMER
-			if (id == 1)
-				throw new ArgumentException("Cannot delete the DELETED CUSTOMER.");
-			;
-
 			using var db = GetConnectionObject();
-			db.Open();
 
-			using var transaction = db.BeginTransaction();
-
-			try
-			{
-				// Move customers order to DELETED CUSTOMER
-				db.Execute(
-					"""
-						UPDATE COrder
-						SET CustomerId = 1
-						WHERE CustomerID = @Id;
-					""",
-					new { Id = id },
-					transaction
-				);
-
-				// Delete customer
-				db.Execute(
-					"""
-						DELETE FROM Customer
-						WHERE Id = @Id;
-					""",
-					new { Id = id },
-					transaction
-				);
-
-				// Save both changes
-				transaction.Commit();
-			}
-			catch (System.Exception)
-			{
-				// Undo the changes if somtething goes wrong
-				transaction.Rollback();
-				throw;
-			}
+			db.Execute(
+				"""
+					UPDATE Customer
+					SET SocialNumber = NULL,
+						FName = 'DELETED',
+						LName = 'CUSTOMER',
+						Address = '',
+						PhoneNumber = ''
+					WHERE Id = @Id;
+				""",
+				new { Id = id }
+			);
 		}
 	}
 }
