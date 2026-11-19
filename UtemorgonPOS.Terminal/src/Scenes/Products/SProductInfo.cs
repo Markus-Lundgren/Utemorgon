@@ -34,13 +34,10 @@ class SProductInfo : IScene
 			Console.WriteLine($"{pr.Id,-3} | {pr.Name,-55} | {pr.Price + " SEK",-15} | {pr.Stock,-10} | {pr.IsArchived,-10} | {pr.ProductType,-15} | {pr.IsArchived,-10}");
 		}
 
-		Product? p = null;
-		Barcode? b = null;
-
-		Console.WriteLine("\nPress B handle barcodes, or E to edit product.");
+		Console.WriteLine("\nPress C handle barcodes, E to edit product or B to return");
 		var pressedKey = Console.ReadKey(intercept: true).Key;
 
-		if (pressedKey == ConsoleKey.B)
+		if (pressedKey == ConsoleKey.C)
 		{
 			Console.WriteLine("\nPress A to attach a barcode to a product, or R to remove a barcode.");
 			pressedKey = Console.ReadKey(intercept: true).Key;

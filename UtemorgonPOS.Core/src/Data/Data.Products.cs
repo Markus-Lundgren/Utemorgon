@@ -15,9 +15,7 @@ public static partial class Data
 
 			string query = "SELECT * FROM Product p";
 
-			var products = db.Query<Product>(query).AsList();
-
-			return products.ToArray();
+			return [.. db.Query<Product>(query).AsList()];
 		}
 		/// <summary>Get an array of all Product items from database with the given name</summary>
 		/// <returns>Product[]</returns>
@@ -27,9 +25,7 @@ public static partial class Data
 
 			string query = "SELECT * FROM Product p WHERE Name = @Name";
 
-			var products = db.Query<Product>(query, new { Name = name }).AsList();
-
-			return products.ToArray();
+			return [.. db.Query<Product>(query, new { Name = name }).AsList()];
 		}
 
 		/// <summary>
@@ -43,9 +39,7 @@ public static partial class Data
 
 			string query = "SELECT * FROM Product p WHERE IsArchived = @IsArchived";
 
-			var products = db.Query<Product>(query, new { IsArchived = isArchived }).AsList();
-
-			return products.ToArray();
+			return [.. db.Query<Product>(query, new { IsArchived = isArchived }).AsList()];
 		}
 		/// <summary>Add product to database using an object of Product</summary>
 		/// <param name="product"></param>
@@ -59,18 +53,19 @@ public static partial class Data
 			db.Execute(query, new
 			{
 				ProductTypeId = (int)product.ProductType,
-				Name = product.Name,
-				Price = product.Price,
-				Stock = product.Stock
+				product.Name,
+				product.Price,
+				product.Stock
 			});
 		}
 		///<summary>Returns the stock of a single product using Id as search parameter</summary>
 		public static int? CheckStock(int id)
 		{
 			using var db = GetConnectionObject();
+
 			string query = "SELECT p.Stock FROM Product WHERE Id = @Id;";
-			int? stock = db.QueryFirstOrDefault<int?>(query, new { Id = id });
-			return stock;
+
+			return db.QueryFirstOrDefault<int?>(query, new { Id = id });
 		}
 
 		/// <summary>Update stock from product</summary>
@@ -105,14 +100,7 @@ public static partial class Data
 
 			string query = "SELECT * FROM Product p WHERE Id = @Id";
 
-			var p = db.QueryFirstOrDefault<Product>(query, new { Id = id });
-
-			// if (p == null)
-			// {
-			// 	Console.WriteLine("Something went wrong");
-			// }
-			// Use outside method instead...p.SetProductType();
-			return p;
+			return db.QueryFirstOrDefault<Product>(query, new { Id = id }); ;
 		}
 
 		/// <summary>Product transaction. Will subtract from stock.</summary>
@@ -177,12 +165,14 @@ public static partial class Data
 		}
 
 		/// <summary>Update price for a product category using the id of the category</summary>
-		public static void UpdateProductCategoryPrice(int categoryId, int amount)
+		public static Response UpdateProductCategoryPrice(int categoryId, decimal amount)
 		{
 			using var db = GetConnectionObject();
 
-			db.Execute("UPDATE Product SET Price = @Amount WHERE ProductTypeId = @CategoryId",
+			int affectedRows = db.Execute("UPDATE Product SET Price = @Amount WHERE ProductTypeId = @CategoryId",
 						new { categoryId = categoryId, Amount = amount });
+			if (affectedRows < 1) return new(1, $"Hittade ingen produkt som har kategori id {categoryId} som id");
+			return new(0, null);
 		}
 
 		/*
