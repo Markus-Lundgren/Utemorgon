@@ -76,7 +76,7 @@ class SProductInfo : IScene
 			if (pressedKey == ConsoleKey.R)
 			{
 				int id = GetId();
-				Response r = Data.Products.DeleteProduct(GetId());
+				Response r = Data.Products.DeleteProduct(id);
 
 				if (r.Code == 1) Console.WriteLine(r.Message);
 				Console.WriteLine("===Press any key to continue===");
