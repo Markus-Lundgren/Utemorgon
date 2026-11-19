@@ -15,9 +15,7 @@ public static partial class Data
 
 			string query = "SELECT * FROM Product p";
 
-			var products = db.Query<Product>(query).AsList();
-
-			return products.ToArray();
+			return [.. db.Query<Product>(query).AsList()];
 		}
 		/// <summary>Get an array of all Product items from database with the given name</summary>
 		/// <returns>Product[]</returns>
@@ -27,9 +25,7 @@ public static partial class Data
 
 			string query = "SELECT * FROM Product p WHERE Name = @Name";
 
-			var products = db.Query<Product>(query, new { Name = name }).AsList();
-
-			return products.ToArray();
+			return [.. db.Query<Product>(query, new { Name = name }).AsList()];
 		}
 
 		/// <summary>
@@ -43,9 +39,7 @@ public static partial class Data
 
 			string query = "SELECT * FROM Product p WHERE IsArchived = @IsArchived";
 
-			var products = db.Query<Product>(query, new { IsArchived = isArchived }).AsList();
-
-			return products.ToArray();
+			return [.. db.Query<Product>(query, new { IsArchived = isArchived }).AsList()];
 		}
 		/// <summary>Add product to database using an object of Product</summary>
 		/// <param name="product"></param>
@@ -59,27 +53,43 @@ public static partial class Data
 			db.Execute(query, new
 			{
 				ProductTypeId = (int)product.ProductType,
-				Name = product.Name,
-				Price = product.Price,
-				Stock = product.Stock
+				product.Name,
+				product.Price,
+				product.Stock
 			});
 		}
 		///<summary>Returns the stock of a single product using Id as search parameter</summary>
 		public static int? CheckStock(int id)
 		{
 			using var db = GetConnectionObject();
+
 			string query = "SELECT p.Stock FROM Product WHERE Id = @Id;";
-			int? stock = db.QueryFirstOrDefault<int?>(query, new { Id = id });
-			return stock;
+
+			return db.QueryFirstOrDefault<int?>(query, new { Id = id });
+		}
+
+		/// <summary>Update stock from product</summary>
+		/// <param name="id"></param>
+		/// <param name="amount"></param>
+		/// <returns>Response object with code and message</returns>
+		public static Response UpdateStock(int id, int amount)
+		{
+			using var db = GetConnectionObject();
+			string query = "UPDATE Product SET Stock = @Amount WHERE Id = @Id and Stock IS NOT NULL";
+			int affectedRows = db.Execute(query, new { Amount = amount, Id = id });
+			if (affectedRows < 1) return new(1, $"Could not update product with id: {id}");
+			return new(0, null);
 		}
 
 		/// <summary>Soft delete a product from the database</summary>
 		/// <param name="id"></param>
-		public static void DeleteProduct(int id)
+		public static Response DeleteProduct(int id)
 		{
 			using var db = GetConnectionObject();
 			string query = "UPDATE Product Set IsArchived = True WHERE Id = @Id;";
-			db.Execute(query, new { Id = id });
+			int affectedRows = db.Execute(query, new { Id = id });
+			if (affectedRows < 1) return new(1, $"Product with id: {id} does not exist");
+			return new(0, null);
 		}
 
 		/// <summary>Get product from database using Id</summary>
@@ -90,14 +100,7 @@ public static partial class Data
 
 			string query = "SELECT * FROM Product p WHERE Id = @Id";
 
-			var p = db.QueryFirstOrDefault<Product>(query, new { Id = id });
-
-			// if (p == null)
-			// {
-			// 	Console.WriteLine("Something went wrong");
-			// }
-			// Use outside method instead...p.SetProductType();
-			return p;
+			return db.QueryFirstOrDefault<Product>(query, new { Id = id }); ;
 		}
 
 		/// <summary>Product transaction. Will subtract from stock.</summary>
@@ -115,19 +118,19 @@ public static partial class Data
 
 			if (p == null)
 			{
-				return new(1, "Denna produkt finns inte"); ;
+				return new(1, "Product does not exist"); ;
 			}
 			if (amount < 1)
 			{
-				return new(2, "Du måste välja minst en"); ;
+				return new(2, "You must buy at least one"); ;
 			}
 			if (p.Stock < 1 || p.Stock == null)
 			{
-				return new(3, $"{p.Name} är tyvärr slut i lagret!"); ;
+				return new(3, $"{p.Name} is out of stock!"); ;
 			}
 			if (p.Stock < amount)
 			{
-				return new(4, "Det finns inte så många av denna produkt i lagret");
+				return new(4, "Insufficient stock");
 			}
 
 			db.Execute("UPDATE Product SET Stock = @Stock WHERE Id = @Id", new { Stock = p.Stock - amount, Id = id });
@@ -136,32 +139,40 @@ public static partial class Data
 		}
 
 		/// <summary>Update price on a product using Id</summary>
-		public static void ChangePrice(int id, decimal amount)
+		public static Response ChangePrice(int id, decimal amount)
 		{
 			using var db = GetConnectionObject();
-			db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
+			int affectedRows = db.Execute("UPDATE Product SET Price = @Amount WHERE Id = @Id", new { Amount = amount, Id = id });
+			if (affectedRows < 1) return new(1, $"Did not find product with id: {id}");
+			return new(0, null);
 		}
 		/// <summary>Update name of a product using id</summary>
-		public static void ChangeName(int id, string name)
+		public static Response ChangeName(int id, string name)
 		{
 			using var db = GetConnectionObject();
-			db.Execute("UPDATE Product SET Name = @Name WHERE Id = @Id", new { Name = name, Id = id });
+			int affectedRows = db.Execute("UPDATE Product SET Name = @Name WHERE Id = @Id", new { Name = name, Id = id });
+			if (affectedRows < 1) return new(1, $"Did not find product with id: {id}");
+			return new(0, null);
 		}
 		/// <summary>Change product type of a product using id</summary>
-		public static void ChangeProductType(int id, ProductType type)
+		public static Response ChangeProductType(int id, ProductType type)
 		{
 			using var db = GetConnectionObject();
 
-			db.Execute("UPDATE Product SET ProductTypeId = @TypeId WHERE Id = @Id", new { TypeId = (int)type, Id = id });
+			int affectedRows = db.Execute("UPDATE Product SET ProductTypeId = @TypeId WHERE Id = @Id", new { TypeId = (int)type, Id = id });
+			if (affectedRows < 1) return new(1, $"Did not find product with id: {id}");
+			return new(0, null);
 		}
 
 		/// <summary>Update price for a product category using the id of the category</summary>
-		public static void UpdateProductCategoryPrice(int categoryId, int amount)
+		public static Response UpdateProductCategoryPrice(int categoryId, decimal amount)
 		{
 			using var db = GetConnectionObject();
 
-			db.Execute("UPDATE Product SET Price = @Amount WHERE ProductTypeId = @CategoryId",
+			int affectedRows = db.Execute("UPDATE Product SET Price = @Amount WHERE ProductTypeId = @CategoryId",
 						new { categoryId = categoryId, Amount = amount });
+			if (affectedRows < 1) return new(1, $"Did not find product with category id {categoryId}");
+			return new(0, null);
 		}
 
 		/*

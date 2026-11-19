@@ -15,6 +15,7 @@ BEGIN
 	AND table_schema = DATABASE()
 	)
 	SELECT p_Id, Seq.Code, False
-	FROM Seq;
+	FROM Seq
+	RETURNING Barcode;
 END //
 DELIMITER ;
