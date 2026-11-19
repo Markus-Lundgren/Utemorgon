@@ -177,7 +177,7 @@ public static partial class Data
 		}
 
 		/// <summary>Update price for a product category using the id of the category</summary>
-		public static Response UpdateProductCategoryPrice(int categoryId, int amount)
+		public static Response UpdateProductCategoryPrice(int categoryId, decimal amount)
 		{
 			using var db = GetConnectionObject();
 
