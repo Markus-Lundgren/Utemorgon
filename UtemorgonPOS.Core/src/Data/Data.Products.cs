@@ -183,7 +183,7 @@ public static partial class Data
 
 			int affectedRows = db.Execute("UPDATE Product SET Price = @Amount WHERE ProductTypeId = @CategoryId",
 						new { categoryId = categoryId, Amount = amount });
-			if (affectedRows < 1) return new(1, $"Hittade ingen kategori med id {categoryId}");
+			if (affectedRows < 1) return new(1, $"Hittade ingen produkt som har kategori id {categoryId} som id");
 			return new(0, null);
 		}
 
