@@ -29,16 +29,11 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			return [.. db.Query<COrder>("SELECT * FROM `COrder`;")];
 		}
-		public static COrder GetFromCustomerId(int customerId)
+		public static COrder[] GetFromCustomerId(int customerId)
 		{
-
 			using var db = GetConnectionObject();
 
-			return db.QuerySingle<COrder>("""
-			 SELECT * FROM `COrder`
-			 WHERE COrder.Id = @customerId
-			 LIMIT 1;
-			 """, new { customerId });
+			return [.. db.Query<COrder>("SELECT * FROM `COrder` WHERE COrder.Id = @customerId; ", new { customerId }).AsList()];
 		}
 
 		public static COrder[] GetFromDate(DateOnly creationdate)
