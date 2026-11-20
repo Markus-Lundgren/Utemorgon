@@ -60,6 +60,23 @@ public static partial class Data
 			return barcodes;
 		}
 
+		/// <summary>Fetches all barcodes and their products</summary>
+		/// <returns>Array of Barcode objects</returns>
+		public static string[] GetAllBarcodesForProduct(int productId)
+		{
+			using var db = GetConnectionObject();
+			string query = """
+						SELECT b.Barcode
+						FROM Product p 
+						JOIN BarcodeToProduct b ON b.ProductId = p.Id
+						WHERE p.Id = @productId
+						""";
+
+			var barcodes = db.Query<string>(query, new { productId }).AsList().ToArray();
+
+			return barcodes ?? [];
+		}
+
 		/// <summary>Add a barcode to a product<br/>
 		/// 0: Success<br/>
 		/// 1: Code is already registered<br/>
@@ -70,20 +87,18 @@ public static partial class Data
 			using var db = GetConnectionObject();
 
 			string query = """
-			INSERT INTO BarcodeToProduct(ProductId, Barcode, IsArchived) VALUES(@ProductId, @BarCode, False);
+				INSERT INTO BarcodeToProduct(ProductId, Barcode, IsArchived) 
+				VALUES(@ProductId, @BarCode, FALSE)
+				ON DUPLICATE KEY UPDATE 
+					ProductId = IF(IsArchived = TRUE, @ProductId, ProductId),
+					IsArchived = FALSE; 
 			""";
 
-			try
-			{
-				db.Execute(query, new { ProductId = productId, BarCode = code });
-				return new(0, null);
-			}
-			catch (Exception)
-			{
-				// Technically, we don't know what happened. 
-				// I can't be bothered to check the true exceptions for Unique conflicts.
-				return new(1, $"Barcode \"{code}\" is already registered!");
-			}
+			int rowsAffected = db.Execute(query, new { ProductId = productId, BarCode = code });
+			return rowsAffected == 1 ?
+				new(0, null) :
+				new(1, $"Barcode \"{code}\" is already registered!");
+
 		}
 
 		/// <summary>Checks if barcode exists</summary>
