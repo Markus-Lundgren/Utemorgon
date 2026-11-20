@@ -35,33 +35,6 @@ public static partial class Data
 			return b;
 		}
 
-		/// <summary>Return a Product using a barcode as search parameter</summary>
-		/// <returns>Product object</returns>
-		public static Product? GetProductFromBarcode(string barcode)
-		{
-			using var db = GetConnectionObject();
-			string query = """
-            SELECT * 
-            FROM BarcodeToProduct b
-            JOIN Product p ON b.ProductId = p.Id
-            WHERE Barcode = @Barcode
-            """;
-
-			Product? p = null;
-			db.Query<Barcode, Product, Barcode>(
-				query,
-				(barcode, product) =>
-				{
-					p = product;
-					return barcode;
-				},
-				new { Barcode = barcode },
-				splitOn: "Id"
-			);
-
-			return p;
-		}
-
 		/// <summary>Fetches all barcodes and their products</summary>
 		/// <returns>Array of Barcode objects</returns>
 		public static Barcode[] GetAllProductsWithBarcode()
@@ -96,21 +69,22 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 
+			// IGNORE downgrades an exception to a warning, which just lets us flow-through
+			// Technically we send the wrong message when colliding on PK's but whatever.
 			string query = """
-			INSERT INTO BarcodeToProduct(ProductId, Barcode, IsArchived) VALUES(@ProductId, @BarCode, False);
+				UPDATE BarcodeToProduct
+				SET ProductId = @ProductId, IsArchived = FALSE
+				WHERE Barcode = @BarCode AND IsArchived = TRUE;
+
+				INSERT IGNORE INTO BarcodeToProduct (ProductId, Barcode, IsArchived)
+				VALUES (@ProductId, @BarCode, FALSE);
 			""";
 
-			try
-			{
-				db.Execute(query, new { ProductId = productId, BarCode = code });
-				return new(0, null);
-			}
-			catch (Exception)
-			{
-				// Technically, we don't know what happened. 
-				// I can't be bothered to check the true exceptions for Unique conflicts.
-				return new(1, $"Barcode \"{code}\" is already registered!");
-			}
+			int rowsAffected = db.Execute(query, new { ProductId = productId, BarCode = code });
+			return rowsAffected > 0 ?
+				new(0, null) :
+				new(1, $"Barcode \"{code}\" is already registered!");
+
 		}
 
 		/// <summary>Checks if barcode exists</summary>

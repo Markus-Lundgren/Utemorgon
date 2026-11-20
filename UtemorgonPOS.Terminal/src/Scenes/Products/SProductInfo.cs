@@ -77,7 +77,7 @@ class SProductInfo : IScene
 		Console.WriteLine(new string('-', 95));
 
 		foreach (var pr in Data.Products.GetProducts())
-			Console.WriteLine($"{(pr.IsArchived ? $"(A) " : null)}{pr.Id,-3} | {pr.Name,-45} | {pr.Price + " SEK",-12} | {pr.Stock,-8} | {pr.ProductType,-15}");
+			Console.WriteLine($"{pr.Id,-3} | {$"{pr.Name} {(pr.IsArchived ? $"(A) " : null)}",-45} | {pr.Price + " SEK",-12} | {pr.Stock,-8} | {pr.ProductType,-15}");
 	}
 
 	void PrintProductCard(Product p)

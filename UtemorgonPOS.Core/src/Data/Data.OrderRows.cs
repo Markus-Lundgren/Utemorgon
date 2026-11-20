@@ -101,7 +101,10 @@ public static partial class Data
 		}
 
 		// Add order row (must take in an order)
-
+		public static Response AddOrderRow(Order order)
+		{
+			return new(0, null);
+		}
 
 		// TODO: If time allows, check if return was successfull
 
