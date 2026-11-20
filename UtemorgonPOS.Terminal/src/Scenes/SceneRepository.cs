@@ -17,5 +17,7 @@ static class SceneRepository
 	public static class Customers
 	{
 		public static SCustomersMain Main = new();
+		public static SCustomerInfo Info = new();
+		public static SAllCustomers All = new();
 	}
 }
