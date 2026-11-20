@@ -49,8 +49,9 @@ public static partial class Data
 			string query = """
 			INSERT INTO Product(ProductTypeId, Name, Price, Stock, IsArchived) 
 				VALUES(@ProductTypeId, @Name, @Price, @Stock, False);
+				SELECT LAST_INSERT_ID();
 			""";
-			db.Execute(query, new
+			product.Id = db.Execute(query, new
 			{
 				ProductTypeId = (int)product.ProductType,
 				product.Name,
