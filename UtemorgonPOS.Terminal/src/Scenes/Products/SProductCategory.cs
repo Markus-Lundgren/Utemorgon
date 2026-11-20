@@ -57,7 +57,7 @@ class SProductCategory : IScene
 		{
 			Console.Write("Enter product category id: ");
 		}
-		while (!int.TryParse(Console.ReadLine(), out id));
+		while (!int.TryParse(Console.ReadLine(), out id) || id <= 0 || id > Enum.GetValues<ProductType>().Length - 1);
 
 		return id;
 	}
