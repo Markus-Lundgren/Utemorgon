@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Dapper;
 
@@ -123,6 +124,26 @@ public static partial class Data
 			db.Execute(query, new { Code = barcode });
 
 			return new(0, null);
+		}
+
+		public static RentalRow[] GetRentedRentalsBetweenDates(DateOnly startDate, DateOnly endDate)
+			=> GetRentalsBetweenDates("ExpectedReturnDate", startDate, endDate);
+
+		public static RentalRow[] GetReturnedRentalsBetweenDates(DateOnly startDate, DateOnly endDate)
+			=> GetRentalsBetweenDates("ReturnedDate", startDate, endDate);
+
+		/// <summary>Fetches all rental rows between two dates<br/>Make sure start date is lower than end date</summary>
+		/// <param name="startDate"></param>
+		/// <param name="endDate"></param>
+		/// <returns>RentalRow array</returns>
+		// TODO: Handle if return should be rental row array or orderrow array
+
+		static RentalRow[] GetRentalsBetweenDates(string column, DateOnly startDate, DateOnly endDate)
+		{
+			using var db = GetConnectionObject();
+
+			string query = $"SELECT * FROM RentalRow rr WHERE rr.{column} BETWEEN @StartDate AND @EndDate";
+			return [.. db.Query<RentalRow>(query, new { StartDate = startDate, EndDate = endDate })];
 		}
 	}
 }
