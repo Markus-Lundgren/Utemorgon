@@ -78,7 +78,7 @@ public static partial class Data
 				db.Execute(query, new { ProductId = productId, BarCode = code });
 				return new(0, null);
 			}
-			catch (Exception _)
+			catch (Exception)
 			{
 				// Technically, we don't know what happened. 
 				// I can't be bothered to check the true exceptions for Unique conflicts.
