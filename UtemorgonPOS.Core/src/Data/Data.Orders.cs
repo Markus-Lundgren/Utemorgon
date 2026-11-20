@@ -29,7 +29,7 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			return [.. db.Query<COrder>("SELECT * FROM `COrder`;")];
 		}
-		public static COrder GetFromId(int customerId)
+		public static COrder GetFromCustomerId(int customerId)
 		{
 
 			using var db = GetConnectionObject();
