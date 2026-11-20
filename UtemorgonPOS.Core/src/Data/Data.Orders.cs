@@ -5,12 +5,11 @@
 */
 using System;
 using Dapper;
-using Microsoft.VisualBasic;
 namespace UtemorgonPOS.Core;
 
 public static partial class Data
 {
-	public static class COrders
+	public static class Orders
 	{
 		// TODO: Add things like GetAllOrdersForCustomer(int customerId)
 		public static void CreateOrder(int customerId, DateTime creationDate)
@@ -30,7 +29,7 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			return [.. db.Query<COrder>("SELECT * FROM `COrder`;")];
 		}
-		public static COrder GetFromId(int customerId)
+		public static COrder GetFromCustomerId(int customerId)
 		{
 
 			using var db = GetConnectionObject();

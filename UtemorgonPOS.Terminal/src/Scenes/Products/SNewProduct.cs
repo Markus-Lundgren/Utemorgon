@@ -88,28 +88,56 @@ class SNewProduct : IScene
 		// send error messages to frontend.
 		Data.Products.AddProduct(p);
 
-		Console.WriteLine("\nPress B to append a barcode, or any other key to continue.");
-		if (Console.ReadKey(intercept: true).Key == ConsoleKey.B)
+		Console.WriteLine("\nB: Append a barcode\nEnter: Finalize.");
+		ConsoleKey k = ConsoleKey.None;
+
+		while (k != ConsoleKey.B && k != ConsoleKey.Enter)
+			k = Console.ReadKey(intercept: true).Key;
+
+		string? barcode = null;
+		bool error = false;
+		if (k == ConsoleKey.B)
 		{
-			string barcode = ScannerTUI.GetBarcode();
-			var response = Data.Barcodes.AddBarcodeToProduct(p.Id, barcode);
-			if (response.Code == 0)
+			if (p.Stock is not null)
 			{
 
-				Console.Clear();
-				Console.WriteLine("======= NEW PRODUCT ADDED =======");
-				Console.WriteLine($"{p.Name} ({p.ProductType})");
-				Console.WriteLine($"Price: {p.Price} SEK");
-				Console.WriteLine($"Stock: {p.Stock}");
-				if (!string.IsNullOrEmpty(barcode))
-					Console.WriteLine($"Barcode: {barcode}");
-				Console.WriteLine("=================================");
+				barcode = ScannerTUI.GetBarcode();
+				var response = Data.Barcodes.AddBarcodeToProduct(p.Id, barcode);
+				if (response.Code != 0)
+				{
+					Console.Clear();
+					Console.WriteLine(response.Message);
+					error = true;
+				}
 			}
 			else
 			{
-				Console.Clear();
-				Console.WriteLine(response.Message);
+				if (p.ProductType.ToString().StartsWith("Rental_", StringComparison.InvariantCultureIgnoreCase))
+				{
+					var bc = Data.Barcodes.AddBarcodeToRental(p.Id);
+					if (bc is not null)
+						Printer.PrintBarcode(bc);
+				}
+				if (p.ProductType.ToString().StartsWith("Service_", StringComparison.InvariantCultureIgnoreCase))
+				{
+					var bc = Data.Barcodes.AddBarcodeToService(p.Id);
+					if (bc is not null)
+						Printer.PrintBarcode(bc);
+				}
 			}
+		}
+
+		if (!error)
+		{
+			Console.Clear();
+			Console.WriteLine("======= NEW PRODUCT ADDED =======");
+			Console.WriteLine($"{p.Name} ({p.ProductType})");
+			Console.WriteLine($"Price: {p.Price} SEK");
+			if (p.Stock is not null)
+				Console.WriteLine($"Stock: {p.Stock}");
+			if (!string.IsNullOrEmpty(barcode))
+				Console.WriteLine($"Barcode: {barcode}");
+			Console.WriteLine("=================================");
 		}
 
 		Console.WriteLine("Press any key to exit.");
