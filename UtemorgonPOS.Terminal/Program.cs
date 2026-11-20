@@ -8,6 +8,7 @@ class Program
 {
 	static void Main(string[] _)
 	{
+
 		Console.Clear();
 		SceneManager sm = new();
 

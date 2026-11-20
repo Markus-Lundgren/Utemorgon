@@ -89,34 +89,30 @@ class SNewProduct : IScene
 		Data.Products.AddProduct(p);
 
 		Console.WriteLine("\nPress B to append a barcode, or any other key to continue.");
-		string? barcode = null;
 		if (Console.ReadKey(intercept: true).Key == ConsoleKey.B)
 		{
-			while (string.IsNullOrEmpty(barcode))
+			string barcode = ScannerTUI.GetBarcode();
+			var response = Data.Barcodes.AddBarcodeToProduct(p.Id, barcode);
+			if (response.Code == 0)
 			{
-				Console.Write("Scan or enter barcode: ");
-				barcode = Console.ReadLine() ?? "";
 
-				if (barcode.Length != 13)
-				{
-					barcode = null;
-					continue;
-				}
+				Console.Clear();
+				Console.WriteLine("======= NEW PRODUCT ADDED =======");
+				Console.WriteLine($"{p.Name} ({p.ProductType})");
+				Console.WriteLine($"Price: {p.Price} SEK");
+				Console.WriteLine($"Stock: {p.Stock}");
+				if (!string.IsNullOrEmpty(barcode))
+					Console.WriteLine($"Barcode: {barcode}");
+				Console.WriteLine("=================================");
 			}
-
-			Data.Barcodes.AddBarcodeToProduct(p.Id, barcode);
+			else
+			{
+				Console.Clear();
+				Console.WriteLine(response.Message);
+			}
 		}
 
-		Console.Clear();
-		Console.WriteLine("======= NEW PRODUCT ADDED =======");
-		Console.WriteLine($"{p.Name} ({p.ProductType})");
-		Console.WriteLine($"Price: {p.Price} SEK");
-		Console.WriteLine($"Stock: {p.Stock}");
-		if (!string.IsNullOrEmpty(barcode))
-			Console.WriteLine($"Barcode: {barcode}");
-		Console.WriteLine("=================================");
-
-		Console.WriteLine("\nPress any key to exit.");
+		Console.WriteLine("Press any key to exit.");
 		Console.ReadKey();
 
 		return new SceneTransition.Pop();
