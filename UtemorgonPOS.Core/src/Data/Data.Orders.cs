@@ -24,24 +24,24 @@ public static partial class Data
 			);
 			Console.WriteLine($"Inserted {customerId} at {creationDate}");
 		}
-		public static COrder[] GetAll()
+		public static Order[] GetAll()
 		{
 			using var db = GetConnectionObject();
-			return [.. db.Query<COrder>("SELECT * FROM `COrder`;")];
+			return [.. db.Query<Order>("SELECT * FROM `COrder`;")];
 		}
-		public static COrder[] GetFromCustomerId(int customerId)
+		public static Order[] GetFromCustomerId(int customerId)
 		{
 			using var db = GetConnectionObject();
 
-			return [.. db.Query<COrder>("SELECT * FROM `COrder` WHERE COrder.CustomerId = @customerId; ", new { customerId }).AsList()];
+			return [.. db.Query<Order>("SELECT * FROM `COrder` WHERE COrder.CustomerId = @customerId; ", new { customerId }).AsList()];
 		}
 
-		public static COrder[] GetFromDate(DateOnly creationdate)
+		public static Order[] GetFromDate(DateOnly creationdate)
 		{
 			using var db = GetConnectionObject();
-			return [.. db.Query<COrder>("Select * from COrder where CAST(CreationDate AS DATE) = @CreationDate ", new { CreationDate = creationdate })];
+			return [.. db.Query<Order>("Select * from COrder where CAST(CreationDate AS DATE) = @CreationDate ", new { CreationDate = creationdate })];
 		}
-		public static COrder[] GetLate()
+		public static Order[] GetLate()
 		{
 			using var db = GetConnectionObject();
 			string Query =
@@ -53,7 +53,7 @@ public static partial class Data
 				where RR.ReturnedDate > RR.ExpectedReturnDate
 				order by CO.Id;
 			""";
-			var lateReturns = db.Query<COrder, OrderRow, RentalRow, COrder>(Query, (COrder, OrderRow, RentalRow) =>
+			var lateReturns = db.Query<Order, OrderRow, RentalRow, Order>(Query, (COrder, OrderRow, RentalRow) =>
 			{
 				COrder.OrderRow = OrderRow;
 				return COrder;
