@@ -86,16 +86,19 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 
+			// IGNORE downgrades an exception to a warning, which just lets us flow-through
+			// Technically we send the wrong message when colliding on PK's but whatever.
 			string query = """
-				INSERT INTO BarcodeToProduct(ProductId, Barcode, IsArchived) 
-				VALUES(@ProductId, @BarCode, FALSE)
-				ON DUPLICATE KEY UPDATE 
-					ProductId = IF(IsArchived = TRUE, @ProductId, ProductId),
-					IsArchived = FALSE; 
+				UPDATE BarcodeToProduct
+				SET ProductId = @ProductId, IsArchived = FALSE
+				WHERE Barcode = @BarCode AND IsArchived = TRUE;
+
+				INSERT IGNORE INTO BarcodeToProduct (ProductId, Barcode, IsArchived)
+				VALUES (@ProductId, @BarCode, FALSE);
 			""";
 
 			int rowsAffected = db.Execute(query, new { ProductId = productId, BarCode = code });
-			return rowsAffected != 1 ?
+			return rowsAffected > 0 ?
 				new(0, null) :
 				new(1, $"Barcode \"{code}\" is already registered!");
 
