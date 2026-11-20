@@ -41,6 +41,34 @@ public static partial class Data
 
 			return [.. db.Query<Product>(query, new { IsArchived = isArchived }).AsList()];
 		}
+
+		/// <summary>Return a Product using a barcode as search parameter</summary>
+		/// <returns>Product object</returns>
+		public static Product? GetProductFromBarcode(string barcode)
+		{
+			using var db = GetConnectionObject();
+			string query = """
+				SELECT * 
+				FROM BarcodeToProduct b
+				JOIN Product p ON b.ProductId = p.Id
+				WHERE Barcode = @Barcode
+				""";
+
+			Product? p = null;
+			db.Query<Barcode, Product, Barcode>(
+				query,
+				(barcode, product) =>
+				{
+					p = product;
+					return barcode;
+				},
+				new { Barcode = barcode },
+				splitOn: "Id"
+			);
+
+			return p;
+		}
+
 		/// <summary>Add product to database using an object of Product</summary>
 		/// <param name="product"></param>
 		public static void AddProduct(Product product)
