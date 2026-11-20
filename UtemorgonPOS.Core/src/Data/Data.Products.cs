@@ -51,7 +51,7 @@ public static partial class Data
 				VALUES(@ProductTypeId, @Name, @Price, @Stock, False);
 				SELECT LAST_INSERT_ID();
 			""";
-			product.Id = db.Execute(query, new
+			product.Id = db.ExecuteScalar<int>(query, new
 			{
 				ProductTypeId = (int)product.ProductType,
 				product.Name,
