@@ -33,7 +33,7 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 
-			return [.. db.Query<COrder>("SELECT * FROM `COrder` WHERE COrder.Id = @customerId; ", new { customerId }).AsList()];
+			return [.. db.Query<COrder>("SELECT * FROM `COrder` WHERE COrder.CustomerId = @customerId; ", new { customerId }).AsList()];
 		}
 
 		public static COrder[] GetFromDate(DateOnly creationdate)
