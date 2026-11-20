@@ -7,7 +7,7 @@ class SCustomerInfo : IScene
 
   Menu _menu = new([
     new(ConsoleKey.A, "Show all customer", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.All); }),
-    new(ConsoleKey.I, "Search customer by ID", () => {}),
+    new(ConsoleKey.I, "Search customer by ID", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.ById); }),
     new(ConsoleKey.P, "Search customer by personal number", () => {}),
     new(ConsoleKey.N, "Search customer by name", () => {}),
     new(ConsoleKey.S, "Customers with late rentals", () => {}),
