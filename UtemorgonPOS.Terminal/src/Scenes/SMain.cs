@@ -7,7 +7,7 @@ class SMain : IScene
 
 	Menu _menu = new([
 		new(ConsoleKey.T, "Enter transaction", () => { _deferredTransition = new SceneTransition.Push(SceneRepository.Transaction.Main); }),
-		new(ConsoleKey.C, "Customers", () => {}),
+		new(ConsoleKey.C, "Customers", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.Main); }),
 		new(ConsoleKey.P, "Products", () => { _deferredTransition = new SceneTransition.Push(SceneRepository.Products.Main); }),
 		new(ConsoleKey.R, "Rentals", () => {}),
 		new(ConsoleKey.B, "Barcodes", () => {}),

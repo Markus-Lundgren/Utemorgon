@@ -13,4 +13,9 @@ static class SceneRepository
 	{
 		public static STransactionMain Main = new();
 	}
+
+	public static class Customers
+	{
+		public static SCustomersMain Main = new();
+	}
 }
