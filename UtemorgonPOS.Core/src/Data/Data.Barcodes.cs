@@ -95,7 +95,7 @@ public static partial class Data
 			""";
 
 			int rowsAffected = db.Execute(query, new { ProductId = productId, BarCode = code });
-			return rowsAffected == 1 ?
+			return rowsAffected != 1 ?
 				new(0, null) :
 				new(1, $"Barcode \"{code}\" is already registered!");
 
