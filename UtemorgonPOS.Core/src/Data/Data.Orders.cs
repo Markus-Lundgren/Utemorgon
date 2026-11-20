@@ -5,12 +5,11 @@
 */
 using System;
 using Dapper;
-using Microsoft.VisualBasic;
 namespace UtemorgonPOS.Core;
 
 public static partial class Data
 {
-	public static class COrders
+	public static class Orders
 	{
 		// TODO: Add things like GetAllOrdersForCustomer(int customerId)
 		public static void CreateOrder(int customerId, DateTime creationDate)

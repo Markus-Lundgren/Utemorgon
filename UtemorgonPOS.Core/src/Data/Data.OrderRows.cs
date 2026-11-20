@@ -100,6 +100,9 @@ public static partial class Data
 			return [.. rentalRowDict.Values];
 		}
 
+		// Add order row (must take in an order)
+
+
 		// TODO: If time allows, check if return was successfull
 
 		///<summary>Returns rented product
