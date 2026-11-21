@@ -41,6 +41,18 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			return [.. db.Query<Order>("Select * from COrder where CAST(CreationDate AS DATE) = @CreationDate ", new { CreationDate = creationdate })];
 		}
+
+		/// <summary>Fetches all orders between two dates<br/>Make sure start date is lower than end date</summary>
+		/// <param name="startDate"></param>
+		/// <param name="endDate"></param>
+		/// <returns>Order array</returns>
+		public static Order[] GetOrdersBetweenDates(DateOnly startDate, DateOnly endDate)
+		{
+			using var db = GetConnectionObject();
+
+			string query = "SELECT * FROM COrder o WHERE o.CreationDate BETWEEN @StartDate AND @EndDate";
+			return [.. db.Query<Order>(query, new { StartDate = startDate, EndDate = endDate })];
+		}
 		public static Order[] GetLate()
 		{
 			using var db = GetConnectionObject();
