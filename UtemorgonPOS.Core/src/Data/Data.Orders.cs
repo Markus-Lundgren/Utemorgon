@@ -80,9 +80,28 @@ public static partial class Data
 			"""
 				INSERT INTO OrderPriceModifier(OrderId, PriceDelta, Reason)
 				VALUES(@orderId, @priceDelta, @reason)
-				RETURNINT Id;
+				RETURNING Id;
 			""";
-			return db.QuerySingle<int>(query, new { OrderId = orderId, PriceDelta = priceDelta, Reason = reason });
+			return db.QuerySingle<int>(query, new { orderId, priceDelta, reason });
+		}
+
+		public static int AddPaymentToOrder(int orderId, decimal amount, PaymentMethod paymentMethod, DateTime receivedDate)
+		{
+			using var db = GetConnectionObject();
+			string query =
+			"""
+				INSERT INTO PaymentToOrder(OrderId, Amount, PaymentMethod, ReceivedDate)
+				VALUES(@orderId, @amount, @PaymentMethod, @receivedDate)
+				RETURNING
+			""";
+
+			return db.QuerySingle<int>(query, new
+			{
+				orderId,
+				amount,
+				PaymentMethod = paymentMethod.ToString(),
+				receivedDate
+			});
 		}
 
 	}
