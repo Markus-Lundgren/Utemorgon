@@ -8,7 +8,7 @@ public static partial class Data
 	public class Rentals
 	{
 		const string ROOT_QUERY = """
-			SELECT rr.*, p.*, c.*, o.*
+			SELECT p.*, o.*, c.*, rr.*
 			FROM RentalRow rr
 			JOIN OrderRow odrr ON rr.OrderRowId = odrr.Id
 			JOIN BarcodeToProduct btp ON odrr.Barcode = btp.Barcode
@@ -20,8 +20,6 @@ public static partial class Data
 		public static RentalProduct[]? GetAllRentalProducts()
 		{
 			using var db = GetConnectionObject();
-
-			RentalProduct? rp = new();
 
 			var rentalArray = db.Query<Product, Order, Customer, RentalRow, RentalProduct>(
 				ROOT_QUERY,
