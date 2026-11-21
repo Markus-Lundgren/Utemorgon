@@ -64,7 +64,7 @@ class STransactionMain : IScene
 				Console.WriteLine($"No item selected.");
 				_currentMenu = _menu;
 			}
-			Console.WriteLine($"----- ----- MODIFIERS ----- -----");
+			Console.WriteLine($"\n----- ----- ORDER MODIFIERS ----- -----");
 			var mods = _currentTransaction.AllModifiers;
 			if (mods.Length < 1)
 				Console.WriteLine("No order modifiers added.");
@@ -216,7 +216,16 @@ class STransactionMain : IScene
 
 	void PrintItemCard(OrderRow row)
 	{
-		Console.WriteLine(row.ToString());
+		Console.WriteLine($"Name: {row.Name}");
+		Console.WriteLine($"Quantity: {row.Quantity}");
+
+		var pms = row.PriceModifiers;
+		Console.Write($"Price modifiers: ");
+		if (pms.Count < 1)
+			Console.Write($"None\n");
+		else
+			foreach (var pm in row.PriceModifiers)
+				Console.WriteLine($"\"{pm.Reason}\" {pm.PriceDelta:N2}");
 	}
 
 	void PrintRow(OrderRow row)
