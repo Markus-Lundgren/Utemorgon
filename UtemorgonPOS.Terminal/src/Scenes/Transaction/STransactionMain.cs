@@ -184,7 +184,26 @@ class STransactionMain : IScene
 
 	void AddOrderModifier()
 	{
+		string? reason = null;
+		decimal delta;
 
+		Console.WriteLine("ADDING ORDER MODIFIER");
+
+		while (string.IsNullOrWhiteSpace(reason))
+		{
+			Console.Write("Reason: ");
+			reason = Console.ReadLine();
+		}
+		string? inpt;
+		do
+		{
+			Console.Write("Amount: ");
+			inpt = Console.ReadLine();
+
+		} while (string.IsNullOrWhiteSpace(inpt) || !decimal.TryParse(inpt, out delta));
+
+		_currentTransaction.AddPriceModifier(reason, delta);
+		_forceReRender = true;
 	}
 
 	void DeselectItem() => _currentTransaction.DeselectItem();
