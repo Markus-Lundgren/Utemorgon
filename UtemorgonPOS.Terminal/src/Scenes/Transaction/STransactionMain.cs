@@ -3,43 +3,26 @@ using RiverScenes;
 
 class STransactionMain : IScene
 {
-	static SceneTransition? _deferredTransition;
+	SceneTransition? _deferredTransition;
 
-	// TODO: Create a static helpe for keeping track of current and non finished orders in RAM.
-	// Current order needs to be kept alive between scene transitions.
-	// State of the current order also needs to be checked to render the appropriate menu.
+	Menu _menu = new([]);
+	Menu _menuRental = new([]);
+	Menu _menuWare = new([]);
 
-	Menu _menu = new([
-	new(ConsoleKey.B, "Enter barcode", () => {}),
-	new(ConsoleKey.C, "Add customer", () => {}),
-	new(ConsoleKey.O, "Add order modifier", () => {}),
-	new(ConsoleKey.F, "Finalize order", () => {}),
-	new(ConsoleKey.S, "Save order and exit", () => {Console.WriteLine("Order saved (not rly)"); Console.ReadKey(); _deferredTransition = new SceneTransition.Pop(); }),
-	new(ConsoleKey.A, "Abort transaction", () => {_deferredTransition = new SceneTransition.Pop(); }),
-	]);
-
-	Menu _menuRental = new([
-	new(ConsoleKey.B, "Enter barcode", () => {}),
-	new(ConsoleKey.P, "Change root price", () => {}),
-	new(ConsoleKey.M, "Add price modifier", () => {}),
-	new(ConsoleKey.D, "Change return date", () => {}),
-	new(ConsoleKey.E, "End scan", () => {_deferredTransition = new SceneTransition.Pop(); }),
-	]);
-
-	Menu _menuWare = new([
-	new(ConsoleKey.B, "Enter barcode", () => {}),
-	new(ConsoleKey.N, "Add price modifier", () => {}),
-	new(ConsoleKey.A, "Change amount", () => {}),
-	new(ConsoleKey.E, "End scan", () => {_deferredTransition = new SceneTransition.Pop(); }),
-	]);
+	//TODO: Add state cache: 
+	// CurrentTransaction
+	// Selected product
 
 	public void Enter()
 	{
+		SetupMenus();
+		SelectOrCreateTransaction();
 		_deferredTransition = null;
 	}
 
 	public void Exit()
 	{
+
 	}
 
 	public SceneTransition Run()
@@ -70,5 +53,38 @@ class STransactionMain : IScene
 			Console.WriteLine("Press any key to continue...");
 			Console.ReadKey();
 		}
+	}
+
+	void SelectOrCreateTransaction()
+	{
+		// TODO: If transaction list is not empty, choose transaction
+		// Else: Create one automatically using current datetime.
+	}
+
+	void SetupMenus()
+	{
+		_menu = new([
+		new(ConsoleKey.B, "Enter barcode", () => {}),
+		new(ConsoleKey.C, "Add customer", () => {}),
+		new(ConsoleKey.O, "Add order modifier", () => {}),
+		new(ConsoleKey.F, "Finalize order", () => {}),
+		new(ConsoleKey.S, "Save order and exit", () => {Console.WriteLine("Order saved (not rly)"); Console.ReadKey(); _deferredTransition = new SceneTransition.Pop(); }),
+		new(ConsoleKey.A, "Abort transaction", () => {_deferredTransition = new SceneTransition.Pop(); }),
+		]);
+
+		_menuRental = new([
+		new(ConsoleKey.B, "Enter barcode", () => {}),
+		new(ConsoleKey.P, "Change root price", () => {}),
+		new(ConsoleKey.M, "Add price modifier", () => {}),
+		new(ConsoleKey.D, "Change return date", () => {}),
+		new(ConsoleKey.E, "End scan", () => {_deferredTransition = new SceneTransition.Pop(); }),
+		]);
+
+		_menuWare = new([
+		new(ConsoleKey.B, "Enter barcode", () => {}),
+		new(ConsoleKey.N, "Add price modifier", () => {}),
+		new(ConsoleKey.A, "Change amount", () => {}),
+		new(ConsoleKey.E, "End scan", () => {_deferredTransition = new SceneTransition.Pop(); }),
+		]);
 	}
 }
