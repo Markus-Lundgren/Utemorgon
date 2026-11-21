@@ -163,7 +163,7 @@ public static partial class Data
 					RentalRow.ExpectedReturnDate
 				FROM Customer
 				JOIN COrder ON Customer.Id = COrder.CustomerId
-				JOIN OrderRow ON COrder.Id = OrderRow.COrderId
+				JOIN OrderRow ON COrder.Id = OrderRow.OrderId
 				JOIN RentalRow ON OrderRow.Id = RentalRow.OrderRowId
 				WHERE RentalRow.ExpectedReturnDate < NOW()
 					AND RentalRow.ReturnedDate IS NULL

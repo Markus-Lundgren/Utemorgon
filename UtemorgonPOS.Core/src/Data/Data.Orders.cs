@@ -60,7 +60,7 @@ public static partial class Data
 			"""
 				SELECT CO.*,RR.*, O.*
 				FROM COrder CO
-				JOIN OrderRow O on CO.Id = O.COrderId
+				JOIN OrderRow O on CO.Id = O.OrderId
 				JOIN RentalRow RR on O.Id = RR.OrderRowId
 				where RR.ReturnedDate > RR.ExpectedReturnDate
 				order by CO.Id;
