@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RiverScenes;
+using UtemorgonPOS.Core;
 
 class STransactionMain : IScene
 {
 	SceneTransition? _deferredTransition;
 
+	Menu _currentMenu = null!;
 	Menu _menu = new([]);
 	Menu _menuRental = new([]);
 	Menu _menuWare = new([]);
@@ -34,27 +36,68 @@ class STransactionMain : IScene
 		{
 			Console.Clear();
 			Console.WriteLine("=====~* UTEMORGON *~=====");
+			Console.WriteLine($"Transaction: {_currentTransaction.AsRow()}");
 
-			// TODO: Get the current transaction from static manager and use the date to set header:
-			// EG: "Transaction 2026-11-10 00:10"
-			Console.WriteLine($"{_currentTransaction.AsRow()}");
-
-			// TODO: Use current order state to render Order and Insert.
-
-			// TODO: Check order state and render / key-query the appropriate menu.
-			Console.WriteLine(_menu.MenuRows);
-
-			var a = _menu.GetAction(Console.ReadKey(intercept: true).Key);
-			if (a is null)
-				Console.WriteLine("Not a valid choice!");
+			Console.WriteLine($"----- ----- ORDER ----- -----");
+			if (_currentTransaction.ItemCount < 1)
+				Console.WriteLine("No items added to order.");
 			else
-				a?.Action();
+				foreach (var row in _currentTransaction.AllItems)
+					PrintRow(row);
 
-			if (_deferredTransition != null)
-				return _deferredTransition;
+			Console.WriteLine($"----- ----- INSERT ----- -----");
+			if (_currentTransaction.SelectedItem is not null)
+			{
+				if (_currentTransaction.SelectedItem is RentalRow)
+					_currentMenu = _menuRental;
+				else
+					_currentMenu = _menuWare;
 
-			Console.WriteLine("Press any key to continue...");
-			Console.ReadKey();
+				PrintItemCard(_currentTransaction.SelectedItem);
+			}
+			else
+			{
+				Console.WriteLine($"No item selected.");
+				_currentMenu = _menu;
+			}
+
+			Console.WriteLine($"----- ----- ------ ----- -----");
+			Console.WriteLine(_currentMenu.MenuRows);
+
+			// SCANNER LOOP HACK
+			// 
+			// This hack allows us to query the scanner on the same thread.
+			// We simply scan for 50ms, and then check for keys in an infinite loop.
+			// Once we need to update the UI, we break the inner loop so that the outer loop can re-draw.
+			// This is probably super fragile and not very good. But we need to get this ready in time for the demo.
+
+			while (true)
+			{
+				Scanner.ClearBuffer();
+				string? barcode = null;
+				barcode = Scanner.ReadForMs(50);
+
+				if (!string.IsNullOrEmpty(barcode))
+				{
+					Barcode? bc = Data.Barcodes.GetBarcodeFromString(barcode);
+					if (bc is not null)
+					{
+						_currentTransaction.AddItem(bc);
+						break;
+					}
+				}
+				else if (Console.KeyAvailable)
+				{
+					MenuAction? a = _currentMenu.GetAction(Console.ReadKey(intercept: true).Key);
+					if (a is null)
+						continue;
+
+					a?.Action();
+				}
+
+				if (_deferredTransition != null)
+					return _deferredTransition;
+			}
 		}
 	}
 
@@ -122,5 +165,18 @@ class STransactionMain : IScene
 		new(ConsoleKey.N, "Add price modifier", () => {}),
 		new(ConsoleKey.A, "Change amount", () => {}),
 		]);
+
+		_currentMenu = _menu;
 	}
+
+	void PrintItemCard(OrderRow row)
+	{
+
+	}
+
+	void PrintRow(OrderRow row)
+	{
+		Console.WriteLine(row.ToString());
+	}
+
 }
