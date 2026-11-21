@@ -23,5 +23,6 @@ static class SceneRepository
 		public static SCustomerBySocialNumber BySocialNumber = new();
 		public static SCustomerByName ByName = new();
 		public static SCustomersWithLateRentals LateRentals = new();
+		public static SNewCustomer NewCustomer = new();
 	}
 }

@@ -6,7 +6,7 @@ class SCustomersMain : IScene
 	static SceneTransition? _deferredTransition;
 
 	Menu _menu = new([
-	new(ConsoleKey.N, "New customer", () => {}),
+	new(ConsoleKey.N, "New customer", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.NewCustomer); }),
 	new(ConsoleKey.I, "Customer info", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.Info); }),
 	new(ConsoleKey.D, "Delete customer", () => {}),
 	new(ConsoleKey.B, "Back", () => {_deferredTransition = new SceneTransition.Pop(); }),
