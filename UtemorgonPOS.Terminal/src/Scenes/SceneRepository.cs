@@ -20,5 +20,6 @@ static class SceneRepository
 		public static SCustomerInfo Info = new();
 		public static SAllCustomers All = new();
 		public static SCustomersById ById = new();
+		public static SCustomerBySocialNumber BySocialNumber = new();
 	}
 }
