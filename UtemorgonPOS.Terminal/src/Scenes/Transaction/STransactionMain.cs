@@ -4,6 +4,13 @@ using System.Linq;
 using RiverScenes;
 using UtemorgonPOS.Core;
 
+// TODO: ALL THESE
+// Price modifier per product
+// Price root per product
+// Date for rental
+// Amount for ware
+// When order is finalized and we push to DB, reduce stock for wares.
+
 class STransactionMain : IScene
 {
 	SceneTransition? _deferredTransition;
