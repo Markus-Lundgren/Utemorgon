@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using UtemorgonPOS.Core;
 
 public class Transaction
@@ -8,7 +9,7 @@ public class Transaction
 	/// Used for identification in frontend flow
 	public DateTime Timestamp { get; private set; }
 	public decimal CurrentTotal => GetTotal();
-	public int ItemCount => _items.Count;
+	public int ItemCount => GetItemCount();
 
 	public int? OrderId { get; set; }
 	public Customer? Customer { get; set; }
@@ -89,6 +90,16 @@ public class Transaction
 
 		foreach (var itm in _items.Values)
 			agg += itm.GetTotalPrice();
+
+		return agg;
+	}
+
+	int GetItemCount()
+	{
+		int agg = 0;
+
+		foreach (var itm in _items.Values)
+			agg += itm.Quantity;
 
 		return agg;
 	}
