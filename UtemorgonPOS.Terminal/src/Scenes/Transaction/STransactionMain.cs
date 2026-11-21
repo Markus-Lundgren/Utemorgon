@@ -67,7 +67,7 @@ class STransactionMain : IScene
 			Console.WriteLine($"----- ----- MODIFIERS ----- -----");
 			var mods = _currentTransaction.AllModifiers;
 			if (mods.Length < 1)
-				Console.WriteLine("No order modifiers available.");
+				Console.WriteLine("No order modifiers added.");
 			else
 				foreach (var om in mods)
 					Console.WriteLine($"\"{om.Reason}\" {om.PriceDelta:N2}");
