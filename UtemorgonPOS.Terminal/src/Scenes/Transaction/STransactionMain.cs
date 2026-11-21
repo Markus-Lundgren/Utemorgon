@@ -18,6 +18,8 @@ class STransactionMain : IScene
 	// This will not be null. It is initialized int Enter().
 	Transaction _currentTransaction = null!;
 
+	bool _forceReRender = false;
+
 	public void Enter()
 	{
 		SetupMenus();
@@ -32,8 +34,10 @@ class STransactionMain : IScene
 
 	public SceneTransition Run()
 	{
+		// Outer loop - this is the menu
 		while (true)
 		{
+			_forceReRender = false;
 			Console.Clear();
 			Console.WriteLine("=====~* UTEMORGON *~=====");
 			Console.WriteLine($"Transaction: {_currentTransaction.AsRow()}");
@@ -71,29 +75,28 @@ class STransactionMain : IScene
 			// Once we need to update the UI, we break the inner loop so that the outer loop can re-draw.
 			// This is probably super fragile and not very good. But we need to get this ready in time for the demo.
 
+			// Inner loop - this is the scanner
 			while (true)
 			{
+				int currentItemCount = _currentTransaction.ItemCount;
+				OrderRow? selectedItem = _currentTransaction.SelectedItem;
+
 				Scanner.ClearBuffer();
-				string? barcode = null;
-				barcode = Scanner.ReadForMs(50);
+				string? barcode = Scanner.ReadForMs(50);
 
 				if (!string.IsNullOrEmpty(barcode))
-				{
-					Barcode? bc = Data.Barcodes.GetBarcodeFromString(barcode);
-					if (bc is not null)
-					{
-						_currentTransaction.AddItem(bc);
-						break;
-					}
-				}
+					AddAndReRender(Data.Barcodes.GetBarcodeFromString(barcode));
 				else if (Console.KeyAvailable)
 				{
 					MenuAction? a = _currentMenu.GetAction(Console.ReadKey(intercept: true).Key);
-					if (a is null)
-						continue;
-
-					a?.Action();
+					if (a is MenuAction ma)
+						ma.Action();
 				}
+
+				// We are dirty, re-render!
+				if (_forceReRender || currentItemCount != _currentTransaction.ItemCount ||
+					selectedItem != _currentTransaction.SelectedItem)
+					break;
 
 				if (_deferredTransition != null)
 					return _deferredTransition;
@@ -143,7 +146,7 @@ class STransactionMain : IScene
 	void SetupMenus()
 	{
 		_menu = new([
-		new(ConsoleKey.B, "Enter barcode", () => {}),
+		new(ConsoleKey.B, "Enter barcode", AddProductThroughManualBarcode),
 		new(ConsoleKey.C, "Add customer", () => {}),
 		new(ConsoleKey.O, "Add order modifier", () => {}),
 		new(ConsoleKey.F, "Finalize order", () => {}),
@@ -153,7 +156,7 @@ class STransactionMain : IScene
 
 		// If selecteditem != null && selecteditem is RentalRow
 		_menuRental = new([
-		new(ConsoleKey.B, "Enter barcode", () => {}),
+		new(ConsoleKey.B, "Enter barcode", AddProductThroughManualBarcode),
 		new(ConsoleKey.P, "Change root price", () => {}),
 		new(ConsoleKey.M, "Add price modifier", () => {}),
 		new(ConsoleKey.D, "Change return date", () => {}),
@@ -169,9 +172,34 @@ class STransactionMain : IScene
 		_currentMenu = _menu;
 	}
 
+	void AddAndReRender(Barcode? barcode)
+	{
+		if (barcode is not null)
+			_currentTransaction.AddItem(barcode);
+		_forceReRender = true;
+	}
+
+	void AddProductThroughManualBarcode()
+	{
+		string? barcode = null;
+		while (string.IsNullOrEmpty(barcode) || barcode.Length != 13 && barcode != "/a")
+		{
+			Console.Write("\nType /a to abort.\nEnter barcode: ");
+			barcode = Console.ReadLine();
+		}
+
+		if (barcode == "/a")
+			return;
+
+		AddAndReRender(Data.Barcodes.GetBarcodeFromString(barcode));
+
+		_forceReRender = true;
+
+	}
+
 	void PrintItemCard(OrderRow row)
 	{
-
+		Console.WriteLine(row.ToString());
 	}
 
 	void PrintRow(OrderRow row)
