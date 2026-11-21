@@ -107,8 +107,8 @@ public static partial class Data
 
 			string query =
 			"""
-				INSERT INTO OrderRow(OrderId, Name, Price, Quantity)
-				VALUES(@OrderId, @Name, @Price, @Quantity)
+				INSERT INTO OrderRow(OrderId, Barcode, Name, Price, Quantity)
+				VALUES(@OrderId, @Barcode, @Name, @Price, @Quantity)
 				RETURNING Id;
 			""";
 
@@ -122,8 +122,8 @@ public static partial class Data
 
 			string query =
 			"""
-					INSERT INTO RentalRow(OrderRowId, Barcode, ExpectedReturnDate, ReturnedDate)
-					VALUES (@orderRowId, @Barcode, @ExpectedReturnDate, @ReturnedDate)
+					INSERT INTO RentalRow(OrderRowId, ExpectedReturnDate, ReturnedDate)
+					VALUES (@orderRowId, @ExpectedReturnDate, @ReturnedDate)
 					RETURNING Id;
 			""";
 
