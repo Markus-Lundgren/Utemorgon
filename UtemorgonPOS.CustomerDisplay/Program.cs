@@ -115,7 +115,7 @@ class Program
 				case 7:
 					Console.WriteLine($"{"Customer name",-30} | {"Product name",-32} | {"Rental row Id",-15} | {"Order id",-8}");
 					Console.WriteLine(new string('-', 125));
-					foreach (RentalProduct r in Data.Rentals.GetAllRentalProducts())
+					foreach (RentalProduct r in Data.Rentals.GetAllRentalData())
 					{
 						Console.WriteLine($"{r.Customer.FullName,-30} | {r.Product.Name,-32} | {r.RentalRow.Id,-20} | {r.Order.Id,-10}");
 						Console.WriteLine(new string('-', 125));

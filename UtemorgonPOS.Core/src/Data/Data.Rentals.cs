@@ -17,7 +17,7 @@ public static partial class Data
 			JOIN Customer c ON o.CustomerId = c.Id
 		""";
 		//THIS METHOD IS HIGHLY EXPERIMENTAL, NOT MEANT FOR USE AS IS
-		public static RentalProduct[]? GetAllRentalProducts()
+		public static RentalProduct[]? GetAllRentalData()
 		{
 			using var db = GetConnectionObject();
 
