@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UtemorgonPOS.Core;
 
 public class Transaction
@@ -20,6 +21,14 @@ public class Transaction
 		Timestamp = DateTime.Now;
 	}
 
+	public void DeselectItem() => SelectedItem = null;
+
+	public void SelectItem(string barcode)
+	{
+		if (_items.TryGetValue(barcode, out var row))
+			SelectedItem = row;
+	}
+
 	public void AddItem(Barcode barcode)
 	{
 		if (barcode.Product is null)
@@ -36,6 +45,8 @@ public class Transaction
 			_items[barcode.BarCode].Quantity += barcode.Product.ProductType.ToString().Contains("rental", StringComparison.InvariantCultureIgnoreCase) ?
 			0 : 1;
 		}
+
+		SelectedItem = _items[barcode.BarCode];
 	}
 
 	public bool RemoveItem(Barcode barcode, out OrderRow? row)
