@@ -25,7 +25,7 @@ public static partial class Data
 
 			//This could easily be reused with an appended query as well.
 			var rentalArray = db.Query<Product, Order, Customer, RentalRow, RentalProduct>(
-				$"{ROOT_QUERY} {append}",
+				$"{ROOT_QUERY} {append};",
 				(product, order, customer, rentalRow) => new RentalProduct
 				{
 					Product = product,
