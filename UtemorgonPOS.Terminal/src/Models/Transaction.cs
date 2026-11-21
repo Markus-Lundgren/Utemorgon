@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using UtemorgonPOS.Core;
 
 public class Transaction
@@ -7,14 +8,14 @@ public class Transaction
 	/// Used for identification in frontend flow
 	public DateTime Timestamp { get; private set; }
 	public decimal CurrentTotal => GetTotal();
-	public decimal ItemCount => _items.Count;
+	public int ItemCount => _items.Count;
 
 	public int? OrderId { get; set; }
 	public Customer? Customer { get; set; }
 	public OrderRow? SelectedItem { get; private set; }
+	public ImmutableArray<OrderRow> AllItems => _items.Values.ToImmutableArray();
 
-
-	Dictionary<string, OrderRow> _items = [];
+	Dictionary<int, OrderRow> _items = [];
 	List<OrderPriceModifier> _priceModifiers = [];
 
 	public Transaction()
@@ -24,9 +25,12 @@ public class Transaction
 
 	public void DeselectItem() => SelectedItem = null;
 
-	public void SelectItem(string barcode)
+	public void SelectItem(Barcode bc)
 	{
-		if (_items.TryGetValue(barcode, out var row))
+		if (bc.Product is null)
+			return;
+
+		if (_items.TryGetValue(bc.Product.Id, out var row))
 			SelectedItem = row;
 	}
 
@@ -35,7 +39,7 @@ public class Transaction
 		if (barcode.Product is null)
 			return;
 
-		if (!_items.TryAdd(barcode.BarCode, new()
+		if (!_items.TryAdd(barcode.Product.Id, new()
 		{
 			Barcode = barcode.BarCode,
 			Name = barcode.Product.Name,
@@ -43,15 +47,23 @@ public class Transaction
 			Quantity = 1
 		}))
 		{
-			_items[barcode.BarCode].Quantity += barcode.Product.ProductType.ToString().Contains("rental", StringComparison.InvariantCultureIgnoreCase) ?
+			_items[barcode.Product.Id].Quantity += barcode.Product.ProductType.ToString().Contains("rental", StringComparison.InvariantCultureIgnoreCase) ?
 			0 : 1;
 		}
 
-		SelectedItem = _items[barcode.BarCode];
+		SelectedItem = _items[barcode.Product.Id];
 	}
 
 	public bool RemoveItem(Barcode barcode, out OrderRow? row)
-		=> _items.Remove(barcode.BarCode, out row);
+	{
+		if (barcode.Product is not null)
+			return _items.Remove(barcode.Product.Id, out row);
+		else
+		{
+			row = null;
+			return false;
+		}
+	}
 
 	public void AddPriceModifier(string reason, decimal priceDelta)
 		=> _priceModifiers.Add(new(reason, priceDelta));
