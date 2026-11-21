@@ -101,10 +101,52 @@ public static partial class Data
 			return [.. rentalRowDict.Values];
 		}
 
-		// Add order row (must take in an order)
-		public static Response AddOrderRow(Order order)
+		public static int PushOrderRow(OrderRow row)
 		{
-			return new(0, null);
+			using var db = GetConnectionObject();
+
+			string query =
+			"""
+				INSERT INTO OrderRow(OrderId, Name, Price, Quantity)
+				VALUES(@OrderId, @Name, @Price, @Quantity)
+				RETURNING Id;
+			""";
+
+			return db.QuerySingle<int>(query, row);
+		}
+
+		// Response<int> would work here, but we're on too much crunch to start implementing a generic response.
+		public static int PushRentalRow(RentalRow rentalRow)
+		{
+			using var db = GetConnectionObject();
+
+			string query =
+			"""
+					INSERT INTO RentalRow(OrderRowId, Barcode, ExpectedReturnDate, ReturnedDate)
+					VALUES (@orderRowId, @Barcode, @ExpectedReturnDate, @ReturnedDate)
+					RETURNING Id;
+			""";
+
+			try
+			{
+				// Double query....
+				int orderRowId = PushOrderRow(rentalRow);
+				return db.QuerySingle<int>(query, new
+				{
+					orderRowId,
+					Barcode = rentalRow.Barcode,
+					ExpectedReturnDate = rentalRow.ExpectedReturnDate,
+					ReturnedDate = rentalRow.ReturnedDate,
+				});
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e.Message);
+				Console.WriteLine("Press any key to continue.");
+				Console.ReadKey();
+				return -1;
+			}
+
 		}
 
 		// TODO: If time allows, check if return was successfull
