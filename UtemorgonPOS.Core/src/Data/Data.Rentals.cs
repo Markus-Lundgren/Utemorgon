@@ -16,13 +16,16 @@ public static partial class Data
 			JOIN `COrder` o ON odrr.OrderId = o.Id
 			JOIN Customer c ON o.CustomerId = c.Id
 		""";
+
+
 		//THIS METHOD IS HIGHLY EXPERIMENTAL, NOT MEANT FOR USE AS IS
-		public static RentalProduct[]? GetAllRentalData()
+		public static RentalProduct[]? GetAllRentalData(string? append = null)
 		{
 			using var db = GetConnectionObject();
 
+			//This could easily be reused with an appended query as well.
 			var rentalArray = db.Query<Product, Order, Customer, RentalRow, RentalProduct>(
-				ROOT_QUERY,
+				$"{ROOT_QUERY} {append}",
 				(product, order, customer, rentalRow) => new RentalProduct
 				{
 					Product = product,
@@ -35,5 +38,8 @@ public static partial class Data
 
 			return rentalArray ?? [];
 		}
+
+		public static RentalProduct[]? GetAllRentalDataForCustomer(int customerId)
+			=> GetAllRentalData($"WHERE o.Id = {customerId}");
 	}
 }
