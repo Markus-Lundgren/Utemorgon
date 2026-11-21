@@ -34,7 +34,7 @@ public class OrderRow
 	{
 		const int LEFT = -42;
 		const int RIGHT = 10;
-		StringBuilder sb = new($"{Name,LEFT} {Price,RIGHT:N2} SEK\n");
+		StringBuilder sb = new($"{Name,LEFT} {Price,RIGHT:N2} SEK     x{Quantity}\n");
 		foreach (var pm in PriceModifiers)
 			sb.AppendLine($"  {pm.Reason,LEFT + 2} {pm.PriceDelta,RIGHT - 2} SEK");
 		if (PriceModifiers.Count > 0)
