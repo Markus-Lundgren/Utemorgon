@@ -160,6 +160,7 @@ class STransactionMain : IScene
 		new(ConsoleKey.P, "Change root price", () => {}),
 		new(ConsoleKey.M, "Add price modifier", () => {}),
 		new(ConsoleKey.D, "Change return date", () => {}),
+		new(ConsoleKey.Escape, "Deselect item", DeselectItem),
 		]);
 
 		// If selecteditem != null
@@ -167,10 +168,13 @@ class STransactionMain : IScene
 		new(ConsoleKey.B, "Enter barcode", () => {}),
 		new(ConsoleKey.N, "Add price modifier", () => {}),
 		new(ConsoleKey.A, "Change amount", () => {}),
+		new(ConsoleKey.Escape, "Deselect item", DeselectItem),
 		]);
 
 		_currentMenu = _menu;
 	}
+
+	void DeselectItem() => _currentTransaction.DeselectItem();
 
 	void AddAndReRender(Barcode? barcode)
 	{
