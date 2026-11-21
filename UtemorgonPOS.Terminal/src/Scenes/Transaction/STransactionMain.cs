@@ -13,11 +13,8 @@ class STransactionMain : IScene
 
 	List<Transaction> _savedTransactions = [];
 
-	// Yeah, this is a code-smell, but this will not be null. I know that for a fact.
-	// We are using a state machine pattern and explicitly setting it through all paths in Enter.
-#pragma warning disable CS8618
-	Transaction _currentTransaction;
-#pragma warning restore CS8618
+	// This will not be null. It is initialized int Enter().
+	Transaction _currentTransaction = null!;
 
 	public void Enter()
 	{
@@ -111,19 +108,19 @@ class STransactionMain : IScene
 		new(ConsoleKey.A, "Abort transaction", () => {_deferredTransition = new SceneTransition.Pop(); }),
 		]);
 
+		// If selecteditem != null && selecteditem is RentalRow
 		_menuRental = new([
 		new(ConsoleKey.B, "Enter barcode", () => {}),
 		new(ConsoleKey.P, "Change root price", () => {}),
 		new(ConsoleKey.M, "Add price modifier", () => {}),
 		new(ConsoleKey.D, "Change return date", () => {}),
-		new(ConsoleKey.E, "End scan", () => {_deferredTransition = new SceneTransition.Pop(); }),
 		]);
 
+		// If selecteditem != null
 		_menuWare = new([
 		new(ConsoleKey.B, "Enter barcode", () => {}),
 		new(ConsoleKey.N, "Add price modifier", () => {}),
 		new(ConsoleKey.A, "Change amount", () => {}),
-		new(ConsoleKey.E, "End scan", () => {_deferredTransition = new SceneTransition.Pop(); }),
 		]);
 	}
 }
