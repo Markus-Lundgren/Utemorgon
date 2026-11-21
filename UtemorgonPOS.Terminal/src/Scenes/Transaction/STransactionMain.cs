@@ -64,8 +64,16 @@ class STransactionMain : IScene
 				Console.WriteLine($"No item selected.");
 				_currentMenu = _menu;
 			}
+			Console.WriteLine($"----- ----- MODIFIERS ----- -----");
+			var mods = _currentTransaction.AllModifiers;
+			if (mods.Length < 1)
+				Console.WriteLine("No order modifiers available.");
+			else
+				foreach (var om in mods)
+					Console.WriteLine($"\"{om.Reason}\" {om.PriceDelta:N2}");
 
 			Console.WriteLine($"----- ----- ------ ----- -----");
+			Console.WriteLine($"TOTAL: {_currentTransaction.CurrentTotal}\n");
 			Console.WriteLine(_currentMenu.MenuRows);
 
 			// SCANNER LOOP HACK
@@ -148,7 +156,7 @@ class STransactionMain : IScene
 		_menu = new([
 		new(ConsoleKey.B, "Enter barcode", AddProductThroughManualBarcode),
 		new(ConsoleKey.C, "Add customer", () => {}),
-		new(ConsoleKey.O, "Add order modifier", () => {}),
+		new(ConsoleKey.O, "Add order modifier", AddOrderModifier),
 		new(ConsoleKey.F, "Finalize order", () => {}),
 		new(ConsoleKey.S, "Save order and exit", () => {_savedTransactions.Add(_currentTransaction); _deferredTransition = new SceneTransition.Pop(); }),
 		new(ConsoleKey.A, "Abort transaction", () => {_deferredTransition = new SceneTransition.Pop(); }),
@@ -172,6 +180,11 @@ class STransactionMain : IScene
 		]);
 
 		_currentMenu = _menu;
+	}
+
+	void AddOrderModifier()
+	{
+
 	}
 
 	void DeselectItem() => _currentTransaction.DeselectItem();

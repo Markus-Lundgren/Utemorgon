@@ -15,6 +15,7 @@ public class Transaction
 	public Customer? Customer { get; set; }
 	public OrderRow? SelectedItem { get; private set; }
 	public ImmutableArray<OrderRow> AllItems => _items.Values.ToImmutableArray();
+	public ImmutableArray<OrderPriceModifier> AllModifiers => _priceModifiers.ToImmutableArray();
 
 	Dictionary<int, OrderRow> _items = [];
 	List<OrderPriceModifier> _priceModifiers = [];
