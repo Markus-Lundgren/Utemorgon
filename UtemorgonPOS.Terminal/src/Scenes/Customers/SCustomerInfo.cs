@@ -10,7 +10,7 @@ class SCustomerInfo : IScene
     new(ConsoleKey.I, "Search customer by ID", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.ById); }),
     new(ConsoleKey.P, "Search customer by personal number", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.BySocialNumber); }),
     new(ConsoleKey.N, "Search customer by name", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.ByName); }),
-    new(ConsoleKey.S, "Customers with late rentals", () => {}),
+    new(ConsoleKey.S, "Customers with late rentals", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.LateRentals); }),
     new(ConsoleKey.B, "Back", () => {_deferredTransition = new SceneTransition.Pop(); }),
   ]);
 
