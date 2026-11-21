@@ -17,13 +17,12 @@ public static partial class Data
 			JOIN Customer c ON o.CustomerId = c.Id
 		""";
 
-
-		//THIS METHOD IS HIGHLY EXPERIMENTAL, NOT MEANT FOR USE AS IS
 		public static RentalProduct[]? GetAllRentalData(string? append = null)
 		{
 			using var db = GetConnectionObject();
 
-			//This could easily be reused with an appended query as well.
+			//This could easily be reused with the appended query as well.
+			// Example: pass WHERE condition as string append
 			var rentalArray = db.Query<Product, Order, Customer, RentalRow, RentalProduct>(
 				$"{ROOT_QUERY} {append};",
 				(product, order, customer, rentalRow) => new RentalProduct
