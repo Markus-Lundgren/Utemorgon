@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UtemorgonPOS.Core;
 
 public class Transaction
 {
 	/// Used for identification in frontend flow
 	public DateTime Timestamp { get; private set; }
+	public decimal CurrentTotal => GetTotal();
+	public decimal ItemCount => _items.Count;
 
 	public int? OrderId { get; set; }
 	public Customer? Customer { get; set; }
@@ -63,6 +64,21 @@ public class Transaction
 			return true;
 		}
 		return false;
+	}
+
+	public string AsRow() => $"{Timestamp} ({ItemCount}) {CurrentTotal} SEK";
+
+	decimal GetTotal()
+	{
+		decimal agg = 0;
+
+		foreach (var pm in _priceModifiers)
+			agg += pm.PriceDelta;
+
+		foreach (var itm in _items.Values)
+			agg += itm.GetTotalPrice();
+
+		return agg;
 	}
 
 }
