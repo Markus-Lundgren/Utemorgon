@@ -18,7 +18,7 @@ public static partial class Data
 			string sql = """
 				INSERT INTO COrder(CustomerId, CreationDate)
 				VALUES(@CustomerId, @CreationDate)
-				RETURNING Id
+				RETURNING Id;
 				""";
 			return db.QuerySingle<int>(
 				sql, new { CustomerId = customerId, CreationDate = creationDate }
@@ -70,6 +70,19 @@ public static partial class Data
 				COrder.OrderRow = OrderRow;
 				return COrder;
 			}, splitOn: "Id").AsList().ToArray();
+			return lateReturns;
+		}
+
+		public static int CreateOrderPriceModifier(int orderId, decimal priceDelta, string reason)
+		{
+			using var db = GetConnectionObject();
+			string Query =
+			"""
+				INSERT INTO OrderPriceModifier(OrderId, PriceDelta, Reason)
+				VALUES(@orderId, @priceDelta, @reason)
+				RETURNINT Id;
+			""";
+			var lateReturns = db.QuerySingle<int>
 			return lateReturns;
 		}
 
