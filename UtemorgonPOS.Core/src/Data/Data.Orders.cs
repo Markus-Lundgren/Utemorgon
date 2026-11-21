@@ -76,14 +76,13 @@ public static partial class Data
 		public static int CreateOrderPriceModifier(int orderId, decimal priceDelta, string reason)
 		{
 			using var db = GetConnectionObject();
-			string Query =
+			string query =
 			"""
 				INSERT INTO OrderPriceModifier(OrderId, PriceDelta, Reason)
 				VALUES(@orderId, @priceDelta, @reason)
 				RETURNINT Id;
 			""";
-			var lateReturns = db.QuerySingle<int>
-			return lateReturns;
+			return db.QuerySingle<int>(query, new { OrderId = orderId, PriceDelta = priceDelta, Reason = reason });
 		}
 
 	}
