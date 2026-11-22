@@ -162,8 +162,8 @@ public static partial class Data
 					OrderRow.Name AS MovieName,
 					RentalRow.ExpectedReturnDate
 				FROM Customer
-				JOIN COrder ON Customer.Id = COrder.CustomerId
-				JOIN OrderRow ON COrder.Id = OrderRow.COrderId
+				JOIN Order ON Customer.Id = Order.CustomerId
+				JOIN OrderRow ON Order.Id = OrderRow.OrderId
 				JOIN RentalRow ON OrderRow.Id = RentalRow.OrderRowId
 				WHERE RentalRow.ExpectedReturnDate < NOW()
 					AND RentalRow.ReturnedDate IS NULL

@@ -13,7 +13,7 @@ public static partial class Data
 		/// </summary>
 		const string ROOT_QUERY = """ 
 			SELECT 
-				odrr.Id, odrr.COrderId AS OrderId, odrr.Barcode, odrr.Name, odrr.Price, odrr.Quantity,
+				odrr.Id, odrr.OrderId AS OrderId, odrr.Barcode, odrr.Name, odrr.Price, odrr.Quantity,
 				rr.Id AS RentalRowId, rr.ExpectedReturnDate, rr.ReturnedDate, 
 				pm.Id, pm.OrderRowId, pm.PriceDelta, pm.Reason
 			FROM OrderRow odrr
@@ -27,7 +27,7 @@ public static partial class Data
 			var rowDict = new Dictionary<int, OrderRow>();
 
 			db.Query<OrderRow, RentalRow, RowPriceModifier, OrderRow>(
-				$"{ROOT_QUERY} WHERE odrr.COrderId = @OrderId",
+				$"{ROOT_QUERY} WHERE odrr.OrderId = @OrderId",
 				(orderRow, rentalRow, modifier) =>
 				{
 					// This is a little convoluted at first glance, but the logic is quite simple:
