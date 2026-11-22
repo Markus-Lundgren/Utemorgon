@@ -17,6 +17,9 @@ public class RentalRow : OrderRow
 		set { /* Leaving accessible because Dapper needs it, but do nothing for Rentals! */ }
 	}
 
+	public int GetReturnDaysDelta(DateTime date)
+		=> (ExpectedReturnDate - date).Days;
+
 	public bool IsReturned => ReturnedDate is not null;
 
 	public int LateDays
