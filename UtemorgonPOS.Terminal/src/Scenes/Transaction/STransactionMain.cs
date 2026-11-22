@@ -479,17 +479,13 @@ class STransactionMain : IScene
 		Console.WriteLine(sb.ToString().TrimEnd());
 	}
 
-	//Basics of finalize order method, to be worked on
+	//Basics of finalize order method
 	void FinalizeOrder()
 	{
-		// Note to us: Customer with id 1 should be set as "Unregistered customer", and that way we point to that 
+		// Note to us: Customer with id 1 should be set as "Anonymous customer", that way we can point to that 
 		// id whenever we insert an order with no set customer
 
 		// Below should be the basics of what we need to use when finalizing order
-		// Note to self: Test getting orders later
-		// Note to self: Test if we can show order history 
-		// - could use Data.Rentals method GetAllRentalData/GetAllRentalDataForCustomer or variants
-		// Note to self: Test if all payment details are added
 
 		Data.Orders.CreateOrder(_currentTransaction.Customer?.Id ?? 1, DateTime.Today);
 		foreach (var row in _currentTransaction.AllItems)
