@@ -39,7 +39,7 @@ public class Transaction
 
 	public void AddItem(Barcode barcode)
 	{
-		if (barcode.Product is null)
+		if (barcode.Product is null || barcode.Product.IsArchived)
 			return;
 
 		bool isRental = barcode.Product.ProductType.ToString().Contains("rental", StringComparison.InvariantCultureIgnoreCase);
