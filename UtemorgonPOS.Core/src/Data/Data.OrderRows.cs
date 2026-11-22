@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Dapper;
 
@@ -12,7 +13,7 @@ public static partial class Data
 		/// </summary>
 		const string ROOT_QUERY = """ 
 			SELECT 
-				odrr.Id, odrr.COrderId AS OrderId, odrr.Barcode, odrr.Name, odrr.Price, odrr.Quantity,
+				odrr.Id, odrr.OrderId AS OrderId, odrr.Barcode, odrr.Name, odrr.Price, odrr.Quantity,
 				rr.Id AS RentalRowId, rr.ExpectedReturnDate, rr.ReturnedDate, 
 				pm.Id, pm.OrderRowId, pm.PriceDelta, pm.Reason
 			FROM OrderRow odrr
@@ -26,7 +27,7 @@ public static partial class Data
 			var rowDict = new Dictionary<int, OrderRow>();
 
 			db.Query<OrderRow, RentalRow, RowPriceModifier, OrderRow>(
-				$"{ROOT_QUERY} WHERE odrr.COrderId = @OrderId",
+				$"{ROOT_QUERY} WHERE odrr.OrderId = @OrderId",
 				(orderRow, rentalRow, modifier) =>
 				{
 					// This is a little convoluted at first glance, but the logic is quite simple:
@@ -100,6 +101,55 @@ public static partial class Data
 			return [.. rentalRowDict.Values];
 		}
 
+		public static int PushOrderRow(OrderRow row)
+		{
+			using var db = GetConnectionObject();
+
+			string query =
+			"""
+				INSERT INTO OrderRow(OrderId, Barcode, Name, Price, Quantity)
+				VALUES(@OrderId, @Barcode, @Name, @Price, @Quantity)
+				RETURNING Id;
+			""";
+
+			return db.QuerySingle<int>(query, row);
+		}
+
+		// Response<int> would work here, but we're on too much crunch to start implementing a generic response.
+		public static int PushRentalRow(RentalRow rentalRow)
+		{
+			using var db = GetConnectionObject();
+
+			string query =
+			"""
+					INSERT INTO RentalRow(OrderRowId, DailyFee, ExpectedReturnDate, ReturnedDate)
+					VALUES (@orderRowId, @DailyFee, @ExpectedReturnDate, @ReturnedDate)
+					RETURNING Id;
+			""";
+
+			try
+			{
+				// Double query....
+				int orderRowId = PushOrderRow(rentalRow);
+				return db.QuerySingle<int>(query, new
+				{
+					orderRowId,
+					rentalRow.Barcode,
+					rentalRow.ExpectedReturnDate,
+					rentalRow.ReturnedDate,
+					rentalRow.DailyFee
+				});
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e.Message);
+				Console.WriteLine("Press any key to continue.");
+				Console.ReadKey();
+				return -1;
+			}
+
+		}
+
 		// TODO: If time allows, check if return was successfull
 
 		///<summary>Returns rented product
@@ -117,6 +167,26 @@ public static partial class Data
 			db.Execute(query, new { Code = barcode });
 
 			return new(0, null);
+		}
+
+		public static RentalRow[] GetRentedRentalsBetweenDates(DateOnly startDate, DateOnly endDate)
+			=> GetRentalsBetweenDates("ExpectedReturnDate", startDate, endDate);
+
+		public static RentalRow[] GetReturnedRentalsBetweenDates(DateOnly startDate, DateOnly endDate)
+			=> GetRentalsBetweenDates("ReturnedDate", startDate, endDate);
+
+		/// <summary>Fetches all rental rows between two dates<br/>Make sure start date is lower than end date</summary>
+		/// <param name="startDate"></param>
+		/// <param name="endDate"></param>
+		/// <returns>RentalRow array</returns>
+		// TODO: Handle if return should be rental row array or orderrow array
+
+		static RentalRow[] GetRentalsBetweenDates(string column, DateOnly startDate, DateOnly endDate)
+		{
+			using var db = GetConnectionObject();
+
+			string query = $"SELECT * FROM RentalRow rr WHERE rr.{column} BETWEEN @StartDate AND @EndDate";
+			return [.. db.Query<RentalRow>(query, new { StartDate = startDate, EndDate = endDate })];
 		}
 	}
 }

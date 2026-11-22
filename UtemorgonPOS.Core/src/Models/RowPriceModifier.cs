@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace UtemorgonPOS.Core;
 
 public class RowPriceModifier
@@ -6,4 +8,13 @@ public class RowPriceModifier
 	public int OrderRowId { get; set; }
 	public decimal PriceDelta { get; set; }
 	public required string Reason { get; set; }
+
+	public RowPriceModifier() { }
+
+	[SetsRequiredMembers]
+	public RowPriceModifier(string reason, decimal priceDelta)
+	{
+		Reason = reason;
+		PriceDelta = priceDelta;
+	}
 }

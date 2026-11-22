@@ -1,174 +1,101 @@
 using System;
-using System.Text;
+using System.Linq;
 using RiverScenes;
 using UtemorgonPOS.Core;
 
 class SProductInfo : IScene
 {
-	StringBuilder _accumulativeMenu = new();
+	SceneTransition? _deferredTransition;
+	Product? _selectedProduct;
+
+	Menu _listMenu = new([]);
+	Menu _productMenu = new([]);
+	Menu _barcodeMenu = new([]);
+	Menu _currentMenu = new([]);
 
 	public void Enter()
 	{
-		_accumulativeMenu = new("=====~* UTEMORGON *~=====\nProducts > Product information\n");
+		_deferredTransition = null;
+		_selectedProduct = null;
+
+		_listMenu = new([
+			new(ConsoleKey.I, "Select product by ID", SelectById),
+			new(ConsoleKey.S, "Select product by barcode", SelectByBarcode),
+			new(ConsoleKey.Escape, "Back", () => _deferredTransition = new SceneTransition.Pop()),
+		]);
+
+		_productMenu = new([
+			new(ConsoleKey.N, "Change name", RenameProduct),
+			new(ConsoleKey.C, "Change category", ChangeCategory),
+			new(ConsoleKey.P, "Change price", ChangePrice),
+			new(ConsoleKey.S, "Update stock", UpdateStock),
+			new(ConsoleKey.B, "Manage barcodes", () => _currentMenu = _barcodeMenu),
+			new(ConsoleKey.D, "Toggle archive", ToggleArchive),
+			new(ConsoleKey.Escape, "Back", BackToList),
+		]);
+
+		_barcodeMenu = new([
+			new(ConsoleKey.A, "Attach normal barcode", AttachNormalBarcode),
+			new(ConsoleKey.R, "Attach rental barcode", AttachRentalBarcode),
+			new(ConsoleKey.D, "Remove barcode", RemoveBarcode),
+			new(ConsoleKey.Escape, "Back", () => _currentMenu = _productMenu),
+		]);
+
+		_currentMenu = _listMenu;
 	}
 
 	public void Exit()
 	{
 	}
 
-	// Find, Check stock, Attach / remove barcode, remove, update etc
 	public SceneTransition Run()
 	{
-		Console.Clear();
-		Console.Write(_accumulativeMenu.ToString());
-
-		Console.WriteLine($"{"Id",-3} | {"Name",-55} | {"Price",-15} | {"Lager",-10} | {"Borttagen",-10} | {"Type",-15} | {"Arkiverad",-10}");
-		Console.WriteLine(new string('-', 125));
-		var products = Data.Products.GetProducts();
-		foreach (var pr in products)
+		while (_deferredTransition is null)
 		{
-			// This line can be removed. Its only purpose is to filter out the removed products. 
-			// However if one wants to see all products, including the archived ones, simply remove this
-			if (pr.IsArchived) continue;
+			Console.Clear();
+			Console.WriteLine("=====~* UTEMORGON *~=====\nProducts > Product information\n");
 
-			Console.WriteLine($"{pr.Id,-3} | {pr.Name,-55} | {pr.Price + " SEK",-15} | {pr.Stock,-10} | {pr.IsArchived,-10} | {pr.ProductType,-15} | {pr.IsArchived,-10}");
+			if (_selectedProduct is null)
+				PrintProductList();
+			else
+				PrintProductCard(_selectedProduct);
+
+			Console.WriteLine("--------------------------");
+			Console.WriteLine(_currentMenu.MenuRows);
+
+			var a = _currentMenu.GetAction(Console.ReadKey(intercept: true).Key);
+
+			a?.Action();
 		}
 
-		Console.WriteLine("\nPress C handle barcodes, E to edit product or B to return");
-		var pressedKey = Console.ReadKey(intercept: true).Key;
-
-		if (pressedKey == ConsoleKey.C)
-		{
-			Console.WriteLine("\nPress A to attach a barcode to a product, or R to remove a barcode.");
-			pressedKey = Console.ReadKey(intercept: true).Key;
-			if (pressedKey == ConsoleKey.A)
-			{
-				int id = GetId();
-
-				Console.WriteLine("\nPress R to attach a rental barcode, or W to attach a normal barcode.");
-				if (Console.ReadKey(intercept: true).Key == ConsoleKey.R)
-				{
-					string barcode = Data.Barcodes.AddBarcodeToRental(id);
-					Console.WriteLine($"Attached barcode: {barcode} to product {id}");
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
-				else
-				{
-					string barcode = GetBarcode();
-					Response r = Data.Barcodes.AddBarcodeToProduct(id, barcode);
-					if (r.Code == 1) Console.WriteLine(r.Message);
-					Console.WriteLine($"Attached barcode: {barcode} to product {id}");
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
-			}
-			else if (pressedKey == ConsoleKey.R)
-			{
-				Response r = Data.Barcodes.ArchiveBarcode(GetBarcode());
-				if (r.Code == 1) Console.WriteLine(r.Message);
-				Console.WriteLine("===Press any key to continue===");
-				Console.ReadKey();
-			}
-		}
-		else if (pressedKey == ConsoleKey.E)
-		{
-			Console.WriteLine("\nPress R to remove a product, or U to update a product.");
-			pressedKey = Console.ReadKey(intercept: true).Key;
-			if (pressedKey == ConsoleKey.R)
-			{
-				int id = GetId();
-				Response r = Data.Products.DeleteProduct(id);
-
-				if (r.Code == 1) Console.WriteLine(r.Message);
-				Console.WriteLine("===Press any key to continue===");
-				Console.ReadKey();
-			}
-			else if (pressedKey == ConsoleKey.U)
-			{
-				Console.WriteLine("\nPress S to update stock, N to rename a product, T to change product category, and C to change price");
-				pressedKey = Console.ReadKey(intercept: true).Key;
-				if (pressedKey == ConsoleKey.S)
-				{
-					int id = GetId();
-					int amount;
-					do
-					{
-						Console.Write("Enter new amount: ");
-					}
-					while (!int.TryParse(Console.ReadLine(), out amount));
-
-					Response r = Data.Products.UpdateStock(id, amount);
-					if (r.Code == 1) Console.WriteLine(r.Message);
-
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
-				else if (pressedKey == ConsoleKey.N)
-				{
-					int id = GetId();
-
-					string name = null;
-
-					while (string.IsNullOrEmpty(name))
-					{
-
-						Console.Write("Enter new product name: ");
-						name = Console.ReadLine() ?? "";
-					}
-
-					Response r = Data.Products.ChangeName(id, name);
-					if (r.Code == 1) Console.WriteLine(r.Message);
-
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
-				else if (pressedKey == ConsoleKey.T)
-				{
-					int count = 0;
-					foreach (ProductType e in Enum.GetValues<ProductType>())
-					{
-						Console.WriteLine($"{count++}. {e}");
-					}
-
-					int id = GetId();
-
-					int productId;
-					do
-					{
-						Console.Write("Enter product category id: ");
-					}
-					while (!int.TryParse(Console.ReadLine(), out productId));
-
-					Response r = Data.Products.ChangeProductType(id, (ProductType)productId);
-					if (r.Code == 1) Console.WriteLine(r.Message);
-
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
-				else if (pressedKey == ConsoleKey.C)
-				{
-					int id = GetId();
-					decimal price;
-					do
-					{
-						Console.Write("Enter new price: ");
-					}
-					while (!decimal.TryParse(Console.ReadLine(), out price));
-
-					Response r = Data.Products.ChangePrice(id, price);
-					if (r.Code == 1) Console.WriteLine(r.Message);
-
-					Console.WriteLine("===Press any key to continue===");
-					Console.ReadKey();
-				}
-			}
-		}
-
-		return new SceneTransition.Pop();
+		return _deferredTransition;
 	}
 
-	private int GetId()
+	void PrintProductList()
+	{
+		Console.WriteLine($"{"Id",-3} | {"Name",-45} | {"Price",-12} | {"Stock",-8} | {"Type",-15}");
+		Console.WriteLine(new string('-', 95));
+
+		foreach (var pr in Data.Products.GetProducts())
+			Console.WriteLine($"{pr.Id,-3} | {$"{pr.Name} {(pr.IsArchived ? $"(A) " : null)}",-45} | {pr.Price + " SEK",-12} | {pr.Stock,-8} | {pr.ProductType,-15}");
+	}
+
+	void PrintProductCard(Product p)
+	{
+		string stockText = p.Stock is null ? "N/A" : $"{p.Stock} units";
+
+		Console.WriteLine($"{"Name:",-12}{p.Name} {(p.IsArchived ? $"(Archived) " : null)}");
+		Console.WriteLine($"{"Category:",-12}{p.ProductType} ({(int)p.ProductType})");
+		Console.WriteLine($"{"Price:",-12}{p.Price} SEK");
+		Console.WriteLine($"{"Stock:",-12}{stockText}");
+		Console.WriteLine($"----- Barcodes -----");
+		// Forgive me.
+		var codes = Data.Barcodes.GetAllProductsWithBarcode().Where(b => b.ProductId == p.Id);
+		foreach (var c in codes)
+			Console.WriteLine($"{c.BarCode}{(c.IsArchived ? " (Archived)" : null)}");
+	}
+
+	void SelectById()
 	{
 		int id;
 		do
@@ -177,79 +104,179 @@ class SProductInfo : IScene
 		}
 		while (!int.TryParse(Console.ReadLine(), out id));
 
-		return id;
-	}
-	private string GetBarcode()
-	{
-		string barcode = null;
-		while (string.IsNullOrEmpty(barcode))
+		var product = Data.Products.GetProductFromId(id);
+		if (product is null)
 		{
-			Console.Write("Scan or enter barcode: ");
-			barcode = Console.ReadLine() ?? "";
-
-			if (barcode.Length != 13)
-			{
-				barcode = null;
-				continue;
-			}
+			Console.WriteLine("Product not found.");
+			Pause();
+			return;
 		}
-		return barcode;
+
+		_selectedProduct = product;
+		_currentMenu = _productMenu;
 	}
-	// Console.WriteLine("\nPress B to search by barcode, or I to search by id.");
 
-	// if (Console.ReadKey(intercept: true).Key == ConsoleKey.B)
-	// {
-	// 	string? barcode = null;
-	// 	while (string.IsNullOrEmpty(barcode))
-	// 	{
-	// 		Console.Write("Scan or enter barcode: ");
-	// 		barcode = Console.ReadLine() ?? "";
+	void SelectByBarcode()
+	{
+		string barcode = ScannerTUI.GetBarcode();
+		var result = Data.Barcodes.GetBarcodeFromString(barcode);
 
-	// 		if (barcode.Length != 13)
-	// 		{
-	// 			barcode = null;
-	// 			continue;
-	// 		}
-	// 	}
-	// 	b = Data.Barcodes.GetBarcodeFromString(barcode);
-	// p = b.Product;
-	// }
-	// else if (Console.ReadKey(intercept: true).Key == ConsoleKey.I)
-	// {
-	// int id = 0;
+		if (result?.Product is null)
+		{
+			Console.WriteLine("No active product found for that barcode.");
+			Pause();
+			return;
+		}
 
-	// while (id == 0)
-	// {
-	// 	Console.Write("Enter id: ");
-	// 	if (!int.TryParse(Console.ReadLine(), out id))
-	// 	{
-	// 		continue;
-	// 	}
-	// }
+		_selectedProduct = result.Product;
+		_currentMenu = _productMenu;
+	}
 
-	// p = Data.Products.GetProductFromId(id);
-	// }
+	void BackToList()
+	{
+		_selectedProduct = null;
+		_currentMenu = _listMenu;
+	}
 
-	// if (p == null)
-	// {
-	// Console.WriteLine("====== PRODUCT NOT FOUND ======");
-	// }
-	// else
-	// {
-	// Console.Clear();
-	// Console.WriteLine("====== PRODUCT INFORMATION ======");
-	// Console.WriteLine($"Id: {p.Id}");
-	// Console.WriteLine($"{p.Name} ({p.ProductType})");
-	// Console.WriteLine($"Price: {p.Price} SEK");
-	// if (!p.ProductType.ToString().StartsWith("Rental_", StringComparison.InvariantCultureIgnoreCase) &&
-	// !p.ProductType.ToString().StartsWith("Service_", StringComparison.InvariantCultureIgnoreCase))
-	// 	Console.WriteLine($"Stock: {p.Stock}");
-	// if (b != null)
-	// 	Console.WriteLine($"Barcode: {b.BarCode}");
-	// Console.WriteLine("=================================");
+	void RefreshSelectedProduct()
+	{
+		if (_selectedProduct is not null)
+			_selectedProduct = Data.Products.GetProductFromId(_selectedProduct.Id);
+	}
 
-	// Console.WriteLine("\nPress any key to exit.");
-	// Console.ReadKey();
+	void RenameProduct()
+	{
+		string name = "";
+		while (string.IsNullOrEmpty(name))
+		{
+			Console.Write("Enter new product name: ");
+			name = Console.ReadLine() ?? "";
+		}
 
-	// }
+		Response r = Data.Products.ChangeName(_selectedProduct!.Id, name);
+		if (r.Code != 0)
+		{
+			Console.WriteLine(r.Message);
+			Pause();
+		}
+
+		RefreshSelectedProduct();
+	}
+
+	void ChangeCategory()
+	{
+		foreach (ProductType e in Enum.GetValues<ProductType>())
+		{
+			if (e == ProductType.None) continue;
+			Console.WriteLine($"{(int)e}. {e}");
+		}
+
+		int typeId;
+		do
+		{
+			Console.Write("Enter product category id: ");
+		}
+		while (!int.TryParse(Console.ReadLine(), out typeId) || typeId <= 0 || typeId >= Enum.GetValues<ProductType>().Length);
+
+		Response r = Data.Products.ChangeProductType(_selectedProduct!.Id, (ProductType)typeId);
+		if (r.Code != 0)
+		{
+			Console.WriteLine(r.Message);
+			Pause();
+		}
+
+		RefreshSelectedProduct();
+	}
+
+	void ChangePrice()
+	{
+		decimal price;
+		do
+		{
+			Console.Write("Enter new price: ");
+		}
+		while (!decimal.TryParse(Console.ReadLine(), out price));
+
+		Response r = Data.Products.ChangePrice(_selectedProduct!.Id, price);
+		if (r.Code != 0)
+		{
+			Console.WriteLine(r.Message);
+			Pause();
+		}
+
+		RefreshSelectedProduct();
+	}
+
+	void UpdateStock()
+	{
+		int amount;
+		do
+		{
+			Console.Write("Enter new stock amount: ");
+		}
+		while (!int.TryParse(Console.ReadLine(), out amount));
+
+		Response r = Data.Products.UpdateStock(_selectedProduct!.Id, amount);
+		if (r.Code != 0)
+		{
+			Console.WriteLine(r.Message);
+			Pause();
+		}
+
+		RefreshSelectedProduct();
+	}
+
+	void ToggleArchive()
+	{
+		Response r;
+		if (!_selectedProduct!.IsArchived)
+			r = Data.Products.ArchiveProduct(_selectedProduct!.Id);
+		else
+			r = Data.Products.UnarchiveProduct(_selectedProduct!.Id);
+
+		if (r.Code != 0)
+		{
+			Console.WriteLine(r.Message);
+			Pause();
+			return;
+		}
+
+		BackToList();
+	}
+
+	void AttachNormalBarcode()
+	{
+		string barcode = ScannerTUI.GetBarcode();
+		Response r = Data.Barcodes.AddBarcodeToProduct(_selectedProduct!.Id, barcode);
+
+		Console.WriteLine(r.Code == 0
+			? $"Attached barcode {barcode} to {_selectedProduct.Name}."
+			: r.Message);
+		Pause();
+	}
+
+	void AttachRentalBarcode()
+	{
+		string? barcode = Data.Barcodes.AddBarcodeToRental(_selectedProduct!.Id);
+		Printer.PrintBarcode(barcode);
+		Console.WriteLine($"Attached rental barcode {barcode} to {_selectedProduct.Name}.");
+		Pause();
+	}
+
+	void RemoveBarcode()
+	{
+		string barcode = ScannerTUI.GetBarcode();
+		Response r = Data.Barcodes.ArchiveBarcode(barcode);
+
+		Console.WriteLine(r.Code == 0
+			? $"Removed barcode {barcode}."
+			: r.Message);
+		Pause();
+	}
+
+	static void Pause()
+	{
+		Console.WriteLine("=== Press any key to continue ===");
+		Console.ReadKey(intercept: true);
+	}
 }

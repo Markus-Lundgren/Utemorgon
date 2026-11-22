@@ -41,6 +41,34 @@ public static partial class Data
 
 			return [.. db.Query<Product>(query, new { IsArchived = isArchived }).AsList()];
 		}
+
+		/// <summary>Return a Product using a barcode as search parameter</summary>
+		/// <returns>Product object</returns>
+		public static Product? GetProductFromBarcode(string barcode)
+		{
+			using var db = GetConnectionObject();
+			string query = """
+				SELECT * 
+				FROM BarcodeToProduct b
+				JOIN Product p ON b.ProductId = p.Id
+				WHERE Barcode = @Barcode
+				""";
+
+			Product? p = null;
+			db.Query<Barcode, Product, Barcode>(
+				query,
+				(barcode, product) =>
+				{
+					p = product;
+					return barcode;
+				},
+				new { Barcode = barcode },
+				splitOn: "Id"
+			);
+
+			return p;
+		}
+
 		/// <summary>Add product to database using an object of Product</summary>
 		/// <param name="product"></param>
 		public static void AddProduct(Product product)
@@ -84,10 +112,21 @@ public static partial class Data
 
 		/// <summary>Soft delete a product from the database</summary>
 		/// <param name="id"></param>
-		public static Response DeleteProduct(int id)
+		public static Response ArchiveProduct(int id)
 		{
 			using var db = GetConnectionObject();
-			string query = "UPDATE Product Set IsArchived = True WHERE Id = @Id;";
+			string query = "UPDATE Product Set IsArchived = TRUE WHERE Id = @Id;";
+			int affectedRows = db.Execute(query, new { Id = id });
+			if (affectedRows < 1) return new(1, $"Product with id: {id} does not exist");
+			return new(0, null);
+		}
+
+		/// <summary>Undelete product from DB</summary>
+		/// <param name="id"></param>
+		public static Response UnarchiveProduct(int id)
+		{
+			using var db = GetConnectionObject();
+			string query = "UPDATE Product Set IsArchived = FALSE WHERE Id = @Id;";
 			int affectedRows = db.Execute(query, new { Id = id });
 			if (affectedRows < 1) return new(1, $"Product with id: {id} does not exist");
 			return new(0, null);
