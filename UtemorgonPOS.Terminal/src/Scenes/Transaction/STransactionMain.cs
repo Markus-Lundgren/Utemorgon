@@ -492,27 +492,18 @@ class STransactionMain : IScene
 		// - could use Data.Rentals method GetAllRentalData/GetAllRentalDataForCustomer or variants
 		// Note to self: Test if all payment details are added
 
-		// Will allow adding to rentalrow table
-		if (customer is not null)
+		Data.Orders.CreateOrder(customer is not null ? customer.Id : 1, DateTime.Today);
+		foreach (var row in _currentTransaction.AllItems)
 		{
-			Data.Orders.CreateOrder(customer.Id, DateTime.Today);
-			foreach (var row in _currentTransaction.AllItems)
-			{
-				// Note to us: We need to insert payment modifiers as well, currently this only inserts in three tables
-				// Note to self: Found modifiers in OrderRows model, 
-				// however when inserting we either need to insert modifiers separatly with new queries or append existing ones
-				if (row is RentalRow rr)
-					Data.OrderRows.PushRentalRow(rr);
-				else
-					Data.OrderRows.PushOrderRow(row);
-			}
-		}
-		// If customer is null it means that there are no rental rows in this transaction
-		else
-		{
-			Data.Orders.CreateOrder(1, DateTime.Today);
-			foreach (var row in _currentTransaction.AllItems)
+			// Note to us: We need to insert payment modifiers as well, currently this only inserts in three tables
+			// Note to self: Found modifiers in OrderRows model, 
+			// however when inserting we either need to insert modifiers separatly with new queries or append existing ones
+			if (row is RentalRow rr)
+				Data.OrderRows.PushRentalRow(rr);
+			else
 				Data.OrderRows.PushOrderRow(row);
+			Data.OrderRows.AddOrderRowPriceModifier(row);
 		}
+		Data.Orders.AddOrderPriceModifier(_currentTransaction.AllModifiers);
 	}
 }
