@@ -16,7 +16,7 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 			string sql = """
-				INSERT INTO Order(CustomerId, CreationDate)
+				INSERT INTO `Order`(CustomerId, CreationDate)
 				VALUES(@CustomerId, @CreationDate)
 				""";
 			db.Execute(
@@ -50,7 +50,7 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 
-			string query = "SELECT * FROM Order o WHERE o.CreationDate BETWEEN @StartDate AND @EndDate";
+			string query = "SELECT * FROM `Order` o WHERE o.CreationDate BETWEEN @StartDate AND @EndDate";
 			return [.. db.Query<Order>(query, new { StartDate = startDate, EndDate = endDate })];
 		}
 		public static Order[] GetLate()
@@ -59,7 +59,7 @@ public static partial class Data
 			string Query =
 			"""
 				SELECT CO.*,RR.*, O.*
-				FROM Order CO
+				FROM `Order` CO
 				JOIN OrderRow O on CO.Id = O.OrderId
 				JOIN RentalRow RR on O.Id = RR.OrderRowId
 				where RR.ReturnedDate > RR.ExpectedReturnDate
