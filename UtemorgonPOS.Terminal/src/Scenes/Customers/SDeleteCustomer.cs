@@ -15,7 +15,7 @@ class SDeleteCustomer : IScene
   {
     Console.Clear();
     Console.WriteLine("=====~* UTEMORGON *~=====");
-    Console.WriteLine("Customers > Anonymize customer");
+    Console.WriteLine("Customers > Delete customer");
     Console.WriteLine();
 
     while (true)
@@ -26,6 +26,7 @@ class SDeleteCustomer : IScene
       {
         Console.WriteLine("Invalid customer ID.");
         Console.WriteLine("Please try again.");
+        Console.WriteLine();
         continue;
       }
 
@@ -37,6 +38,7 @@ class SDeleteCustomer : IScene
         {
           Console.WriteLine("No customer found with this ID.");
           Console.WriteLine("Please try again.");
+          Console.WriteLine();
           continue;
         }
 
@@ -44,7 +46,7 @@ class SDeleteCustomer : IScene
         Console.WriteLine($"Customer: {customer.FullName}");
         Console.WriteLine($"Personal number: {customer.SSNFormated}");
         Console.WriteLine();
-        Console.WriteLine("This will anonymize the customer.");
+        Console.WriteLine("This will delete the customer.");
         Console.WriteLine("The customer record and ID will remain in the database.");
         Console.WriteLine();
 
@@ -64,7 +66,7 @@ class SDeleteCustomer : IScene
 
         if (confirmation == ConsoleKey.N)
         {
-          Console.WriteLine("Anonymization cancelled.");
+          Console.WriteLine("Deletion cancelled.");
           Console.WriteLine("Returning to customer menu.");
           Console.WriteLine("Press any key to return.");
           Console.ReadKey();
@@ -72,29 +74,29 @@ class SDeleteCustomer : IScene
         }
 
         Console.WriteLine();
-        Console.WriteLine("Anonymizing customer...");
+        Console.WriteLine("Deleting customer...");
 
         Data.Customers.DeleteCustomer(id);
 
-        Customer? anonymizedCustomer = Data.Customers.GetCustomer(id);
+        Customer? deletedCustomer = Data.Customers.GetCustomer(id);
 
-        if (anonymizedCustomer == null)
+        if (deletedCustomer == null)
         {
-          Console.WriteLine("The customer could not be retrieved after anonymization.");
+          Console.WriteLine("The customer could not be retrieved after deletion.");
           Console.WriteLine("Please check the database.");
         }
         else
         {
           Console.WriteLine();
-          Console.WriteLine("===== CUSTOMER ANONYMIZED =====");
-          Console.WriteLine($"Customer ID: {anonymizedCustomer.Id}");
-          Console.WriteLine($"Name: {anonymizedCustomer.FullName}");
-          Console.WriteLine($"Personal number: {anonymizedCustomer.SocialNumber ?? "Not provided"}");
-          Console.WriteLine($"Address: {anonymizedCustomer.Address}");
-          Console.WriteLine($"Phone number: {anonymizedCustomer.PhoneNumber}");
+          Console.WriteLine("===== DELETE CUSTOMER  =====");
+          Console.WriteLine($"Customer ID: {deletedCustomer.Id}");
+          Console.WriteLine($"Name: {deletedCustomer.FullName}");
+          Console.WriteLine($"Personal number: {deletedCustomer.SocialNumber ?? "Not provided"}");
+          Console.WriteLine($"Address: {deletedCustomer.Address}");
+          Console.WriteLine($"Phone number: {deletedCustomer.PhoneNumber}");
           Console.WriteLine("===============================");
           Console.WriteLine();
-          Console.WriteLine("Customer successfully anonymized.");
+          Console.WriteLine("Customer successfully deleted.");
         }
 
         Console.WriteLine();
@@ -107,7 +109,7 @@ class SDeleteCustomer : IScene
       {
         Console.WriteLine();
         Console.WriteLine("A database error occurred.");
-        Console.WriteLine("The anonymization could not be completed or verified.");
+        Console.WriteLine("The deletion could not be completed or verified.");
         Console.WriteLine();
         Console.Write("Press R to retry or any other key to return: ");
 

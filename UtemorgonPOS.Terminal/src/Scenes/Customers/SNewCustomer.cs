@@ -93,7 +93,7 @@ class SNewCustomer : IScene
       Console.Write("Address with both street and city: ");
       customer.Address = Console.ReadLine()?.Trim() ?? "";
 
-      Console.Write("Phonenumber: ");
+      Console.Write("Phone number: ");
       customer.PhoneNumber = Console.ReadLine()?.Trim() ?? "";
 
       Data.Customers.AddCustomer(customer);
@@ -104,8 +104,9 @@ class SNewCustomer : IScene
       Console.Clear();
       Console.WriteLine("===== CUSTOMER not ADDED =====");
       Console.WriteLine("A database error occurred.");
+      Console.WriteLine("The customer could not be saved.");
+      Console.WriteLine();
       Console.WriteLine("Please try again later.");
-
       Console.WriteLine();
       Console.WriteLine("Press any key to return.");
       Console.ReadKey();
@@ -116,10 +117,12 @@ class SNewCustomer : IScene
     Console.Clear();
     Console.WriteLine("===== CUSTOMER ADDED =====");
     Console.WriteLine($"Name: {customer.FullName}");
-    Console.WriteLine($"Personal number: {customer.SocialNumber}");
+    Console.WriteLine($"Personal number: {customer.SocialNumber ?? "Not provided"}");
     Console.WriteLine($"Address: {customer.Address}");
     Console.WriteLine($"Phone number: {customer.PhoneNumber}");
     Console.WriteLine("==========================");
+    Console.WriteLine();
+    Console.WriteLine("Customer successfully added.");
 
     Console.WriteLine();
     Console.WriteLine("Press any key to return.");

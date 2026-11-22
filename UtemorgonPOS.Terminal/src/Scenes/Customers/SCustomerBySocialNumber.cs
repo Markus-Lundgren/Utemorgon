@@ -1,4 +1,5 @@
 using System;
+using System.Data.Common;
 using RiverScenes;
 using UtemorgonPOS.Core;
 
@@ -40,24 +41,35 @@ class SCustomerBySocialNumber : IScene
 
       if (!isValid)
       {
-        Console.WriteLine("Invalid socialnumber. Try again: ");
+        Console.WriteLine("Invalid personal number. Try again: ");
       }
     }
 
-    var customer = Data.Customers.GetCustomerBySocialNumber(socialNumber);
-    Console.WriteLine();
+    try
+    {
+      var customer = Data.Customers.GetCustomerBySocialNumber(socialNumber);
+      Console.WriteLine();
 
-    if (customer == null)
-    {
-      Console.WriteLine("No customers found.");
+      if (customer == null)
+      {
+        Console.WriteLine("No customer found.");
+      }
+      else
+      {
+        Console.WriteLine("===== CUSTOMER BY PERSONAL NUMBER =====");
+        Console.WriteLine($"Customer ID: {customer.Id}");
+        Console.WriteLine($"Name: {customer.FullName}");
+        Console.WriteLine($"Personal number: {customer.SocialNumber}");
+        Console.WriteLine($"Address: {customer.Address}");
+        Console.WriteLine($"Phone number: {customer.PhoneNumber}");
+        Console.WriteLine("============================");
+      }
     }
-    else
+    catch (DbException)
     {
-      Console.WriteLine($"Customer ID: {customer.Id}");
-      Console.WriteLine($"Name: {customer.FullName}");
-      Console.WriteLine($"Personal number: {customer.SocialNumber}");
-      Console.WriteLine($"Address: {customer.Address}");
-      Console.WriteLine($"PhoneNumber: {customer.PhoneNumber}");
+      Console.WriteLine();
+      Console.WriteLine("A database error occurred.");
+      Console.WriteLine("The customer could not be retrieved.");
     }
 
     Console.WriteLine();

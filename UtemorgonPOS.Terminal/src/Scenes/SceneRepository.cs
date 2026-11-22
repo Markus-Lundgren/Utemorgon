@@ -17,11 +17,11 @@ static class SceneRepository
 	public static class Customers
 	{
 		public static SCustomersMain Main = new();
-		public static SCustomerInfo Info = new();
+		public static SCustomersInfo Info = new();
 		public static SAllCustomers All = new();
-		public static SCustomersById ById = new();
+		public static SCustomerById ById = new();
 		public static SCustomerBySocialNumber BySocialNumber = new();
-		public static SCustomerByName ByName = new();
+		public static SCustomersByName ByName = new();
 		public static SCustomersWithLateRentals LateRentals = new();
 		public static SNewCustomer NewCustomer = new();
 		public static SDeleteCustomer DeleteCustomer = new();

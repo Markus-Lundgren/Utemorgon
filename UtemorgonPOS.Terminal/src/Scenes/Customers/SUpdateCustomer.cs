@@ -47,8 +47,8 @@ class SUpdateCustomer : IScene
         Console.WriteLine($"Customer ID: {originalCustomer.Id}");
         Console.WriteLine($"Personal number: {originalCustomer.SSNFormated}");
         Console.WriteLine($"Name: {originalCustomer.FullName}");
-        Console.WriteLine($"Adress: {originalCustomer.Address}");
-        Console.WriteLine($"Phonenumber: {originalCustomer.PhoneNumber}");
+        Console.WriteLine($"Address: {originalCustomer.Address}");
+        Console.WriteLine($"Phone number: {originalCustomer.PhoneNumber}");
         Console.WriteLine("============================");
         Console.WriteLine();
         Console.WriteLine("Leave empty to keep the current value, by pressing Enter.");
@@ -140,7 +140,7 @@ class SUpdateCustomer : IScene
         else if (address != "")
           updatedCustomer.Address = address;
 
-        Console.Write($"Phonenumber ({originalCustomer.PhoneNumber}): ");
+        Console.Write($"Phone number ({originalCustomer.PhoneNumber}): ");
         string phoneNumber = Console.ReadLine()?.Trim() ?? "";
 
         if (phoneNumber == "-")
@@ -153,8 +153,7 @@ class SUpdateCustomer : IScene
           originalCustomer.FName != updatedCustomer.FName ||
           originalCustomer.LName != updatedCustomer.LName ||
           originalCustomer.Address != updatedCustomer.Address ||
-          originalCustomer.PhoneNumber != updatedCustomer.PhoneNumber
-        ;
+          originalCustomer.PhoneNumber != updatedCustomer.PhoneNumber;
 
         if (!hasChanges)
         {
@@ -173,7 +172,7 @@ class SUpdateCustomer : IScene
         Customer? finalizedCustomer = Data.Customers.GetCustomer(id);
         if (finalizedCustomer == null)
         {
-          Console.WriteLine("The customer could not be retrieved after anonymization.");
+          Console.WriteLine("The customer could not be retrieved after updating.");
           Console.WriteLine("Please check the database.");
         }
         else
