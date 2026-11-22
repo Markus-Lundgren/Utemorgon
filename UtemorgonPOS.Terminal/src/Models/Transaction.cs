@@ -44,6 +44,14 @@ public class Transaction
 
 		bool isRental = barcode.Product.ProductType.ToString().Contains("rental", StringComparison.InvariantCultureIgnoreCase);
 
+		if (isRental && Customer is null)
+		{
+			Console.WriteLine("Cannot add a rental product when the order has no customer!");
+			Console.WriteLine("Press any key to continue.");
+			Console.ReadKey(intercept: true);
+			return;
+		}
+
 		if (!_items.TryAdd(barcode.Product.Id, isRental ?
 		new RentalRow()
 		{
@@ -98,7 +106,11 @@ public class Transaction
 		return false;
 	}
 
-	public string AsRow() => $"{Timestamp} ({ItemCount}) {CurrentTotal} SEK";
+	public string AsRow()
+	{
+		string? cname = Customer is not null ? $"{Customer.FullName}" : "Anonymous";
+		return $"({cname}) {Timestamp} ({ItemCount}) {CurrentTotal} SEK";
+	}
 
 	// DISCLAIMER: We know this code is dodo.
 	// This was done as crunch-time finalization

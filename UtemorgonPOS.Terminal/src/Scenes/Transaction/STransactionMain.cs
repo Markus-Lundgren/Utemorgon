@@ -165,7 +165,7 @@ class STransactionMain : IScene
 	{
 		_menu = new([
 		new(ConsoleKey.B, "Enter barcode", AddProductThroughManualBarcode),
-		new(ConsoleKey.C, "Add customer", () => {}),
+		new(ConsoleKey.C, "Add customer", AddCustomerToOrder),
 		new(ConsoleKey.O, "Add order modifier", AddOrderModifier),
 		new(ConsoleKey.F, "Finalize order", () => {}),
 		new(ConsoleKey.S, "Save order and exit", () => {_savedTransactions.Add(_currentTransaction); _deferredTransition = new SceneTransition.Pop(); }),
@@ -191,6 +191,40 @@ class STransactionMain : IScene
 		]);
 
 		_currentMenu = _menu;
+	}
+
+	void AddCustomerToOrder()
+	{
+		string? ssn = null;
+
+		do
+		{
+			Console.Write("\nEnter SSN (12 digits): ");
+			ssn = Console.ReadLine();
+		} while (string.IsNullOrWhiteSpace(ssn) || ssn.Length != 12 || !ssn.All(char.IsDigit));
+		// Note to self
+		// ssn.All(char.IsDigit)
+		// Is the same as
+		// ssn.All(c => char.IsDigit(c))
+
+		Customer? customer = Data.Customers.GetCustomerBySocialNumber(ssn);
+
+		if (customer is null)
+		{
+			Console.WriteLine("Could not find a customer with that SSN.");
+			Console.WriteLine("Press any key to continue.");
+			Console.ReadKey(intercept: true);
+		}
+		else
+		{
+			_currentTransaction.Customer = customer;
+			Console.WriteLine($"{customer.FullName} has been added to the order.");
+			Console.WriteLine("Press any key to continue.");
+			Console.ReadKey(intercept: true);
+		}
+
+		_forceReRender = true;
+		return;
 	}
 
 	// Holy hack of hacks....
