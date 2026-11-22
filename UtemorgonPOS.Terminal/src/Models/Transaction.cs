@@ -59,6 +59,7 @@ public class Transaction
 		{
 			Barcode = barcode.BarCode,
 			Name = barcode.Product.Name,
+			DailyFee = barcode.Product.Price,
 			Price = barcode.Product.Price * DEFAULT_RENTAL_DAYS,
 			ExpectedReturnDate = DateTime.Today.AddDays(DEFAULT_RENTAL_DAYS),
 			ReturnedDate = null,
