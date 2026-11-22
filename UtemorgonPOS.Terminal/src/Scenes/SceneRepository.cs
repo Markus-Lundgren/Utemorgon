@@ -25,5 +25,6 @@ static class SceneRepository
 		public static SCustomersWithLateRentals LateRentals = new();
 		public static SNewCustomer NewCustomer = new();
 		public static SDeleteCustomer DeleteCustomer = new();
+		public static SUpdateCustomer UpdateCustomer = new();
 	}
 }
