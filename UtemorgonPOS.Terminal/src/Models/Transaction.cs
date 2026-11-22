@@ -6,6 +6,7 @@ using UtemorgonPOS.Core;
 
 public class Transaction
 {
+	const int DEFAULT_RENTAL_DAYS = 3;
 	/// Used for identification in frontend flow
 	public DateTime Timestamp { get; private set; }
 	public decimal CurrentTotal => GetTotal();
@@ -52,13 +53,14 @@ public class Transaction
 			return;
 		}
 
+
 		if (!_items.TryAdd(barcode.Product.Id, isRental ?
 		new RentalRow()
 		{
 			Barcode = barcode.BarCode,
 			Name = barcode.Product.Name,
-			Price = barcode.Product.Price,
-			ExpectedReturnDate = DateTime.Today.AddDays(1),
+			Price = barcode.Product.Price * DEFAULT_RENTAL_DAYS,
+			ExpectedReturnDate = DateTime.Today.AddDays(DEFAULT_RENTAL_DAYS),
 			ReturnedDate = null,
 			Quantity = 1
 		} :
