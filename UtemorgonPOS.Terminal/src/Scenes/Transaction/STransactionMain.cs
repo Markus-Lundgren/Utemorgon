@@ -171,7 +171,7 @@ class STransactionMain : IScene
 		new(ConsoleKey.B, "Enter barcode", AddProductThroughManualBarcode),
 		new(ConsoleKey.C, "Add customer", AddCustomerToOrder),
 		new(ConsoleKey.O, "Add order modifier", AddOrderModifier),
-		new(ConsoleKey.F, "Finalize order", () => {}),
+		new(ConsoleKey.F, "Finalize order", FinalizeOrder),
 		new(ConsoleKey.S, "Save order and exit", () => {_savedTransactions.Add(_currentTransaction); _deferredTransition = new SceneTransition.Pop(); }),
 		new(ConsoleKey.A, "Abort transaction", () => {_deferredTransition = new SceneTransition.Pop(); }),
 		]);
@@ -479,4 +479,38 @@ class STransactionMain : IScene
 		Console.WriteLine(sb.ToString().TrimEnd());
 	}
 
+	//Basics of finalize order method, to be worked on
+	void FinalizeOrder()
+	{
+		Customer? customer = _currentTransaction.Customer;
+		// Note to us: Customer with id 1 should be set as "Unregistered customer", and that way we point to that 
+		// id whenever we insert an order with no set customer
+
+		// Below should be the basics of what we need to use when finalizing order
+		// Note to self: Test getting orders later
+		// Note to self: Test if we can show order history 
+		// - could use Data.Rentals method GetAllRentalData/GetAllRentalDataForCustomer or variants
+		// Note to self: Test if all payment details are added
+
+		// Will allow adding to rentalrow table
+		if (customer is not null)
+		{
+			Data.Orders.CreateOrder(customer.Id, DateTime.Today);
+			foreach (var row in _currentTransaction.AllItems)
+			{
+				//Note to us: We need to insert payment modifiers as well, currently this only inserts in three tables
+				if (row is RentalRow rr)
+					Data.OrderRows.PushRentalRow(rr);
+				else
+					Data.OrderRows.PushOrderRow(row);
+			}
+		}
+		// If customer is null it means that there are no rental rows in this transaction
+		else
+		{
+			Data.Orders.CreateOrder(1, DateTime.Today);
+			foreach (var row in _currentTransaction.AllItems)
+				Data.OrderRows.PushOrderRow(row);
+		}
+	}
 }
