@@ -193,7 +193,7 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 
-			string query = "INSERT INTO OrderPriceModifier(OrderId, PriceDelta, Reason) VALUES(@OrderId, @PriceDelta, @Reason)";
+			string query = "INSERT INTO OrderRowPriceModifier(OrderRowId, PriceDelta, Reason) VALUES(@OrderRowId, @PriceDelta, @Reason)";
 
 			var priceModifers = row.PriceModifiers;
 
