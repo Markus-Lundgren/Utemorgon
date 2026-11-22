@@ -16,7 +16,7 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 			string sql = """
-				INSERT INTO COrder(CustomerId, CreationDate)
+				INSERT INTO Order(CustomerId, CreationDate)
 				VALUES(@CustomerId, @CreationDate)
 				""";
 			db.Execute(
@@ -27,19 +27,19 @@ public static partial class Data
 		public static Order[] GetAll()
 		{
 			using var db = GetConnectionObject();
-			return [.. db.Query<Order>("SELECT * FROM `COrder`;")];
+			return [.. db.Query<Order>("SELECT * FROM `Order`;")];
 		}
 		public static Order[] GetFromCustomerId(int customerId)
 		{
 			using var db = GetConnectionObject();
 
-			return [.. db.Query<Order>("SELECT * FROM `COrder` WHERE COrder.CustomerId = @customerId; ", new { customerId }).AsList()];
+			return [.. db.Query<Order>("SELECT * FROM `Order` WHERE Order.CustomerId = @customerId; ", new { customerId }).AsList()];
 		}
 
 		public static Order[] GetFromDate(DateOnly creationdate)
 		{
 			using var db = GetConnectionObject();
-			return [.. db.Query<Order>("Select * from COrder where CAST(CreationDate AS DATE) = @CreationDate ", new { CreationDate = creationdate })];
+			return [.. db.Query<Order>("Select * from Order where CAST(CreationDate AS DATE) = @CreationDate ", new { CreationDate = creationdate })];
 		}
 
 		/// <summary>Fetches all orders between two dates<br/>Make sure start date is lower than end date</summary>
@@ -50,7 +50,7 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 
-			string query = "SELECT * FROM COrder o WHERE o.CreationDate BETWEEN @StartDate AND @EndDate";
+			string query = "SELECT * FROM Order o WHERE o.CreationDate BETWEEN @StartDate AND @EndDate";
 			return [.. db.Query<Order>(query, new { StartDate = startDate, EndDate = endDate })];
 		}
 		public static Order[] GetLate()
@@ -59,16 +59,16 @@ public static partial class Data
 			string Query =
 			"""
 				SELECT CO.*,RR.*, O.*
-				FROM COrder CO
-				JOIN OrderRow O on CO.Id = O.COrderId
+				FROM Order CO
+				JOIN OrderRow O on CO.Id = O.OrderId
 				JOIN RentalRow RR on O.Id = RR.OrderRowId
 				where RR.ReturnedDate > RR.ExpectedReturnDate
 				order by CO.Id;
 			""";
-			var lateReturns = db.Query<Order, OrderRow, RentalRow, Order>(Query, (COrder, OrderRow, RentalRow) =>
+			var lateReturns = db.Query<Order, OrderRow, RentalRow, Order>(Query, (Order, OrderRow, RentalRow) =>
 			{
-				COrder.OrderRow = OrderRow;
-				return COrder;
+				Order.OrderRow = OrderRow;
+				return Order;
 			}, splitOn: "Id").AsList().ToArray();
 			return lateReturns;
 		}

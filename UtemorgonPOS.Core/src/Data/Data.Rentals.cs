@@ -13,7 +13,7 @@ public static partial class Data
 			JOIN OrderRow odrr ON rr.OrderRowId = odrr.Id
 			JOIN BarcodeToProduct btp ON odrr.Barcode = btp.Barcode
 			JOIN Product p ON btp.ProductId = p.Id
-			JOIN `COrder` o ON odrr.OrderId = o.Id
+			JOIN `Order` o ON odrr.OrderId = o.Id
 			JOIN Customer c ON o.CustomerId = c.Id
 		""";
 
