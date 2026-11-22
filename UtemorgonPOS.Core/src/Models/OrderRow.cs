@@ -40,8 +40,6 @@ public class OrderRow
 		StringBuilder sb = new($"{Name,LEFT} {Price,RIGHT:N2} SEK     x{Quantity}\n");
 		foreach (var pm in PriceModifiers)
 			sb.AppendLine($"  {pm.Reason,LEFT + 2} {pm.PriceDelta,RIGHT - 2} SEK");
-		if (PriceModifiers.Count > 0)
-			sb.AppendLine($"{"Summa",LEFT} {GetTotalPrice(),RIGHT:N2} SEK");
 
 		return sb.ToString();
 	}

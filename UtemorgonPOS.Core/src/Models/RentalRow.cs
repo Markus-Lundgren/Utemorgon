@@ -36,14 +36,12 @@ public class RentalRow : OrderRow
 		const int RIGHT = 10;
 		StringBuilder sb = new($"{Name,LEFT} {Price,RIGHT:N2} SEK\n  Returneras senast: {ExpectedReturnDate:yyyy-MM-dd}\n");
 		string rdate = !IsReturned ? "Ej returnerad." : $"Returnerad: {ReturnedDate:yyyy-MM-dd}";
-		sb.Append($"  {rdate} ");
+		sb.AppendLine($"  {rdate} ");
 		if (LateDays > 0)
-			sb.Append($"({LateDays} dagar sen.)\n");
+			sb.AppendLine($"    ({LateDays} dagar sen.)\n");
 
 		foreach (var pm in PriceModifiers)
 			sb.AppendLine($"  {pm.Reason,LEFT + 2} {pm.PriceDelta,RIGHT - 2} SEK");
-		if (PriceModifiers.Count > 0)
-			sb.AppendLine($"{"Summa",LEFT} {GetTotalPrice(),RIGHT:N2} SEK");
 
 		return sb.ToString().TrimEnd();
 	}
