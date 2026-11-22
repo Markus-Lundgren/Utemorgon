@@ -56,6 +56,10 @@ class STransactionMain : IScene
 				foreach (var row in _currentTransaction.AllItems)
 					PrintRow(row);
 
+			Console.WriteLine($"\n{"TOTAL:",-42} {_currentTransaction.CurrentTotal,10:N2} SEK");
+			Console.WriteLine($"{"DISCOUNTS:",-42} {Math.Abs(_currentTransaction.CurrentDiscount),10:N2} SEK");
+
+
 			Console.WriteLine($"----- ----- INSERT ----- -----");
 			if (_currentTransaction.SelectedItem is not null)
 			{
@@ -80,7 +84,6 @@ class STransactionMain : IScene
 					Console.WriteLine($"\"{om.Reason}\" {om.PriceDelta:N2}");
 
 			Console.WriteLine($"----- ----- ------ ----- -----");
-			Console.WriteLine($"TOTAL: {_currentTransaction.CurrentTotal}\n");
 			Console.WriteLine(_currentMenu.MenuRows);
 
 			// SCANNER LOOP HACK
@@ -175,6 +178,7 @@ class STransactionMain : IScene
 		new(ConsoleKey.R, "Change root price", () => {}),
 		new(ConsoleKey.P, "Add price modifier",  AddProductModifier),
 		new(ConsoleKey.D, "Change return date", () => {}),
+		new(ConsoleKey.A, "Abort rental", RemoveSelected),
 		new(ConsoleKey.Escape, "Deselect item", DeselectItem),
 		]);
 
@@ -187,6 +191,20 @@ class STransactionMain : IScene
 		]);
 
 		_currentMenu = _menu;
+	}
+
+	// Holy hack of hacks....
+	void RemoveSelected()
+	{
+		var product = Data.Products.GetProductFromBarcode(_currentTransaction.SelectedItem?.Barcode ?? "");
+
+		if (product is null)
+			return;
+
+		_currentTransaction.RemoveItem(product.Id, out var _);
+		_currentTransaction.RemoveZeroQuantity();
+
+		_forceReRender = true;
 	}
 
 	void ChangeAmount()
@@ -323,8 +341,11 @@ class STransactionMain : IScene
 		if (pms.Count < 1)
 			Console.Write($"None\n");
 		else
+		{
+			Console.WriteLine();
 			foreach (var pm in row.PriceModifiers)
-				Console.WriteLine($"\"{pm.Reason}\" {pm.PriceDelta:N2}");
+				Console.WriteLine($"\"{pm.Reason}\" {pm.PriceDelta:N2} SEK");
+		}
 	}
 
 	void PrintRow(OrderRow row)
