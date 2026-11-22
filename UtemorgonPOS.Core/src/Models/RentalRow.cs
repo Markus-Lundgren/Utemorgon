@@ -17,6 +17,9 @@ public class RentalRow : OrderRow
 		set { /* Leaving accessible because Dapper needs it, but do nothing for Rentals! */ }
 	}
 
+	// Note for future: 
+	// To get root price of rental products: Send order date as date-delta
+	// The price per day is then: price / delta
 	public int GetReturnDaysDelta(DateTime date)
 		=> (ExpectedReturnDate - date).Days;
 
