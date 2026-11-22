@@ -498,7 +498,9 @@ class STransactionMain : IScene
 			Data.Orders.CreateOrder(customer.Id, DateTime.Today);
 			foreach (var row in _currentTransaction.AllItems)
 			{
-				//Note to us: We need to insert payment modifiers as well, currently this only inserts in three tables
+				// Note to us: We need to insert payment modifiers as well, currently this only inserts in three tables
+				// Note to self: Found modifiers in OrderRows model, 
+				// however when inserting we either need to insert modifiers separatly with new queries or append existing ones
 				if (row is RentalRow rr)
 					Data.OrderRows.PushRentalRow(rr);
 				else
