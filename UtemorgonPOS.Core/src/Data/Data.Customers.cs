@@ -4,7 +4,6 @@
 	EG: Customer _ = Data.Customers.GetCustomer(12); // 12 = a customer id. 
 */
 
-using System;
 using System.Collections.Generic;
 using Dapper;
 
@@ -162,8 +161,8 @@ public static partial class Data
 					OrderRow.Name AS MovieName,
 					RentalRow.ExpectedReturnDate
 				FROM Customer
-				JOIN Order ON Customer.Id = Order.CustomerId
-				JOIN OrderRow ON Order.Id = OrderRow.OrderId
+				JOIN `Order` ON Customer.Id = `Order`.CustomerId
+				JOIN OrderRow ON `Order`.Id = OrderRow.OrderId
 				JOIN RentalRow ON OrderRow.Id = RentalRow.OrderRowId
 				WHERE RentalRow.ExpectedReturnDate < NOW()
 					AND RentalRow.ReturnedDate IS NULL

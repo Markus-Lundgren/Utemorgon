@@ -12,17 +12,17 @@ public static partial class Data
 	public static class Orders
 	{
 		// TODO: Add things like GetAllOrdersForCustomer(int customerId)
-		public static void CreateOrder(int customerId, DateTime creationDate)
+		public static int CreateOrder(int customerId, DateTime creationDate)
 		{
 			using var db = GetConnectionObject();
 			string sql = """
-				INSERT INTO Order(CustomerId, CreationDate)
+				INSERT INTO `Order`(CustomerId, CreationDate)
 				VALUES(@CustomerId, @CreationDate)
+				RETURNING Id;
 				""";
-			db.Execute(
+			return db.QuerySingle<int>(
 				sql, new { CustomerId = customerId, CreationDate = creationDate }
 			);
-			Console.WriteLine($"Inserted {customerId} at {creationDate}");
 		}
 		public static Order[] GetAll()
 		{
@@ -33,13 +33,13 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 
-			return [.. db.Query<Order>("SELECT * FROM `Order` WHERE Order.CustomerId = @customerId; ", new { customerId }).AsList()];
+			return [.. db.Query<Order>("SELECT * FROM `Order` WHERE `Order`.CustomerId = @customerId; ", new { customerId }).AsList()];
 		}
 
 		public static Order[] GetFromDate(DateOnly creationdate)
 		{
 			using var db = GetConnectionObject();
-			return [.. db.Query<Order>("Select * from Order where CAST(CreationDate AS DATE) = @CreationDate ", new { CreationDate = creationdate })];
+			return [.. db.Query<Order>("Select * from `Order` where CAST(CreationDate AS DATE) = @CreationDate ", new { CreationDate = creationdate })];
 		}
 
 		/// <summary>Fetches all orders between two dates<br/>Make sure start date is lower than end date</summary>
@@ -50,7 +50,7 @@ public static partial class Data
 		{
 			using var db = GetConnectionObject();
 
-			string query = "SELECT * FROM Order o WHERE o.CreationDate BETWEEN @StartDate AND @EndDate";
+			string query = "SELECT * FROM `Order` o WHERE o.CreationDate BETWEEN @StartDate AND @EndDate";
 			return [.. db.Query<Order>(query, new { StartDate = startDate, EndDate = endDate })];
 		}
 		public static Order[] GetLate()
@@ -59,7 +59,7 @@ public static partial class Data
 			string Query =
 			"""
 				SELECT CO.*,RR.*, O.*
-				FROM Order CO
+				FROM `Order` CO
 				JOIN OrderRow O on CO.Id = O.OrderId
 				JOIN RentalRow RR on O.Id = RR.OrderRowId
 				where RR.ReturnedDate > RR.ExpectedReturnDate
@@ -71,6 +71,37 @@ public static partial class Data
 				return Order;
 			}, splitOn: "Id").AsList().ToArray();
 			return lateReturns;
+		}
+
+		public static int CreateOrderPriceModifier(int orderId, decimal priceDelta, string reason)
+		{
+			using var db = GetConnectionObject();
+			string query =
+			"""
+				INSERT INTO OrderPriceModifier(OrderId, PriceDelta, Reason)
+				VALUES(@orderId, @priceDelta, @reason)
+				RETURNING Id;
+			""";
+			return db.QuerySingle<int>(query, new { orderId, priceDelta, reason });
+		}
+
+		public static int AddPaymentToOrder(int orderId, decimal amount, PaymentMethod paymentMethod, DateTime receivedDate)
+		{
+			using var db = GetConnectionObject();
+			string query =
+			"""
+				INSERT INTO PaymentToOrder(OrderId, Amount, PaymentMethod, ReceivedDate)
+				VALUES(@orderId, @amount, @PaymentMethod, @receivedDate)
+				RETURNING
+			""";
+
+			return db.QuerySingle<int>(query, new
+			{
+				orderId,
+				amount,
+				PaymentMethod = paymentMethod.ToString(),
+				receivedDate
+			});
 		}
 
 	}

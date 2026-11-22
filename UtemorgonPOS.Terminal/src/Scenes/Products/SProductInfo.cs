@@ -30,7 +30,7 @@ class SProductInfo : IScene
 			new(ConsoleKey.P, "Change price", ChangePrice),
 			new(ConsoleKey.S, "Update stock", UpdateStock),
 			new(ConsoleKey.B, "Manage barcodes", () => _currentMenu = _barcodeMenu),
-			new(ConsoleKey.D, "Delete", DeleteProduct),
+			new(ConsoleKey.D, "Toggle archive", ToggleArchive),
 			new(ConsoleKey.Escape, "Back", BackToList),
 		]);
 
@@ -226,9 +226,14 @@ class SProductInfo : IScene
 		RefreshSelectedProduct();
 	}
 
-	void DeleteProduct()
+	void ToggleArchive()
 	{
-		Response r = Data.Products.DeleteProduct(_selectedProduct!.Id);
+		Response r;
+		if (!_selectedProduct!.IsArchived)
+			r = Data.Products.ArchiveProduct(_selectedProduct!.Id);
+		else
+			r = Data.Products.UnarchiveProduct(_selectedProduct!.Id);
+
 		if (r.Code != 0)
 		{
 			Console.WriteLine(r.Message);

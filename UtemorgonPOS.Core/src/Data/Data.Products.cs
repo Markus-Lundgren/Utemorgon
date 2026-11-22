@@ -112,10 +112,21 @@ public static partial class Data
 
 		/// <summary>Soft delete a product from the database</summary>
 		/// <param name="id"></param>
-		public static Response DeleteProduct(int id)
+		public static Response ArchiveProduct(int id)
 		{
 			using var db = GetConnectionObject();
-			string query = "UPDATE Product Set IsArchived = True WHERE Id = @Id;";
+			string query = "UPDATE Product Set IsArchived = TRUE WHERE Id = @Id;";
+			int affectedRows = db.Execute(query, new { Id = id });
+			if (affectedRows < 1) return new(1, $"Product with id: {id} does not exist");
+			return new(0, null);
+		}
+
+		/// <summary>Undelete product from DB</summary>
+		/// <param name="id"></param>
+		public static Response UnarchiveProduct(int id)
+		{
+			using var db = GetConnectionObject();
+			string query = "UPDATE Product Set IsArchived = FALSE WHERE Id = @Id;";
 			int affectedRows = db.Execute(query, new { Id = id });
 			if (affectedRows < 1) return new(1, $"Product with id: {id} does not exist");
 			return new(0, null);

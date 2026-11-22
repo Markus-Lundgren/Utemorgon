@@ -21,6 +21,9 @@ public class OrderRow
 	/// <summary>The amount of products bought at point of sale.</summary>
 	public virtual int Quantity { get; set; }
 
+	public void AddPriceModifier(string reason, decimal priceDelta)
+	=> PriceModifiers.Add(new(reason, priceDelta));
+
 	public decimal GetTotalPrice()
 	{
 		decimal agg = Price * Quantity;
@@ -34,11 +37,9 @@ public class OrderRow
 	{
 		const int LEFT = -42;
 		const int RIGHT = 10;
-		StringBuilder sb = new($"{Name,LEFT} {Price,RIGHT:N2} SEK\n");
+		StringBuilder sb = new($"{Name,LEFT} {Price,RIGHT:N2} SEK     x{Quantity}\n");
 		foreach (var pm in PriceModifiers)
 			sb.AppendLine($"  {pm.Reason,LEFT + 2} {pm.PriceDelta,RIGHT - 2} SEK");
-		if (PriceModifiers.Count > 0)
-			sb.AppendLine($"{"Summa",LEFT} {GetTotalPrice(),RIGHT:N2} SEK");
 
 		return sb.ToString();
 	}
