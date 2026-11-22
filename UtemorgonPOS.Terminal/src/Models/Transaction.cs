@@ -79,6 +79,10 @@ public class Transaction
 		SelectedItem = _items[barcode.Product.Id];
 	}
 
+
+	public void RecalculateTotalRentalPrice(RentalRow row)
+		=> row.Price = row.DailyFee * row.GetReturnDaysDelta(DateTime.Today);
+
 	public bool RemoveItem(Barcode barcode, out OrderRow? row)
 	{
 		if (barcode.Product is not null)
