@@ -13,6 +13,6 @@ public class Customer
 
 	public string SSNFormated => string.IsNullOrEmpty(SocialNumber) || SocialNumber.Length < 4
 		? ""
-		: $"{SocialNumber[..^4]} - {SocialNumber[^4..]}"
+		: $"{SocialNumber[..^4]}-{SocialNumber[^4..]}"
 ;
 }

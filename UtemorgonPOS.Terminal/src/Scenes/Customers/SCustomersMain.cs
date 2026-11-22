@@ -8,7 +8,7 @@ class SCustomersMain : IScene
 	Menu _menu = new([
 	new(ConsoleKey.N, "New customer", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.NewCustomer); }),
 	new(ConsoleKey.I, "Customer info", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.Info); }),
-	new(ConsoleKey.D, "Delete customer", () => {}),
+	new(ConsoleKey.D, "Delete customer", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.DeleteCustomer); }),
 	new(ConsoleKey.B, "Back", () => {_deferredTransition = new SceneTransition.Pop(); }),
 	]);
 
