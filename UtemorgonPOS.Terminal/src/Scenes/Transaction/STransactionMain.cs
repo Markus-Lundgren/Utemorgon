@@ -179,9 +179,9 @@ class STransactionMain : IScene
 		// If selecteditem != null && selecteditem is RentalRow
 		_menuRental = new([
 		new(ConsoleKey.B, "Enter barcode", AddProductThroughManualBarcode),
-		new(ConsoleKey.R, "Change root price", () => {}),
+		new(ConsoleKey.R, "Change root price", ChangeRentalRootPrice),
 		new(ConsoleKey.P, "Add price modifier",  AddProductModifier),
-		new(ConsoleKey.D, "Change return date", () => {}),
+		new(ConsoleKey.D, "Change return date", ChangeRentalReturnDays),
 		new(ConsoleKey.A, "Abort rental", RemoveSelected),
 		new(ConsoleKey.Escape, "Deselect item", DeselectItem),
 		]);
@@ -195,6 +195,50 @@ class STransactionMain : IScene
 		]);
 
 		_currentMenu = _menu;
+	}
+
+	void ChangeRentalRootPrice()
+	{
+		var row = _currentTransaction.SelectedItem;
+		if (row is not RentalRow rr)
+			return;
+
+		string? price = null;
+		decimal dPrice;
+
+		do
+		{
+			Console.Write("\nEnter new price per day: ");
+			price = Console.ReadLine();
+
+		} while (!decimal.TryParse(price, out dPrice));
+
+		rr.DailyFee = dPrice;
+		_currentTransaction.RecalculateTotalRentalPrice(rr);
+
+		_forceReRender = true;
+	}
+
+	void ChangeRentalReturnDays()
+	{
+		var row = _currentTransaction.SelectedItem;
+		if (row is not RentalRow rr)
+			return;
+
+		string? days = null;
+		int iDays;
+
+		do
+		{
+			Console.Write("\nDays to rent product: ");
+			days = Console.ReadLine();
+
+		} while (!int.TryParse(days, out iDays));
+
+		rr.ExpectedReturnDate = DateTime.Today.AddDays(iDays);
+		_currentTransaction.RecalculateTotalRentalPrice(rr);
+
+		_forceReRender = true;
 	}
 
 	void AddCustomerToOrder()
@@ -241,6 +285,7 @@ class STransactionMain : IScene
 
 		_currentTransaction.RemoveItem(product.Id, out var _);
 		_currentTransaction.RemoveZeroQuantity();
+		_currentTransaction.DeselectItem();
 
 		_forceReRender = true;
 	}
@@ -301,6 +346,10 @@ class STransactionMain : IScene
 
 		} while (string.IsNullOrWhiteSpace(inpt) || !decimal.TryParse(inpt, out delta));
 
+		if (delta == 0)
+			return;
+
+
 		_currentTransaction.AddPriceModifier(reason, Math.Abs(delta) * mp);
 		_forceReRender = true;
 	}
@@ -337,6 +386,9 @@ class STransactionMain : IScene
 			inpt = Console.ReadLine();
 
 		} while (string.IsNullOrWhiteSpace(inpt) || !decimal.TryParse(inpt, out delta));
+
+		if (delta == 0)
+			return;
 
 		_currentTransaction.SelectedItem?.AddPriceModifier(reason, Math.Abs(delta) * mp);
 		_forceReRender = true;
@@ -398,10 +450,12 @@ class STransactionMain : IScene
 	{
 		int daysDelta = row.GetReturnDaysDelta(DateTime.Today);
 		string deltaNumerus = daysDelta == 1 ? "Day" : "Days";
-		string name = $"{row.Name} x{daysDelta} {deltaNumerus}";
+		string reason = $"x{daysDelta} {deltaNumerus} á {row.DailyFee} SEK";
 		string price = $"{row.Price} SEK";
 
-		Console.WriteLine($"{name,LEFT} {price,RIGHT}");
+
+		Console.WriteLine($"{row.Name}");
+		Console.WriteLine($"  {reason,LEFT + 2} {price,RIGHT}");
 		Console.WriteLine($"  Return by: {row.ExpectedReturnDate:yyyy-MM-dd}");
 
 		StringBuilder sb = new();
