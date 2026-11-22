@@ -462,7 +462,7 @@ class STransactionMain : IScene
 		foreach (var pm in row.PriceModifiers)
 			sb.AppendLine($"  {pm.Reason,LEFT + 2} {pm.PriceDelta,RIGHT - 2} SEK");
 
-		Console.WriteLine(sb.ToString());
+		Console.WriteLine(sb.ToString().TrimEnd());
 	}
 
 	void PrintWare(OrderRow row)
@@ -476,7 +476,7 @@ class STransactionMain : IScene
 		foreach (var pm in row.PriceModifiers)
 			sb.AppendLine($"  {pm.Reason,LEFT + 2} {pm.PriceDelta,RIGHT - 2} SEK");
 
-		Console.WriteLine(sb.ToString());
+		Console.WriteLine(sb.ToString().TrimEnd());
 	}
 
 }
