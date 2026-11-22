@@ -1,12 +1,12 @@
 using System;
 using RiverScenes;
 
-class SCustomerInfo : IScene
+class SCustomersInfo : IScene
 {
   static SceneTransition? _deferredTransition;
 
   Menu _menu = new([
-    new(ConsoleKey.A, "Show all customer", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.All); }),
+    new(ConsoleKey.A, "Show all customers", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.All); }),
     new(ConsoleKey.I, "Search customer by ID", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.ById); }),
     new(ConsoleKey.P, "Search customer by personal number", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.BySocialNumber); }),
     new(ConsoleKey.N, "Search customer by name", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.ByName); }),
@@ -28,13 +28,13 @@ class SCustomerInfo : IScene
     {
       Console.Clear();
       Console.WriteLine("=====~* UTEMORGON *~=====");
-      Console.WriteLine("Customer > Customer info");
+      Console.WriteLine("Customers > Customer info");
       Console.WriteLine(_menu.MenuRows);
 
       var a = _menu.GetAction(Console.ReadKey(intercept: true).Key);
 
       if (a is null)
-        Console.WriteLine("Not a valid chocie!");
+        Console.WriteLine("Not a valid choice!");
       else
         a?.Action();
 
