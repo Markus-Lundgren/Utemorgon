@@ -78,6 +78,12 @@ public class Transaction
 		}
 	}
 
+	public bool RemoveItem(int productId, out OrderRow? row)
+		=> _items.Remove(productId, out row);
+
+	public void RemoveZeroQuantity()
+		=> _items = _items.Where(kvp => kvp.Value.Quantity > 0).ToDictionary();
+
 	public void AddPriceModifier(string reason, decimal priceDelta)
 		=> _priceModifiers.Add(new(reason, priceDelta));
 
