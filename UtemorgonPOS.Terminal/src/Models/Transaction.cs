@@ -41,7 +41,19 @@ public class Transaction
 		if (barcode.Product is null)
 			return;
 
-		if (!_items.TryAdd(barcode.Product.Id, new()
+		bool isRental = barcode.Product.ProductType.ToString().Contains("rental", StringComparison.InvariantCultureIgnoreCase);
+
+		if (!_items.TryAdd(barcode.Product.Id, isRental ?
+		new RentalRow()
+		{
+			Barcode = barcode.BarCode,
+			Name = barcode.Product.Name,
+			Price = barcode.Product.Price,
+			ExpectedReturnDate = DateTime.Today.AddDays(1),
+			ReturnedDate = null,
+			Quantity = 1
+		} :
+		new OrderRow()
 		{
 			Barcode = barcode.BarCode,
 			Name = barcode.Product.Name,
@@ -49,8 +61,7 @@ public class Transaction
 			Quantity = 1
 		}))
 		{
-			_items[barcode.Product.Id].Quantity += barcode.Product.ProductType.ToString().Contains("rental", StringComparison.InvariantCultureIgnoreCase) ?
-			0 : 1;
+			_items[barcode.Product.Id].Quantity += isRental ? 0 : 1;
 		}
 
 		SelectedItem = _items[barcode.Product.Id];
