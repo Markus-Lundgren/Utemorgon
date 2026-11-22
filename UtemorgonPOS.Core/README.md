@@ -28,9 +28,8 @@ instead we opt for centralized queries to be used in pure C#.
 - Fetch customer with name
 - Fetch customers with late rentals
 - Update customer (any field except ID)
-- Delete customer FLOW
-- - Point all current orders to DELETED CUSTOMER (Id: 1)
-- - Delete row
+- Delete customer
+- - Clear customer information (keep the record and original ID for historical orders)
 
 #### Order
 
