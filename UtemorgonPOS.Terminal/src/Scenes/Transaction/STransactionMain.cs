@@ -482,7 +482,6 @@ class STransactionMain : IScene
 	//Basics of finalize order method, to be worked on
 	void FinalizeOrder()
 	{
-		Customer? customer = _currentTransaction.Customer;
 		// Note to us: Customer with id 1 should be set as "Unregistered customer", and that way we point to that 
 		// id whenever we insert an order with no set customer
 
@@ -492,12 +491,9 @@ class STransactionMain : IScene
 		// - could use Data.Rentals method GetAllRentalData/GetAllRentalDataForCustomer or variants
 		// Note to self: Test if all payment details are added
 
-		Data.Orders.CreateOrder(customer is not null ? customer.Id : 1, DateTime.Today);
+		Data.Orders.CreateOrder(_currentTransaction.Customer?.Id ?? 1, DateTime.Today);
 		foreach (var row in _currentTransaction.AllItems)
 		{
-			// Note to us: We need to insert payment modifiers as well, currently this only inserts in three tables
-			// Note to self: Found modifiers in OrderRows model, 
-			// however when inserting we either need to insert modifiers separatly with new queries or append existing ones
 			if (row is RentalRow rr)
 				Data.OrderRows.PushRentalRow(rr);
 			else
