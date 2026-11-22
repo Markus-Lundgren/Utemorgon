@@ -4,7 +4,6 @@
 	EG: Customer _ = Data.Customers.GetCustomer(12); // 12 = a customer id. 
 */
 
-using System;
 using System.Collections.Generic;
 using Dapper;
 
