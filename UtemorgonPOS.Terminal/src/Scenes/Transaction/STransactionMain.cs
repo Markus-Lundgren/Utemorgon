@@ -172,29 +172,65 @@ class STransactionMain : IScene
 		// If selecteditem != null && selecteditem is RentalRow
 		_menuRental = new([
 		new(ConsoleKey.B, "Enter barcode", AddProductThroughManualBarcode),
-		new(ConsoleKey.P, "Change root price", () => {}),
-		new(ConsoleKey.M, "Add price modifier", () => {}),
+		new(ConsoleKey.R, "Change root price", () => {}),
+		new(ConsoleKey.P, "Add price modifier",  AddProductModifier),
 		new(ConsoleKey.D, "Change return date", () => {}),
 		new(ConsoleKey.Escape, "Deselect item", DeselectItem),
 		]);
 
 		// If selecteditem != null
 		_menuWare = new([
-		new(ConsoleKey.B, "Enter barcode", () => {}),
-		new(ConsoleKey.N, "Add price modifier", () => {}),
-		new(ConsoleKey.A, "Change amount", () => {}),
+		new(ConsoleKey.B, "Enter barcode", AddProductThroughManualBarcode),
+		new(ConsoleKey.P, "Add price modifier",  AddProductModifier),
+		new(ConsoleKey.A, "Change amount", ChangeAmount),
 		new(ConsoleKey.Escape, "Deselect item", DeselectItem),
 		]);
 
 		_currentMenu = _menu;
 	}
 
+	void ChangeAmount()
+	{
+		Console.WriteLine($"CHANGING QUANTITY OF {_currentTransaction.SelectedItem?.Name}");
+
+		string? amountInput;
+		int amount;
+		do
+		{
+			Console.Write("Amount: ");
+			amountInput = Console.ReadLine();
+
+		} while (string.IsNullOrWhiteSpace(amountInput) || !int.TryParse(amountInput, out amount) || amount < 0);
+
+		_currentTransaction.SelectedItem?.Quantity = amount;
+
+		_currentTransaction.RemoveZeroQuantity();
+
+		if (_currentTransaction.SelectedItem?.Quantity <= 0)
+			_currentTransaction.DeselectItem();
+
+		_forceReRender = true;
+	}
+
 	void AddOrderModifier()
 	{
 		string? reason = null;
 		decimal delta;
+		int mp = 1;
 
 		Console.WriteLine("ADDING ORDER MODIFIER");
+
+		ConsoleKey? k;
+		do
+		{
+			Console.WriteLine("D: Add discount");
+			Console.WriteLine("F: Add extra fee");
+			k = Console.ReadKey(intercept: true).Key;
+		}
+		while (k != ConsoleKey.D && k != ConsoleKey.F);
+
+		if (k == ConsoleKey.D)
+			mp = -1;
 
 		while (string.IsNullOrWhiteSpace(reason))
 		{
@@ -209,7 +245,44 @@ class STransactionMain : IScene
 
 		} while (string.IsNullOrWhiteSpace(inpt) || !decimal.TryParse(inpt, out delta));
 
-		_currentTransaction.AddPriceModifier(reason, delta);
+		_currentTransaction.AddPriceModifier(reason, Math.Abs(delta) * mp);
+		_forceReRender = true;
+	}
+
+	void AddProductModifier()
+	{
+		string? reason = null;
+		decimal delta;
+		int mp = 1;
+
+		Console.WriteLine("ADDING PRODUCT MODIFIER");
+
+		ConsoleKey? k;
+		do
+		{
+			Console.WriteLine("D: Add discount");
+			Console.WriteLine("F: Add extra fee");
+			k = Console.ReadKey(intercept: true).Key;
+		}
+		while (k != ConsoleKey.D && k != ConsoleKey.F);
+
+		if (k == ConsoleKey.D)
+			mp = -1;
+
+		while (string.IsNullOrWhiteSpace(reason))
+		{
+			Console.Write("Reason: ");
+			reason = Console.ReadLine();
+		}
+		string? inpt;
+		do
+		{
+			Console.Write("Amount: ");
+			inpt = Console.ReadLine();
+
+		} while (string.IsNullOrWhiteSpace(inpt) || !decimal.TryParse(inpt, out delta));
+
+		_currentTransaction.SelectedItem?.AddPriceModifier(reason, Math.Abs(delta) * mp);
 		_forceReRender = true;
 	}
 
