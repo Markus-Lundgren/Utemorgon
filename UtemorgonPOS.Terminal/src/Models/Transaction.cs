@@ -9,6 +9,7 @@ public class Transaction
 	/// Used for identification in frontend flow
 	public DateTime Timestamp { get; private set; }
 	public decimal CurrentTotal => GetTotal();
+	public decimal CurrentDiscount => GetTotalDiscount();
 	public int ItemCount => GetItemCount();
 
 	public int? OrderId { get; set; }
@@ -99,6 +100,9 @@ public class Transaction
 
 	public string AsRow() => $"{Timestamp} ({ItemCount}) {CurrentTotal} SEK";
 
+	// DISCLAIMER: We know this code is dodo.
+	// This was done as crunch-time finalization
+
 	decimal GetTotal()
 	{
 		decimal agg = 0;
@@ -108,6 +112,22 @@ public class Transaction
 
 		foreach (var itm in _items.Values)
 			agg += itm.GetTotalPrice();
+
+		return agg;
+	}
+
+	decimal GetTotalDiscount()
+	{
+		decimal agg = 0;
+
+		foreach (var pm in _priceModifiers)
+			if (pm.PriceDelta < 0)
+				agg += pm.PriceDelta;
+
+		foreach (var itm in _items.Values)
+			foreach (var ipm in itm.PriceModifiers)
+				if (ipm.PriceDelta < 0)
+					agg += ipm.PriceDelta;
 
 		return agg;
 	}
