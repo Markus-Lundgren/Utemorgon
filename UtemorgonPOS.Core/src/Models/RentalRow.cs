@@ -6,6 +6,7 @@ namespace UtemorgonPOS.Core;
 public class RentalRow : OrderRow
 {
 	public int RentalRowId { get; set; }
+	public decimal DailyFee { get; set; }
 	public DateTime ExpectedReturnDate { get; set; }
 	public DateTime? ReturnedDate { get; set; }
 

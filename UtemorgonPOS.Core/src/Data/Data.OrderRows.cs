@@ -122,8 +122,8 @@ public static partial class Data
 
 			string query =
 			"""
-					INSERT INTO RentalRow(OrderRowId, ExpectedReturnDate, ReturnedDate)
-					VALUES (@orderRowId, @ExpectedReturnDate, @ReturnedDate)
+					INSERT INTO RentalRow(OrderRowId, DailyFee, ExpectedReturnDate, ReturnedDate)
+					VALUES (@orderRowId, @DailyFee, @ExpectedReturnDate, @ReturnedDate)
 					RETURNING Id;
 			""";
 
@@ -134,9 +134,10 @@ public static partial class Data
 				return db.QuerySingle<int>(query, new
 				{
 					orderRowId,
-					Barcode = rentalRow.Barcode,
-					ExpectedReturnDate = rentalRow.ExpectedReturnDate,
-					ReturnedDate = rentalRow.ReturnedDate,
+					rentalRow.Barcode,
+					rentalRow.ExpectedReturnDate,
+					rentalRow.ReturnedDate,
+					rentalRow.DailyFee
 				});
 			}
 			catch (Exception e)
