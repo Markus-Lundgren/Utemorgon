@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using RiverScenes;
 using UtemorgonPOS.Core;
 
@@ -13,6 +14,9 @@ using UtemorgonPOS.Core;
 
 class STransactionMain : IScene
 {
+	const int LEFT = -42;
+	const int RIGHT = -10;
+
 	SceneTransition? _deferredTransition;
 
 	Menu _currentMenu = null!;
@@ -56,8 +60,8 @@ class STransactionMain : IScene
 				foreach (var row in _currentTransaction.AllItems)
 					PrintRow(row);
 
-			Console.WriteLine($"\n{"TOTAL:",-42} {_currentTransaction.CurrentTotal,10:N2} SEK");
-			Console.WriteLine($"{"DISCOUNTS:",-42} {Math.Abs(_currentTransaction.CurrentDiscount),10:N2} SEK");
+			Console.WriteLine($"\n{"TOTAL:",LEFT} {_currentTransaction.CurrentTotal,RIGHT:N2} SEK");
+			Console.WriteLine($"{"DISCOUNTS:",LEFT} {Math.Abs(_currentTransaction.CurrentDiscount),RIGHT:N2} SEK");
 
 
 			Console.WriteLine($"----- ----- INSERT ----- -----");
@@ -384,7 +388,37 @@ class STransactionMain : IScene
 
 	void PrintRow(OrderRow row)
 	{
-		Console.WriteLine(row.ToString());
+		if (row is RentalRow rr)
+			PrintRental(rr);
+		else
+			PrintWare(row);
+	}
+
+	void PrintRental(RentalRow row)
+	{
+		int daysDelta = row.GetReturnDaysDelta(DateTime.Today);
+		string deltaNumerus = daysDelta == 1 ? "Day" : "Days";
+		string name = $"{row.Name} x{daysDelta} {deltaNumerus}";
+		string price = $"{row.Price} SEK";
+
+		Console.WriteLine($"{name,LEFT} {price,RIGHT}");
+		Console.WriteLine($"  Return by: {row.ExpectedReturnDate:yyyy-MM-dd}");
+
+		StringBuilder sb = new();
+		foreach (var pm in row.PriceModifiers)
+			sb.AppendLine($"  {pm.Reason,LEFT + 2} {pm.PriceDelta,RIGHT - 2} SEK");
+	}
+
+	void PrintWare(OrderRow row)
+	{
+		string name = $"{row.Name} x{row.Quantity}";
+		string price = $"{row.Price} SEK";
+
+		Console.WriteLine($"{name,LEFT} {price,RIGHT}");
+
+		StringBuilder sb = new();
+		foreach (var pm in row.PriceModifiers)
+			sb.AppendLine($"  {pm.Reason,LEFT + 2} {pm.PriceDelta,RIGHT - 2} SEK");
 	}
 
 }
