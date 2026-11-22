@@ -21,6 +21,9 @@ public class OrderRow
 	/// <summary>The amount of products bought at point of sale.</summary>
 	public virtual int Quantity { get; set; }
 
+	public void AddPriceModifier(string reason, decimal priceDelta)
+	=> PriceModifiers.Add(new(reason, priceDelta));
+
 	public decimal GetTotalPrice()
 	{
 		decimal agg = Price * Quantity;
