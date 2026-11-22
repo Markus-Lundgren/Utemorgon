@@ -37,6 +37,17 @@ public class RentalRow : OrderRow
 		}
 	}
 
+	public decimal LateFee
+	{
+		get
+		{
+			DateTime actualReturn = ReturnedDate ?? DateTime.Today;
+
+			// If we are not at the expected return date, return 0 instead of like -7.
+			return Math.Max(0, (actualReturn.Date - ExpectedReturnDate.Date).Days) * DailyFee;
+		}
+	}
+
 	public override string ToString()
 	{
 		const int LEFT = -42;
