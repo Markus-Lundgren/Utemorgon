@@ -39,6 +39,6 @@ public static partial class Data
 		}
 
 		public static RentalProduct[]? GetAllRentalDataForCustomer(int customerId)
-			=> GetAllRentalData($"WHERE o.Id = {customerId}");
+			=> GetAllRentalData($"WHERE c.Id = {customerId}");
 	}
 }
