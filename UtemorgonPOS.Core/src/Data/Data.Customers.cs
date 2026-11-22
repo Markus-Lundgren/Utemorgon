@@ -19,7 +19,6 @@ public static partial class Data
 			return [.. db.Query<Customer>("SELECT * FROM Customer;")];
 		}
 
-		// fetch customer by id
 		public static Customer? GetCustomer(int id)
 		{
 			using var db = GetConnectionObject();
@@ -29,7 +28,6 @@ public static partial class Data
 			);
 		}
 
-		// fetch customer by multiple ids
 		public static Customer[] GetCustomersByMultipleIds(IEnumerable<int> ids)
 		{
 			using var db = GetConnectionObject();
@@ -56,7 +54,6 @@ public static partial class Data
 			return [.. db.Query<Customer>(sql, parameters)];
 		}
 
-		// fetch customer with ssn
 		public static Customer? GetCustomerBySocialNumber(string ssn)
 		{
 			using var db = GetConnectionObject();
@@ -66,7 +63,6 @@ public static partial class Data
 			);
 		}
 
-		// fetch customer by name
 		public static Customer[] GetCustomersByName(string name)
 		{
 			if (string.IsNullOrWhiteSpace(name)) return [];
@@ -87,7 +83,6 @@ public static partial class Data
 			)];
 		}
 
-		// add customer
 		public static void AddCustomer(Customer addCustomer)
 		{
 			using var db = GetConnectionObject();
@@ -101,7 +96,6 @@ public static partial class Data
 			db.Execute(sql, addCustomer);
 		}
 
-		// update customer
 		public static void UpdateCustomer(Customer originalCustomer, Customer updatedCustomer)
 		{
 			using var db = GetConnectionObject();
@@ -148,7 +142,6 @@ public static partial class Data
 			db.Execute(sql, parameters);
 		}
 
-		// fetch customers with late rentals
 		public static LateRental[] GetCustomersWithLateRentals()
 		{
 			using var db = GetConnectionObject();
@@ -171,7 +164,6 @@ public static partial class Data
 			return [.. db.Query<LateRental>(sql)];
 		}
 
-		// delete customer
 		///<remarks>This scrambles the columns, it does not delete a row in the database.</remarks>
 		public static void DeleteCustomer(int id)
 		{
