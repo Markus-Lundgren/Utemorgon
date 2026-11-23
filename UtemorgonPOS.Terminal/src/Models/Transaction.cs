@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using UtemorgonPOS.Core;
 
-public class Transaction
+public class Transaction : ITransaction
 {
 	const int DEFAULT_RENTAL_DAYS = 3;
 	/// Used for identification in frontend flow
