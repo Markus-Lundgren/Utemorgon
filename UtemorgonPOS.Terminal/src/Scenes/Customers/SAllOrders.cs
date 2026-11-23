@@ -58,11 +58,8 @@ class SAllOrders : IScene
 			{
 				var orders = Data.Orders.GetFromCustomerId(customer.Id);
 				Console.WriteLine("===== CUSTOMER BY PERSONAL NUMBER =====");
-				Console.WriteLine($"Customer ID: {customer.Id}");
-				Console.WriteLine($"Name: {customer.FullName}");
-				Console.WriteLine($"Personal number: {customer.SocialNumber}");
-				Console.WriteLine($"Address: {customer.Address}");
-				Console.WriteLine($"Phone number: {customer.PhoneNumber}");
+				Console.WriteLine(customer.AsCard());
+
 				Console.WriteLine($"\nORDER HISTORY");
 
 				foreach (var order in orders)

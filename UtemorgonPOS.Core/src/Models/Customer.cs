@@ -1,4 +1,6 @@
-﻿namespace UtemorgonPOS.Core;
+﻿using System.Text;
+
+namespace UtemorgonPOS.Core;
 
 public class Customer
 {
@@ -13,6 +15,18 @@ public class Customer
 
 	public string SSNFormated => string.IsNullOrEmpty(SocialNumber) || SocialNumber.Length < 4
 		? ""
-		: $"{SocialNumber[..^4]}-{SocialNumber[^4..]}"
-;
+		: $"{SocialNumber[..^4]}-{SocialNumber[^4..]}";
+
+	public string AsCard()
+	{
+		StringBuilder sb = new();
+
+		sb.AppendLine($"Customer ID: {Id}");
+		sb.AppendLine($"Name: {FullName}");
+		sb.AppendLine($"Personal number: {SocialNumber ?? "Not provided"}");
+		sb.AppendLine($"Address: {Address}");
+		sb.AppendLine($"Phone number: {PhoneNumber}");
+
+		return sb.ToString();
+	}
 }
