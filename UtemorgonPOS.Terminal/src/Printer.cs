@@ -24,13 +24,14 @@ public static class Printer
 	static byte[] PrintSe(string text)
 		=> Encoding.GetEncoding(1252).GetBytes(text + "\n");
 
-	static byte[] AddItem(string label, double price)
-		=> ItemRow(label, $"{price:F2} SEK");
 
-
-	static byte[] ItemRow(string itemName, string price, int width = 42)
+	static byte[] ItemRow(string itemName, string price, int width = 42, int indent = 0)
 	{
 		// Truncate item name if it's incredibly long to avoid breaking the row
+		string? indentString = indent > 0 ? new string(' ', indent) : null;
+		itemName = $"{indentString}{itemName}";
+		price = $"{price}{indentString}";
+
 		if (itemName.Length > width - price.Length - 1)
 			itemName = itemName.Substring(0, width - price.Length - 1);
 
@@ -47,13 +48,13 @@ public static class Printer
 			bytes.Add(ItemRow(rname, row.GetTotalPrice().ToString()));
 			if (row is RentalRow rr)
 			{
-				bytes.Add(PrintSe($"Returneras senast: {rr.ExpectedReturnDate:yyyy-MM-dd}"));
+				bytes.Add(PrintSe($"  Returneras senast: {rr.ExpectedReturnDate:yyyy-MM-dd}"));
 				if (rr.ReturnedDate is not null)
-					bytes.Add(PrintSe($"Returnerad: {rr.ReturnedDate:yyyy-MM-dd}"));
+					bytes.Add(PrintSe($"  Returnerad: {rr.ReturnedDate:yyyy-MM-dd}"));
 			}
 
 			foreach (var pm in row.PriceModifiers)
-				bytes.Add(ItemRow($"{pm.Reason}", $"{pm.PriceDelta}  "));
+				bytes.Add(ItemRow($"{pm.Reason}", $"{pm.PriceDelta}", indent: 2));
 		}
 
 		return [.. bytes.SelectMany(b => b)];
@@ -63,7 +64,7 @@ public static class Printer
 	{
 		List<byte[]> bytes = [];
 		foreach (var pm in order.PriceModifiers)
-			bytes.Add(ItemRow($"{pm.Reason}", $"{pm.PriceDelta}"));
+			bytes.Add(ItemRow($"{pm.Reason}", $"{pm.PriceDelta}", indent: 2));
 
 		return [.. bytes.SelectMany(b => b)];
 	}
@@ -76,8 +77,8 @@ public static class Printer
 
 		bytes.Add(PrintSe(""));
 
-		bytes.Add(ItemRow("Inkommet", order.TotalPaid.ToString()));
-		bytes.Add(ItemRow("Kvarstående", order.OutstandingAmount.ToString()));
+		bytes.Add(ItemRow("Inkommet", order.TotalPaid.ToString(), indent: 2));
+		bytes.Add(ItemRow("Kvarstående", order.OutstandingAmount.ToString(), indent: 2));
 
 		return [.. bytes.SelectMany(b => b)];
 	}
