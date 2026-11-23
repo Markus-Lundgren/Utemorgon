@@ -110,10 +110,10 @@ public static partial class Data
 					currentOrder.OrderRows.Add(currentRow);
 				}
 
-				if (payment is not null)
+				if (payment is not null && !currentOrder.Payments.Any(p => p.Id == payment.Id))
 					currentOrder.Payments.Add(payment);
 
-				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(x => x.Id == orderPriceModifier.Id))
+				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(pm => pm.Id == orderPriceModifier.Id))
 					currentOrder.PriceModifiers.Add(orderPriceModifier);
 
 				if (rowPriceModifier is not null && currentRow is not null && !currentRow.PriceModifiers.Any(x => x.Id == rowPriceModifier.Id))
@@ -177,7 +177,7 @@ public static partial class Data
 					currentOrder.OrderRows.Add(currentRow);
 				}
 
-				if (payment is not null)
+				if (payment is not null && !currentOrder.Payments.Any(p => p.Id == payment.Id))
 					currentOrder.Payments.Add(payment);
 
 				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(x => x.Id == orderPriceModifier.Id))
