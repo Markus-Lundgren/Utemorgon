@@ -10,6 +10,7 @@ public class Transaction : ITransaction
 	/// Used for identification in frontend flow
 	public DateTime Timestamp { get; private set; }
 	public decimal CurrentTotal => GetTotal();
+	public decimal TotalPayed => _payments.Sum(p => p.Amount);
 	public decimal CurrentDiscount => GetTotalDiscount();
 	public int ItemCount => GetItemCount();
 
@@ -18,14 +19,18 @@ public class Transaction : ITransaction
 	public OrderRow? SelectedItem { get; private set; }
 	public ImmutableArray<OrderRow> AllItems => _items.Values.ToImmutableArray();
 	public ImmutableArray<OrderPriceModifier> AllModifiers => _priceModifiers.ToImmutableArray();
+	public ImmutableArray<Payment> AllPayments => _payments.ToImmutableArray();
 
 	Dictionary<int, OrderRow> _items = [];
 	List<OrderPriceModifier> _priceModifiers = [];
+	List<Payment> _payments = [];
 
 	public Transaction()
 	{
 		Timestamp = DateTime.Now;
 	}
+
+	public void AddPayment(Payment payment) => _payments.Add(payment);
 
 	public void DeselectItem() => SelectedItem = null;
 
