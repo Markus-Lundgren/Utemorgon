@@ -13,9 +13,13 @@ public static partial class Data
 	public static class Orders
 	{
 
+		// Thanks to: https://www.learndapper.com/misc/transaction
+		// Big up! 
 		public static Response FinalizeOrder(ITransaction transaction)
 		{
 			using var db = GetConnectionObject();
+			db.Open();
+
 			using var sqlTrans = db.BeginTransaction();
 			try
 			{
