@@ -49,7 +49,7 @@ public static class Printer
 			{
 				bytes.Add(PrintSe($"Returneras senast: {rr.ExpectedReturnDate:yyyy-MM-dd}"));
 				if (rr.ReturnedDate is not null)
-					bytes.Add(PrintSe($"Returnerad: {rr.ReturnedDate}"));
+					bytes.Add(PrintSe($"Returnerad: {rr.ReturnedDate:yyyy-MM-dd}"));
 			}
 
 			foreach (var pm in row.PriceModifiers)
