@@ -4,7 +4,9 @@
 	EG: Orders[] _ = Data.Orders.GettAllOrdersForCustomer(12); // 12 = a customer id. 
 */
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using Dapper;
 namespace UtemorgonPOS.Core;
 
@@ -63,13 +65,88 @@ public static partial class Data
 		public static Order[] GetAll()
 		{
 			using var db = GetConnectionObject();
-			return [.. db.Query<Order>("SELECT * FROM `Order`;")];
+
+			string query = """
+				SELECT o.*, opm.*, odrr.*, odrrpm.* 
+				FROM `Order` o 
+				LEFT JOIN OrderPriceModifier opm ON opm.OrderId = o.Id 
+				LEFT JOIN OrderRow odrr ON odrr.OrderId = o.Id 
+				LEFT JOIN OrderRowPriceModifier odrrpm ON odrrpm.OrderRowId = odrr.Id;
+			""";
+
+			Dictionary<int, Order> ordersDict = [];
+			Dictionary<int, OrderRow> rowsDict = [];
+
+			var orders = db.Query<Order, OrderPriceModifier, RowPriceModifier, OrderRow, Order>(query,
+			(order, orderPriceModifier, rowPriceModifier, row) =>
+			{
+				if (!ordersDict.TryGetValue(order.Id, out var currentOrder))
+				{
+					currentOrder = order;
+					ordersDict.Add(order.Id, order);
+				}
+
+				if (!rowsDict.TryGetValue(row.Id, out var currentRow))
+				{
+					currentRow = row;
+					rowsDict.Add(row.Id, row);
+				}
+
+				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(x => x.Id == orderPriceModifier.Id))
+					currentOrder.PriceModifiers.Add(orderPriceModifier);
+
+				if (rowPriceModifier is not null && !currentRow.PriceModifiers.Any(x => x.Id == rowPriceModifier.Id))
+					currentRow.PriceModifiers.Add(rowPriceModifier);
+
+				return order;
+			},
+			splitOn: "Id").AsList();
+
+			return [.. ordersDict.Values];
 		}
-		public static Order[] GetFromCustomerId(int customerId)
+		public static Order[] GetFromCustomerId(int? customerId)
 		{
 			using var db = GetConnectionObject();
 
-			return [.. db.Query<Order>("SELECT * FROM `Order` WHERE `Order`.CustomerId = @customerId; ", new { customerId }).AsList()];
+			string query = """
+				SELECT o.*, opm.*, odrr.*, odrrpm.* 
+				FROM `Order` o 
+				LEFT JOIN OrderPriceModifier opm ON opm.OrderId = o.Id 
+				LEFT JOIN OrderRow odrr ON odrr.OrderId = o.Id 
+				LEFT JOIN OrderRowPriceModifier odrrpm ON odrrpm.OrderRowId = odrr.Id
+				WHERE o.CustomerId = @customerId;
+			""";
+
+			Dictionary<int, Order> ordersDict = [];
+			Dictionary<int, OrderRow> rowsDict = [];
+
+			var orders = db.Query<Order, OrderPriceModifier, RowPriceModifier, OrderRow, Order>(query,
+			(order, orderPriceModifier, rowPriceModifier, row) =>
+			{
+				if (!ordersDict.TryGetValue(order.Id, out var currentOrder))
+				{
+					currentOrder = order;
+					ordersDict.Add(order.Id, order);
+				}
+
+				if (!rowsDict.TryGetValue(row.Id, out var currentRow))
+				{
+					currentRow = row;
+					rowsDict.Add(row.Id, row);
+				}
+
+				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(x => x.Id == orderPriceModifier.Id))
+					currentOrder.PriceModifiers.Add(orderPriceModifier);
+
+				if (rowPriceModifier is not null && !currentRow.PriceModifiers.Any(x => x.Id == rowPriceModifier.Id))
+					currentRow.PriceModifiers.Add(rowPriceModifier);
+
+				return order;
+			},
+			new { customerId },
+			splitOn: "Id").AsList();
+
+			return [.. ordersDict.Values];
 		}
 
 		public static Order[] GetFromDate(DateOnly creationdate)
