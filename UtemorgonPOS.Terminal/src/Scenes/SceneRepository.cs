@@ -1,6 +1,8 @@
 static class SceneRepository
 {
 	public static SMain Main = new();
+	public static SManageOrders ManageOrders = new();
+
 	public static class Products
 	{
 		public static SProductsMain Main = new();
