@@ -224,7 +224,7 @@ class STransactionMain : IScene
 
 		} while (!decimal.TryParse(price, out paidAmount));
 
-		_currentTransaction.AddPayment(new(paidAmount, (PaymentMethod)methodId));
+		_currentTransaction.AddPayment(new(paidAmount, (PaymentMethod)methodId, DateTime.Now));
 
 		_forceReRender = true;
 	}

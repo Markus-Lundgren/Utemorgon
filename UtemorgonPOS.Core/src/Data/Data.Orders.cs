@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 using Dapper;
 namespace UtemorgonPOS.Core;
 
@@ -38,6 +39,7 @@ public static partial class Data
 				}
 
 				AddOrderPriceModifier(transaction.AllModifiers, orderId);
+				AddOrderPayments(transaction.AllPayments, orderId);
 				sqlTrans.Commit();
 
 				return new(0, null);
@@ -67,63 +69,20 @@ public static partial class Data
 			using var db = GetConnectionObject();
 
 			string query = """
-				SELECT o.*, opm.*, odrr.*, odrrpm.* 
-				FROM `Order` o 
-				LEFT JOIN OrderPriceModifier opm ON opm.OrderId = o.Id 
-				LEFT JOIN OrderRow odrr ON odrr.OrderId = o.Id 
-				LEFT JOIN OrderRowPriceModifier odrrpm ON odrrpm.OrderRowId = odrr.Id;
-			""";
-
-			Dictionary<int, Order> ordersDict = [];
-			Dictionary<int, OrderRow> rowsDict = [];
-
-			var orders = db.Query<Order, OrderPriceModifier, RowPriceModifier, OrderRow, Order>(query,
-			(order, orderPriceModifier, rowPriceModifier, row) =>
-			{
-				if (!ordersDict.TryGetValue(order.Id, out var currentOrder))
-				{
-					currentOrder = order;
-					ordersDict.Add(order.Id, order);
-				}
-
-				if (!rowsDict.TryGetValue(row.Id, out var currentRow))
-				{
-					currentRow = row;
-					rowsDict.Add(row.Id, row);
-					currentOrder.OrderRows.Add(row);
-				}
-
-				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(x => x.Id == orderPriceModifier.Id))
-					currentOrder.PriceModifiers.Add(orderPriceModifier);
-
-				if (rowPriceModifier is not null && !currentRow.PriceModifiers.Any(x => x.Id == rowPriceModifier.Id))
-					currentRow.PriceModifiers.Add(rowPriceModifier);
-
-				return order;
-			},
-			splitOn: "Id").AsList();
-
-			return [.. ordersDict.Values];
-		}
-		public static Order[] GetFromCustomerId(int? customerId)
-		{
-			using var db = GetConnectionObject();
-
-			string query = """
-				SELECT o.*, opm.*, odrr.*, odrrpm.*, rr.*
+				SELECT o.*, opm.*, odrr.*, odrrpm.*, rr.*, pto.*
 				FROM `Order` o 
 				LEFT JOIN OrderPriceModifier opm ON opm.OrderId = o.Id 
 				LEFT JOIN OrderRow odrr ON odrr.OrderId = o.Id 
 				LEFT JOIN OrderRowPriceModifier odrrpm ON odrrpm.OrderRowId = odrr.Id
 				LEFT JOIN RentalRow rr ON rr.OrderRowId = odrr.Id
-				WHERE o.CustomerId = @customerId;
+				LEFT JOIN PaymentToOrder pto ON pto.OrderId = o.Id;
 			""";
 
 			Dictionary<int, Order> ordersDict = [];
 			Dictionary<int, OrderRow> rowsDict = [];
 
-			var orders = db.Query<Order, OrderPriceModifier, OrderRow, RowPriceModifier, RentalRow, Order>(query,
-			(order, orderPriceModifier, row, rowPriceModifier, rentalRow) =>
+			var orders = db.Query<Order, OrderPriceModifier, OrderRow, RowPriceModifier, RentalRow, Payment, Order>(query,
+			(order, orderPriceModifier, row, rowPriceModifier, rentalRow, payment) =>
 			{
 				if (!ordersDict.TryGetValue(order.Id, out var currentOrder))
 				{
@@ -150,6 +109,71 @@ public static partial class Data
 					rowsDict.Add(row.Id, currentRow);
 					currentOrder.OrderRows.Add(currentRow);
 				}
+
+				if (payment is not null)
+					currentOrder.Payments.Add(payment);
+
+				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(x => x.Id == orderPriceModifier.Id))
+					currentOrder.PriceModifiers.Add(orderPriceModifier);
+
+				if (rowPriceModifier is not null && currentRow is not null && !currentRow.PriceModifiers.Any(x => x.Id == rowPriceModifier.Id))
+					currentRow.PriceModifiers.Add(rowPriceModifier);
+
+				return order;
+			},
+			splitOn: "Id").AsList();
+
+			return [.. ordersDict.Values];
+		}
+		public static Order[] GetFromCustomerId(int? customerId)
+		{
+			using var db = GetConnectionObject();
+
+			string query = """
+				SELECT o.*, opm.*, odrr.*, odrrpm.*, rr.*, pto.*
+				FROM `Order` o 
+				LEFT JOIN OrderPriceModifier opm ON opm.OrderId = o.Id 
+				LEFT JOIN OrderRow odrr ON odrr.OrderId = o.Id 
+				LEFT JOIN OrderRowPriceModifier odrrpm ON odrrpm.OrderRowId = odrr.Id
+				LEFT JOIN RentalRow rr ON rr.OrderRowId = odrr.Id
+				LEFT JOIN PaymentToOrder pto ON pto.OrderId = o.Id
+				WHERE o.CustomerId = @customerId;
+			""";
+
+			Dictionary<int, Order> ordersDict = [];
+			Dictionary<int, OrderRow> rowsDict = [];
+
+			var orders = db.Query<Order, OrderPriceModifier, OrderRow, RowPriceModifier, RentalRow, Payment, Order>(query,
+			(order, orderPriceModifier, row, rowPriceModifier, rentalRow, payment) =>
+			{
+				if (!ordersDict.TryGetValue(order.Id, out var currentOrder))
+				{
+					currentOrder = order;
+					ordersDict.Add(order.Id, order);
+				}
+
+				OrderRow? currentRow = null;
+				if (row is not null && !rowsDict.TryGetValue(row.Id, out currentRow))
+				{
+					if (rentalRow is not null)
+					{
+						rentalRow.RentalRowId = rentalRow.Id;
+						rentalRow.Id = row.Id;
+						rentalRow.OrderId = row.OrderId;
+						rentalRow.Barcode = row.Barcode;
+						rentalRow.Name = row.Name;
+						rentalRow.Price = row.Price;
+						currentRow = rentalRow;
+					}
+					else
+						currentRow = row;
+
+					rowsDict.Add(row.Id, currentRow);
+					currentOrder.OrderRows.Add(currentRow);
+				}
+
+				if (payment is not null)
+					currentOrder.Payments.Add(payment);
 
 				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(x => x.Id == orderPriceModifier.Id))
 					currentOrder.PriceModifiers.Add(orderPriceModifier);
@@ -237,19 +261,57 @@ public static partial class Data
 
 		public static void AddOrderPriceModifier(ImmutableArray<OrderPriceModifier> orderPriceModifiers, int orderId)
 		{
+			if (orderPriceModifiers.IsDefaultOrEmpty)
+				return;
+
 			using var db = GetConnectionObject();
 
-			string query = "INSERT INTO OrderPriceModifier(OrderId, PriceDelta, Reason) VALUES(@OrderId, @PriceDelta, @Reason)";
+			var query = new StringBuilder(
+				"INSERT INTO OrderPriceModifier (OrderId, PriceDelta, Reason) VALUES ");
 
-			foreach (var modifier in orderPriceModifiers)
+			var parameters = new DynamicParameters();
+
+			for (int i = 0; i < orderPriceModifiers.Length; i++)
 			{
-				db.Execute(query, new
-				{
-					OrderId = orderId,
-					modifier.PriceDelta,
-					modifier.Reason
-				});
+				if (i > 0)
+					query.Append(", ");
+
+				query.Append($"(@OrderId{i}, @PriceDelta{i}, @Reason{i})");
+
+				parameters.Add($"OrderId{i}", orderId);
+				parameters.Add($"PriceDelta{i}", orderPriceModifiers[i].PriceDelta);
+				parameters.Add($"Reason{i}", orderPriceModifiers[i].Reason);
 			}
+
+			db.Execute(query.ToString(), parameters);
+		}
+
+		public static void AddOrderPayments(ImmutableArray<Payment> orderPayments, int orderId)
+		{
+			if (orderPayments.IsDefaultOrEmpty)
+				return;
+
+			using var db = GetConnectionObject();
+
+			var query = new StringBuilder(
+				"INSERT INTO PaymentToOrder (OrderId, PaymentMethodId, Amount, ReceivedDate) VALUES ");
+
+			var parameters = new DynamicParameters();
+
+			for (int i = 0; i < orderPayments.Length; i++)
+			{
+				if (i > 0)
+					query.Append(", ");
+
+				query.Append($"(@OrderId{i}, @PaymentMethodId{i}, @Amount{i}, @ReceivedDate{i})");
+
+				parameters.Add($"OrderId{i}", orderId);
+				parameters.Add($"PaymentMethodId{i}", orderPayments[i].PaymentMethodId);
+				parameters.Add($"Amount{i}", orderPayments[i].Amount);
+				parameters.Add($"ReceivedDate{i}", orderPayments[i].ReceivedDate);
+			}
+
+			db.Execute(query.ToString(), parameters);
 		}
 	}
 }
