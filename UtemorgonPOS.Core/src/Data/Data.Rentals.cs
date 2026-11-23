@@ -47,5 +47,8 @@ public static partial class Data
 
 		public static RentalProduct[]? GetAllRentalDataForProduct(int productId)
 			=> GetAllRentalData($"WHERE p.Id = {productId}");
+
+		public static RentalProduct[]? GetAllRentalDataFromBarcode(string barcode)
+			=> GetAllRentalData($"WHERE odrr.Barcode = {barcode}");
 	}
 }
