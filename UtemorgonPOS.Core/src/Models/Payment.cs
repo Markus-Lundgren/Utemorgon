@@ -1,6 +1,6 @@
 namespace UtemorgonPOS.Core;
 
-public struct Payment
+public class Payment
 {
 	public decimal Amount { get; set; }
 	public PaymentMethod Method { get; set; }
