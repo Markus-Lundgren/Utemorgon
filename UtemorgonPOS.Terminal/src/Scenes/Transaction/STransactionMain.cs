@@ -171,6 +171,7 @@ class STransactionMain : IScene
 		new(ConsoleKey.B, "Enter barcode", AddProductThroughManualBarcode),
 		new(ConsoleKey.C, "Add customer", AddCustomerToOrder),
 		new(ConsoleKey.O, "Add order modifier", AddOrderModifier),
+		new(ConsoleKey.P, "Add payment", AddPaymentToOrder),
 		new(ConsoleKey.F, "Finalize order", FinalizeOrder),
 		new(ConsoleKey.S, "Save order and exit", () => {_savedTransactions.Add(_currentTransaction); _deferredTransition = new SceneTransition.Pop(); }),
 		new(ConsoleKey.A, "Abort transaction", () => {_deferredTransition = new SceneTransition.Pop(); }),
@@ -195,6 +196,37 @@ class STransactionMain : IScene
 		]);
 
 		_currentMenu = _menu;
+	}
+
+	void AddPaymentToOrder()
+	{
+		decimal paidAmount;
+		string? price;
+		string methodChoice;
+		int methodId;
+
+		string[] methods = Enum.GetNames(typeof(PaymentMethod));
+
+		for (int i = 1; i < methods.Length; i++)
+			Console.WriteLine($"{i}: {methods[i]}");
+
+		do
+		{
+			Console.Write("\nChoose a payment method: ");
+			methodChoice = Console.ReadLine() ?? "";
+
+		} while (!int.TryParse(methodChoice, out methodId) || methodId <= 0 || methodId > methods.Length - 1);
+
+		do
+		{
+			Console.Write("\nEnter amount (SEK): ");
+			price = Console.ReadLine();
+
+		} while (!decimal.TryParse(price, out paidAmount));
+
+		_currentTransaction.AddPayment(new(paidAmount, (PaymentMethod)methodId));
+
+		_forceReRender = true;
 	}
 
 	void ChangeRentalRootPrice()

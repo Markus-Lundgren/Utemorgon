@@ -10,7 +10,7 @@ public class Transaction : ITransaction
 	/// Used for identification in frontend flow
 	public DateTime Timestamp { get; private set; }
 	public decimal CurrentTotal => GetTotal();
-	public decimal TotalPayed => _payments.Sum(p => p.Amount);
+	public decimal TotalPaid => _payments.Sum(p => p.Amount);
 	public decimal CurrentDiscount => GetTotalDiscount();
 	public int ItemCount => GetItemCount();
 
@@ -121,7 +121,7 @@ public class Transaction : ITransaction
 	public string AsRow()
 	{
 		string? cname = Customer is not null ? $"{Customer.FullName}" : "Anonymous";
-		return $"({cname}) {Timestamp} ({ItemCount}) {CurrentTotal} SEK";
+		return $"({cname}) {Timestamp} ({ItemCount}) {TotalPaid} / {CurrentTotal} SEK (Diff: {CurrentTotal - TotalPaid})";
 	}
 
 	// DISCLAIMER: We know this code is dodo.
