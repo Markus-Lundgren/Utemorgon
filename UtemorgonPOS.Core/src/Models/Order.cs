@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace UtemorgonPOS.Core;
 
@@ -15,5 +16,27 @@ public class Order
 	public List<OrderRow> OrderRows { get; set; } = [];
 
 	public decimal TotalCost => PriceModifiers.Sum(pm => pm.PriceDelta) + OrderRows.Sum(odr => odr.GetTotalPrice());
+	public decimal TotalPaid => Payments.Sum(p => p.Amount);
+
+
+	public string AsCard()
+	{
+		StringBuilder sb = new();
+
+		sb.AppendLine($"Order ID: {Id}");
+		sb.AppendLine($"- MODIFIERS");
+		foreach (var mod in PriceModifiers)
+			sb.AppendLine($"\"{mod.Reason}\" {mod.PriceDelta}");
+
+		sb.AppendLine($"- ITEMS");
+		foreach (var row in OrderRows)
+			sb.AppendLine($"{row}");
+
+		decimal tc = TotalCost;
+		decimal tp = TotalPaid;
+		sb.AppendLine($"Total: {tp} / {tc} (diff: {tc - tp})");
+
+		return sb.ToString().TrimEnd();
+	}
 
 }

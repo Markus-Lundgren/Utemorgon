@@ -64,18 +64,7 @@ class SAllOrders : IScene
 
 				foreach (var order in orders)
 				{
-					Console.WriteLine($"Order ID: {order.Id}");
-					Console.WriteLine($"Total: {order.TotalCost}");
-					Console.WriteLine($"MODIFIERS");
-					foreach (var mod in order.PriceModifiers)
-						Console.WriteLine($"\"{mod.Reason}\" {mod.PriceDelta}");
-
-					Console.WriteLine($"ITEMS");
-					foreach (var row in order.OrderRows)
-					{
-						Console.WriteLine($"{row}");
-					}
-
+					Console.WriteLine(order.AsCard());
 					Console.WriteLine("-------------------------");
 				}
 				Console.WriteLine("============================");
