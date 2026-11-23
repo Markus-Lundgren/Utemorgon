@@ -47,7 +47,7 @@ public static class Printer
 			bytes.Add(ItemRow(rname, row.GetTotalPrice().ToString()));
 			if (row is RentalRow rr)
 			{
-				bytes.Add(PrintSe($"Returneras senast: {rr.ExpectedReturnDate.Date}"));
+				bytes.Add(PrintSe($"Returneras senast: {rr.ExpectedReturnDate:yyyy-MM-dd}"));
 				if (rr.ReturnedDate is not null)
 					bytes.Add(PrintSe($"Returnerad: {rr.ReturnedDate}"));
 			}
@@ -138,11 +138,10 @@ public static class Printer
 				e.FullCut()
 			);
 
-		// Hacky way to just keep the app alive whilst sending data.
 		if (printer is not null)
 		{
 			printer.Write(receipt);
-			// Thread.Sleep(6000);
+			Thread.Sleep(1000);
 		}
 	}
 
