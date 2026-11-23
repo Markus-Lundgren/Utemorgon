@@ -90,6 +90,7 @@ public static partial class Data
 				{
 					currentRow = row;
 					rowsDict.Add(row.Id, row);
+					currentOrder.OrderRows.Add(row);
 				}
 
 				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(x => x.Id == orderPriceModifier.Id))
@@ -133,6 +134,7 @@ public static partial class Data
 				{
 					currentRow = row;
 					rowsDict.Add(row.Id, row);
+					currentOrder.OrderRows.Add(row);
 				}
 
 				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(x => x.Id == orderPriceModifier.Id))
@@ -166,25 +168,27 @@ public static partial class Data
 			string query = "SELECT * FROM `Order` o WHERE o.CreationDate BETWEEN @StartDate AND @EndDate";
 			return [.. db.Query<Order>(query, new { StartDate = startDate, EndDate = endDate })];
 		}
-		public static Order[] GetLate()
-		{
-			using var db = GetConnectionObject();
-			string Query =
-			"""
-				SELECT CO.*,RR.*, O.*
-				FROM `Order` CO
-				JOIN OrderRow O on CO.Id = O.OrderId
-				JOIN RentalRow RR on O.Id = RR.OrderRowId
-				where RR.ReturnedDate > RR.ExpectedReturnDate
-				order by CO.Id;
-			""";
-			var lateReturns = db.Query<Order, OrderRow, RentalRow, Order>(Query, (Order, OrderRow, RentalRow) =>
-			{
-				Order.OrderRow = OrderRow;
-				return Order;
-			}, splitOn: "Id").AsList().ToArray();
-			return lateReturns;
-		}
+
+		// TODO: Fix query to function with multiple rows
+		// public static Order[] GetLate()
+		// {
+		// 	using var db = GetConnectionObject();
+		// 	string Query =
+		// 	"""
+		// 		SELECT CO.*,RR.*, O.*
+		// 		FROM `Order` CO
+		// 		JOIN OrderRow O on CO.Id = O.OrderId
+		// 		JOIN RentalRow RR on O.Id = RR.OrderRowId
+		// 		where RR.ReturnedDate > RR.ExpectedReturnDate
+		// 		order by CO.Id;
+		// 	""";
+		// 	var lateReturns = db.Query<Order, OrderRow, RentalRow, Order>(Query, (Order, OrderRow, RentalRow) =>
+		// 	{
+		// 		Order.OrderRows = OrderRow;
+		// 		return Order;
+		// 	}, splitOn: "Id").AsList().ToArray();
+		// 	return lateReturns;
+		// }
 
 		public static int CreateOrderPriceModifier(int orderId, decimal priceDelta, string reason)
 		{

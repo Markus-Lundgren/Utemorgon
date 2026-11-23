@@ -10,6 +10,6 @@ public class Order
 	public DateTime CreationDate { get; set; }
 
 	public List<OrderPriceModifier> PriceModifiers;
-	public OrderRow OrderRow;
+	public List<OrderRow> OrderRows;
 
 }
