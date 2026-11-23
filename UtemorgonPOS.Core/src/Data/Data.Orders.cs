@@ -105,7 +105,7 @@ public static partial class Data
 			});
 		}
 
-		public static void AddOrderPriceModifier(ImmutableArray<OrderPriceModifier> orderPriceModifiers)
+		public static void AddOrderPriceModifier(ImmutableArray<OrderPriceModifier> orderPriceModifiers, int orderId)
 		{
 			using var db = GetConnectionObject();
 
@@ -115,7 +115,7 @@ public static partial class Data
 			{
 				db.Execute(query, new
 				{
-					modifier.OrderId,
+					OrderId = orderId,
 					modifier.PriceDelta,
 					modifier.Reason
 				});
