@@ -201,7 +201,7 @@ public static partial class Data
 			{
 				db.Execute(query, new
 				{
-					modifier.OrderRowId,
+					OrderRowId = row.Id,
 					modifier.PriceDelta,
 					modifier.Reason
 				});
