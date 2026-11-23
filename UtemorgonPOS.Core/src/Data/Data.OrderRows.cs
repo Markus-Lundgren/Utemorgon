@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dapper;
 
 namespace UtemorgonPOS.Core;
@@ -18,7 +19,7 @@ public static partial class Data
 				pm.Id, pm.OrderRowId, pm.PriceDelta, pm.Reason
 			FROM OrderRow odrr
 				LEFT JOIN RentalRow rr ON rr.OrderRowId = odrr.Id
-				LEFT JOIN OrderRowPriceModifier pm ON rr.OrderRowId = pm.OrderRowId
+				LEFT JOIN OrderRowPriceModifier pm ON odrr.Id = pm.OrderRowId
 		""";
 
 		public static OrderRow[] GetAllRowsForOrder(int orderId)
@@ -131,7 +132,7 @@ public static partial class Data
 			{
 				// Double query....
 				int orderRowId = PushOrderRow(rentalRow);
-				return db.QuerySingle<int>(query, new
+				db.QuerySingle<int>(query, new
 				{
 					orderRowId,
 					rentalRow.Barcode,
@@ -139,6 +140,8 @@ public static partial class Data
 					rentalRow.ReturnedDate,
 					rentalRow.DailyFee
 				});
+
+				return orderRowId;
 			}
 			catch (Exception e)
 			{
@@ -155,7 +158,7 @@ public static partial class Data
 		///<summary>Returns rented product
 		///</summary>
 		/// <returns>Response object</returns>
-		public static Response ReturnRental(string barcode)
+		public static int ReturnRental(string barcode)
 		{
 			using var db = GetConnectionObject();
 			string query = """
@@ -164,9 +167,21 @@ public static partial class Data
 			SET r.ReturnedDate = NOW()
 			WHERE o.Barcode = @Code AND r.ReturnedDate IS NULL
 			""";
-			db.Execute(query, new { Code = barcode });
+			return db.Execute(query, new { Code = barcode });
+		}
 
-			return new(0, null);
+		public static RentalRow? GetLastRentalRowFromBarcode(string barcode)
+		{
+			using var db = GetConnectionObject();
+
+			string query = """
+			SELECT r.*
+			FROM RentalRow r
+			JOIN OrderRow o ON r.OrderRowId = o.Id
+			WHERE o.Barcode = @Code AND r.ReturnedDate IS NULL
+			""";
+
+			return db.Query<RentalRow>(query, new { Code = barcode }).LastOrDefault();
 		}
 
 		public static RentalRow[] GetRentedRentalsBetweenDates(DateOnly startDate, DateOnly endDate)

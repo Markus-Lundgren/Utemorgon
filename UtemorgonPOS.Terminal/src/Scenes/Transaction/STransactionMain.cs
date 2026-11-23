@@ -171,6 +171,7 @@ class STransactionMain : IScene
 		new(ConsoleKey.B, "Enter barcode", AddProductThroughManualBarcode),
 		new(ConsoleKey.C, "Add customer", AddCustomerToOrder),
 		new(ConsoleKey.O, "Add order modifier", AddOrderModifier),
+		new(ConsoleKey.P, "Add payment", AddPaymentToOrder),
 		new(ConsoleKey.F, "Finalize order", FinalizeOrder),
 		new(ConsoleKey.S, "Save order and exit", () => {_savedTransactions.Add(_currentTransaction); _deferredTransition = new SceneTransition.Pop(); }),
 		new(ConsoleKey.A, "Abort transaction", () => {_deferredTransition = new SceneTransition.Pop(); }),
@@ -197,15 +198,46 @@ class STransactionMain : IScene
 		_currentMenu = _menu;
 	}
 
+	void AddPaymentToOrder()
+	{
+		decimal paidAmount;
+		string? price;
+		string methodChoice;
+		int methodId;
+
+		string[] methods = Enum.GetNames(typeof(PaymentMethod));
+
+		for (int i = 1; i < methods.Length; i++)
+			Console.WriteLine($"{i}: {methods[i]}");
+
+		do
+		{
+			Console.Write("\nChoose a payment method: ");
+			methodChoice = Console.ReadLine() ?? "";
+
+		} while (!int.TryParse(methodChoice, out methodId) || methodId <= 0 || methodId > methods.Length - 1);
+
+		do
+		{
+			Console.Write("\nEnter amount (SEK): ");
+			price = Console.ReadLine();
+
+		} while (!decimal.TryParse(price, out paidAmount));
+
+		_currentTransaction.AddPayment(new(paidAmount, (PaymentMethod)methodId, DateTime.Now));
+
+		_forceReRender = true;
+	}
+
 	void ChangeRentalRootPrice()
 	{
 		var row = _currentTransaction.SelectedItem;
 		if (row is not RentalRow rr)
 			return;
-
-		string? price = null;
 		decimal dPrice;
 
+
+		string? price;
 		do
 		{
 			Console.Write("\nEnter new price per day: ");
@@ -224,10 +256,10 @@ class STransactionMain : IScene
 		var row = _currentTransaction.SelectedItem;
 		if (row is not RentalRow rr)
 			return;
-
-		string? days = null;
 		int iDays;
 
+
+		string? days;
 		do
 		{
 			Console.Write("\nDays to rent product: ");
@@ -399,7 +431,24 @@ class STransactionMain : IScene
 	void AddAndReRender(Barcode? barcode)
 	{
 		if (barcode is not null)
-			_currentTransaction.AddItem(barcode);
+		{
+			var rr = Data.OrderRows.GetLastRentalRowFromBarcode(barcode.BarCode);
+
+			if (rr is not null && rr.ReturnedDate is null)
+			{
+				Console.WriteLine("Cannot rent a product that has not been returned!");
+				Console.WriteLine("Press any key to continue...");
+				Console.ReadKey(intercept: true);
+				_forceReRender = true;
+				return;
+			}
+
+			bool hasOutstanding = false;
+			if (_currentTransaction.Customer is not null)
+				hasOutstanding = Data.Customers.GetOutstandingOrders(_currentTransaction.Customer.Id).Length > 0;
+
+			_currentTransaction.AddItem(barcode, hasOutstanding);
+		}
 		_forceReRender = true;
 	}
 
@@ -494,25 +543,21 @@ class STransactionMain : IScene
 		if (_currentTransaction.AllItems.Any(i => i is null))
 		{
 			Console.WriteLine("One of the rows does not contain anything");
+			Console.WriteLine("Press any key to continue...");
+			Console.ReadKey(intercept: true);
 			return;
 		}
 
-		// Note to us: Customer with id 1 should be set as "Anonymous customer", that way we can point to that 
-		// id whenever we insert an order with no set customer
+		var response = Data.Orders.FinalizeOrder(_currentTransaction);
 
-		// Below should be the basics of what we need to use when finalizing order
+		if (response.Code == 0)
+			Console.WriteLine("Order added to database without issues!");
+		else
+			Console.WriteLine($"\nERROR: {response.Message}");
 
-		int orderId = Data.Orders.CreateOrder(_currentTransaction.Customer?.Id ?? 1, DateTime.Today);
-		foreach (var row in _currentTransaction.AllItems)
-		{
-			row.OrderId = orderId;
-			if (row is RentalRow rr)
-				row.Id = Data.OrderRows.PushRentalRow(rr);
-			else
-				row.Id = Data.OrderRows.PushOrderRow(row);
-			Data.OrderRows.AddOrderRowPriceModifier(row);
-		}
-		Data.Orders.AddOrderPriceModifier(_currentTransaction.AllModifiers, orderId);
+		Console.WriteLine("Press any key to continue...");
+		Console.ReadKey(intercept: true);
+
 		_deferredTransition = new SceneTransition.Pop();
 	}
 }

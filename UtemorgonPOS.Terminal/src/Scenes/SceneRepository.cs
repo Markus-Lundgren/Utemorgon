@@ -7,6 +7,7 @@ static class SceneRepository
 		public static SNewProduct New = new();
 		public static SProductInfo Info = new();
 		public static SProductCategory Category = new();
+		public static SProductReturnRentals ReturnRentals = new();
 	}
 
 	public static class Transaction
@@ -26,5 +27,6 @@ static class SceneRepository
 		public static SNewCustomer NewCustomer = new();
 		public static SDeleteCustomer DeleteCustomer = new();
 		public static SUpdateCustomer UpdateCustomer = new();
+		public static SAllOrders AllOrders = new();
 	}
 }

@@ -4,12 +4,13 @@ using System.Collections.Immutable;
 using System.Linq;
 using UtemorgonPOS.Core;
 
-public class Transaction
+public class Transaction : ITransaction
 {
 	const int DEFAULT_RENTAL_DAYS = 3;
 	/// Used for identification in frontend flow
 	public DateTime Timestamp { get; private set; }
 	public decimal CurrentTotal => GetTotal();
+	public decimal TotalPaid => _payments.Sum(p => p.Amount);
 	public decimal CurrentDiscount => GetTotalDiscount();
 	public int ItemCount => GetItemCount();
 
@@ -18,14 +19,18 @@ public class Transaction
 	public OrderRow? SelectedItem { get; private set; }
 	public ImmutableArray<OrderRow> AllItems => _items.Values.ToImmutableArray();
 	public ImmutableArray<OrderPriceModifier> AllModifiers => _priceModifiers.ToImmutableArray();
+	public ImmutableArray<Payment> AllPayments => _payments.ToImmutableArray();
 
 	Dictionary<int, OrderRow> _items = [];
 	List<OrderPriceModifier> _priceModifiers = [];
+	List<Payment> _payments = [];
 
 	public Transaction()
 	{
 		Timestamp = DateTime.Now;
 	}
+
+	public void AddPayment(Payment payment) => _payments.Add(payment);
 
 	public void DeselectItem() => SelectedItem = null;
 
@@ -38,19 +43,35 @@ public class Transaction
 			SelectedItem = row;
 	}
 
-	public void AddItem(Barcode barcode)
+	public void AddItem(Barcode barcode, bool hasOutstanding)
 	{
 		if (barcode.Product is null || barcode.Product.IsArchived)
 			return;
 
 		bool isRental = barcode.Product.ProductType.ToString().Contains("rental", StringComparison.InvariantCultureIgnoreCase);
 
-		if (isRental && Customer is null)
+		if (isRental)
 		{
-			Console.WriteLine("Cannot add a rental product when the order has no customer!");
-			Console.WriteLine("Press any key to continue.");
-			Console.ReadKey(intercept: true);
-			return;
+			bool blocked = false;
+
+			if (Customer is null)
+			{
+				Console.WriteLine("Cannot add a rental product when the order has no customer!");
+				blocked = true;
+			}
+			else if (hasOutstanding)
+			{
+				Console.WriteLine("Cannot add a rental product for a customer with outstanding payments!");
+				blocked = true;
+			}
+
+			if (blocked)
+			{
+				Console.WriteLine("Press any key to continue.");
+				Console.ReadKey(intercept: true);
+				return;
+			}
+
 		}
 
 
@@ -116,7 +137,7 @@ public class Transaction
 	public string AsRow()
 	{
 		string? cname = Customer is not null ? $"{Customer.FullName}" : "Anonymous";
-		return $"({cname}) {Timestamp} ({ItemCount}) {CurrentTotal} SEK";
+		return $"({cname}) {Timestamp} ({ItemCount}) {TotalPaid} / {CurrentTotal} SEK (Diff: {CurrentTotal - TotalPaid})";
 	}
 
 	// DISCLAIMER: We know this code is dodo.

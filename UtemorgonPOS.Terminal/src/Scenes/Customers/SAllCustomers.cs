@@ -1,53 +1,53 @@
 using System;
 using System.Data.Common;
+using System.Linq;
 using RiverScenes;
 using UtemorgonPOS.Core;
 
 class SAllCustomers : IScene
 {
-  public void Enter()
-  { }
+	public void Enter()
+	{ }
 
-  public void Exit()
-  { }
+	public void Exit()
+	{ }
 
-  public SceneTransition Run()
-  {
-    Console.Clear();
-    Console.WriteLine("=====~* UTEMORGON *~=====");
-    Console.WriteLine("Customers > Customers info > All customers");
-    Console.WriteLine();
+	public SceneTransition Run()
+	{
+		Console.Clear();
+		Console.WriteLine("=====~* UTEMORGON *~=====");
+		Console.WriteLine("Customers > Customers info > All customers");
+		Console.WriteLine();
 
-    bool hasCustomers = false;
+		bool hasCustomers = false;
 
-    try
-    {
-      foreach (var customer in Data.Customers.GetAll())
-      {
-        hasCustomers = true;
+		try
+		{
+			foreach (var customer in Data.Customers.GetAll())
+			{
+				hasCustomers = true;
 
-        Console.WriteLine("===== CUSTOMER DETAILS =====");
-        Console.WriteLine($"Customer ID: {customer.Id}");
-        Console.WriteLine($"Name: {customer.FullName}");
-        Console.WriteLine($"Personal number: {customer.SSNFormated}");
-        Console.WriteLine($"Address: {customer.Address}");
-        Console.WriteLine($"Phone number: {customer.PhoneNumber}");
-        Console.WriteLine("============================");
-        Console.WriteLine();
-      }
+				Console.WriteLine("===== CUSTOMER DETAILS =====");
+				Console.WriteLine(customer.AsCard());
+				Order[] orders = Data.Customers.GetOutstandingOrders(customer.Id);
+				decimal debt = orders.Sum(o => o.TotalCost - o.TotalPaid);
+				Console.WriteLine($"Outstanding amount: {debt} SEK");
+				Console.WriteLine("============================");
+				Console.WriteLine();
+			}
 
-      if (!hasCustomers) Console.WriteLine("No customers found.");
-    }
-    catch (DbException)
-    {
-      Console.WriteLine("A database error occurred.");
-      Console.WriteLine("Customers could not be retrieved.");
-    }
+			if (!hasCustomers) Console.WriteLine("No customers found.");
+		}
+		catch (DbException)
+		{
+			Console.WriteLine("A database error occurred.");
+			Console.WriteLine("Customers could not be retrieved.");
+		}
 
-    Console.WriteLine();
-    Console.WriteLine("Press any key to return.");
-    Console.ReadKey();
+		Console.WriteLine();
+		Console.WriteLine("Press any key to return.");
+		Console.ReadKey();
 
-    return new SceneTransition.Pop();
-  }
+		return new SceneTransition.Pop();
+	}
 }
