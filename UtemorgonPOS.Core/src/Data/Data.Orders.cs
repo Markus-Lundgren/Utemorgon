@@ -110,19 +110,20 @@ public static partial class Data
 			using var db = GetConnectionObject();
 
 			string query = """
-				SELECT o.*, opm.*, odrr.*, odrrpm.* 
+				SELECT o.*, opm.*, odrr.*, odrrpm.*, rr.*
 				FROM `Order` o 
 				LEFT JOIN OrderPriceModifier opm ON opm.OrderId = o.Id 
 				LEFT JOIN OrderRow odrr ON odrr.OrderId = o.Id 
 				LEFT JOIN OrderRowPriceModifier odrrpm ON odrrpm.OrderRowId = odrr.Id
+				LEFT JOIN RentalRow rr ON rr.OrderRowId = odrr.Id
 				WHERE o.CustomerId = @customerId;
 			""";
 
 			Dictionary<int, Order> ordersDict = [];
 			Dictionary<int, OrderRow> rowsDict = [];
 
-			var orders = db.Query<Order, OrderPriceModifier, RowPriceModifier, OrderRow, Order>(query,
-			(order, orderPriceModifier, rowPriceModifier, row) =>
+			var orders = db.Query<Order, OrderPriceModifier, OrderRow, RowPriceModifier, RentalRow, Order>(query,
+			(order, orderPriceModifier, row, rowPriceModifier, rentalRow) =>
 			{
 				if (!ordersDict.TryGetValue(order.Id, out var currentOrder))
 				{
@@ -130,17 +131,30 @@ public static partial class Data
 					ordersDict.Add(order.Id, order);
 				}
 
-				if (!rowsDict.TryGetValue(row.Id, out var currentRow))
+				OrderRow? currentRow = null;
+				if (row is not null && !rowsDict.TryGetValue(row.Id, out currentRow))
 				{
-					currentRow = row;
-					rowsDict.Add(row.Id, row);
-					currentOrder.OrderRows.Add(row);
+					if (rentalRow is not null)
+					{
+						rentalRow.RentalRowId = rentalRow.Id;
+						rentalRow.Id = row.Id;
+						rentalRow.OrderId = row.OrderId;
+						rentalRow.Barcode = row.Barcode;
+						rentalRow.Name = row.Name;
+						rentalRow.Price = row.Price;
+						currentRow = rentalRow;
+					}
+					else
+						currentRow = row;
+
+					rowsDict.Add(row.Id, currentRow);
+					currentOrder.OrderRows.Add(currentRow);
 				}
 
 				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(x => x.Id == orderPriceModifier.Id))
 					currentOrder.PriceModifiers.Add(orderPriceModifier);
 
-				if (rowPriceModifier is not null && !currentRow.PriceModifiers.Any(x => x.Id == rowPriceModifier.Id))
+				if (rowPriceModifier is not null && currentRow is not null && !currentRow.PriceModifiers.Any(x => x.Id == rowPriceModifier.Id))
 					currentRow.PriceModifiers.Add(rowPriceModifier);
 
 				return order;
