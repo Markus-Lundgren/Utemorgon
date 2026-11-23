@@ -5,6 +5,7 @@
 */
 
 using System.Collections.Generic;
+using System.Linq;
 using Dapper;
 
 namespace UtemorgonPOS.Core;
@@ -182,5 +183,9 @@ public static partial class Data
 				new { Id = id }
 			);
 		}
+
+		// Im so sorry, this sucks.
+		public static Order[] GetOutstandingOrders(int customerId)
+			=> Orders.GetFromCustomerId(customerId).Where(o => o.IsOutstanding).ToArray();
 	}
 }

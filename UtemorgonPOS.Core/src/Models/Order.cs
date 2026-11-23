@@ -15,8 +15,10 @@ public class Order
 	public List<OrderPriceModifier> PriceModifiers { get; set; } = [];
 	public List<OrderRow> OrderRows { get; set; } = [];
 
+	// This is very allocating, not very memory aware.
 	public decimal TotalCost => PriceModifiers.Sum(pm => pm.PriceDelta) + OrderRows.Sum(odr => odr.GetTotalPrice());
 	public decimal TotalPaid => Payments.Sum(p => p.Amount);
+	public bool IsOutstanding => TotalPaid < TotalCost;
 
 
 	public string AsCard()

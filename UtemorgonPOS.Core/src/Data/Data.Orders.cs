@@ -125,6 +125,11 @@ public static partial class Data
 
 			return [.. ordersDict.Values];
 		}
+
+		// This sucks. We should do this in the query, not in RAM. Crunchtime...
+		public static Order[] GetAllOutstanding()
+			=> GetAll().Where(o => o.IsOutstanding).ToArray();
+
 		public static Order[] GetFromCustomerId(int? customerId)
 		{
 			using var db = GetConnectionObject();
