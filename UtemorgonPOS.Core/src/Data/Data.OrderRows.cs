@@ -158,7 +158,7 @@ public static partial class Data
 		///<summary>Returns rented product
 		///</summary>
 		/// <returns>Response object</returns>
-		public static Response ReturnRental(string barcode)
+		public static int ReturnRental(string barcode)
 		{
 			using var db = GetConnectionObject();
 			string query = """
@@ -167,9 +167,7 @@ public static partial class Data
 			SET r.ReturnedDate = NOW()
 			WHERE o.Barcode = @Code AND r.ReturnedDate IS NULL
 			""";
-			db.Execute(query, new { Code = barcode });
-
-			return new(0, null);
+			return db.Execute(query, new { Code = barcode });
 		}
 
 		public static RentalRow? GetLastRentalRowFromBarcode(string barcode)
