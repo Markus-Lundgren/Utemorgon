@@ -431,7 +431,13 @@ class STransactionMain : IScene
 	void AddAndReRender(Barcode? barcode)
 	{
 		if (barcode is not null)
-			_currentTransaction.AddItem(barcode);
+		{
+			bool hasOutstanding = false;
+			if (_currentTransaction.Customer is not null)
+				hasOutstanding = Data.Customers.GetOutstandingOrders(_currentTransaction.Customer.Id).Length > 0;
+
+			_currentTransaction.AddItem(barcode, hasOutstanding);
+		}
 		_forceReRender = true;
 	}
 

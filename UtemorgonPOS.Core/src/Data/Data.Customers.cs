@@ -186,6 +186,6 @@ public static partial class Data
 
 		// Im so sorry, this sucks.
 		public static Order[] GetOutstandingOrders(int customerId)
-			=> Orders.GetFromCustomerId(customerId).Where(o => o.IsOutstanding).ToArray();
+			=> Orders.GetFromCustomerId(customerId).Where(o => o.IsOutstanding).ToArray() ?? [];
 	}
 }

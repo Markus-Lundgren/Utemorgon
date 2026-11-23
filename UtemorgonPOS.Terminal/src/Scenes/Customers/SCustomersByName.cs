@@ -1,5 +1,6 @@
 using System;
 using System.Data.Common;
+using System.Linq;
 using RiverScenes;
 using UtemorgonPOS.Core;
 
@@ -33,6 +34,9 @@ class SCustomersByName : IScene
 				hasCustomers = true;
 				Console.WriteLine("===== CUSTOMER BY NAME =====");
 				Console.WriteLine(customer.AsCard());
+				Order[] orders = Data.Customers.GetOutstandingOrders(customer.Id);
+				decimal debt = orders.Sum(o => o.TotalCost - o.TotalPaid);
+				Console.WriteLine($"Outstanding amount: {debt} SEK");
 				Console.WriteLine("============================");
 			}
 

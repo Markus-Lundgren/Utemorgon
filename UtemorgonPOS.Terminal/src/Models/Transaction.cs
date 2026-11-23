@@ -43,16 +43,20 @@ public class Transaction : ITransaction
 			SelectedItem = row;
 	}
 
-	public void AddItem(Barcode barcode)
+	public void AddItem(Barcode barcode, bool hasOutstanding)
 	{
 		if (barcode.Product is null || barcode.Product.IsArchived)
 			return;
 
 		bool isRental = barcode.Product.ProductType.ToString().Contains("rental", StringComparison.InvariantCultureIgnoreCase);
 
-		if (isRental && Customer is null)
+		if (isRental)
 		{
-			Console.WriteLine("Cannot add a rental product when the order has no customer!");
+			if (Customer is null)
+				Console.WriteLine("Cannot add a rental product when the order has no customer!");
+			else if (hasOutstanding)
+				Console.WriteLine("Cannot add a rental product for a customer with outstanding payments!");
+
 			Console.WriteLine("Press any key to continue.");
 			Console.ReadKey(intercept: true);
 			return;

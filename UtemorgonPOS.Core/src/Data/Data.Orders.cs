@@ -128,7 +128,7 @@ public static partial class Data
 
 		// This sucks. We should do this in the query, not in RAM. Crunchtime...
 		public static Order[] GetAllOutstanding()
-			=> GetAll().Where(o => o.IsOutstanding).ToArray();
+			=> GetAll().Where(o => o.IsOutstanding).ToArray() ?? [];
 
 		public static Order[] GetFromCustomerId(int? customerId)
 		{
