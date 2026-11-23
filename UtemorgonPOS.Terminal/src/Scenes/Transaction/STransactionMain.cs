@@ -482,6 +482,21 @@ class STransactionMain : IScene
 	//Basics of finalize order method
 	void FinalizeOrder()
 	{
+		if (_currentTransaction.AllItems.Length == 0)
+		{
+			Console.WriteLine("You cannot send an empty order!");
+			return;
+		}
+
+		// I don't know if this will be needed but this will check if 
+		// any item is null
+		// could possibly be removed
+		if (_currentTransaction.AllItems.Any(i => i is null))
+		{
+			Console.WriteLine("One of the rows does not contain anything");
+			return;
+		}
+
 		// Note to us: Customer with id 1 should be set as "Anonymous customer", that way we can point to that 
 		// id whenever we insert an order with no set customer
 
