@@ -318,7 +318,7 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			string query =
 			"""
-				INSERT INTO PaymentToOrder(OrderId, Amount, PaymentMethod, ReceivedDate)
+				INSERT INTO PaymentToOrder(OrderId, Amount, PaymentMethodId, ReceivedDate)
 				VALUES(@orderId, @amount, @PaymentMethod, @receivedDate)
 				RETURNING Id;
 			""";
@@ -327,7 +327,7 @@ public static partial class Data
 			{
 				orderId,
 				amount,
-				PaymentMethod = paymentMethod.ToString(),
+				PaymentMethod = (int)paymentMethod,
 				receivedDate
 			});
 		}
