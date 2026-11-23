@@ -18,16 +18,11 @@ class SCustomerById : IScene
     Console.WriteLine("Customers > Customers info > Search by ID");
     Console.WriteLine();
 
+    Console.Write("Enter customer ID: ");
 
     int id;
-
-    while (true)
+    while (!int.TryParse(Console.ReadLine(), out id))
     {
-      Console.Write("Enter customer ID: ");
-
-      if (int.TryParse(Console.ReadLine(), out id))
-        break;
-
       Console.Write("Invalid ID. Enter a number: ");
     }
 
