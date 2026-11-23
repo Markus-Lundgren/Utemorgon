@@ -27,7 +27,7 @@ public static partial class Data
 			try
 			{
 				// If customer id is -1, CreteOrder will automatically set it to null
-				int orderId = CreateOrder(transaction.Customer?.Id ?? -1, DateTime.Today);
+				int orderId = CreateOrder(transaction.Customer?.Id ?? -1, transaction.CreationDate);
 				foreach (var row in transaction.AllItems)
 				{
 					row.OrderId = orderId;
