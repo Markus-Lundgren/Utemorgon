@@ -14,10 +14,10 @@ public static class Printer
 	// TODO: Move into env vars
 	const string PRINTER_ADDRESS = "192.168.10.119:9100";
 
-	static NetworkPrinter? GetPrinter()
+	static ImmediateNetworkPrinter? GetPrinter()
 	{
 		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-		return new NetworkPrinter(settings: new() { ConnectionString = PRINTER_ADDRESS });
+		return new ImmediateNetworkPrinter(settings: new() { ConnectionString = PRINTER_ADDRESS });
 	}
 
 	// Use correct byte translation for Swedish text
@@ -79,7 +79,7 @@ public static class Printer
 
 	public static void PrintOrder(Order order)
 	{
-		using var printer = GetPrinter();
+		var printer = GetPrinter();
 		var e = new EPSON();
 
 		var receipt = ByteSplicer.Combine(
@@ -99,7 +99,7 @@ public static class Printer
 				e.LeftAlign(),
 				PrintSe($"Datum: {order.CreationDate:yyyy-MM-dd HH:mm}    Kassa: 1"),
 				PrintSe($"Kvittonr: #{order.Id}"),
-				PrintSe($"Kund: {(order.CustomerId != -1 ? $"#{order.CustomerId}" : "Anonym")}"),
+				PrintSe($"Kund: {(order.CustomerId > 0 ? $"#{order.CustomerId}" : "Anonym")}"),
 				PrintSe(new string('-', 42)), // Horizontal line
 
 				// ITEMS
@@ -138,11 +138,7 @@ public static class Printer
 				e.FullCut()
 			);
 
-		if (printer is not null)
-		{
-			printer.Write(receipt);
-			Thread.Sleep(1000);
-		}
+		printer?.WriteAsync(receipt).GetAwaiter().GetResult();
 	}
 
 	// TODO: Add real stuff in here...
