@@ -188,5 +188,24 @@ public static partial class Data
 			string query = $"SELECT * FROM RentalRow rr WHERE rr.{column} BETWEEN @StartDate AND @EndDate";
 			return [.. db.Query<RentalRow>(query, new { StartDate = startDate, EndDate = endDate })];
 		}
+
+		public static void AddOrderRowPriceModifier(OrderRow row)
+		{
+			using var db = GetConnectionObject();
+
+			string query = "INSERT INTO OrderRowPriceModifier(OrderRowId, PriceDelta, Reason) VALUES(@OrderRowId, @PriceDelta, @Reason)";
+
+			var priceModifers = row.PriceModifiers;
+
+			foreach (var modifier in priceModifers)
+			{
+				db.Execute(query, new
+				{
+					OrderRowId = row.Id,
+					modifier.PriceDelta,
+					modifier.Reason
+				});
+			}
+		}
 	}
 }

@@ -171,7 +171,7 @@ class STransactionMain : IScene
 		new(ConsoleKey.B, "Enter barcode", AddProductThroughManualBarcode),
 		new(ConsoleKey.C, "Add customer", AddCustomerToOrder),
 		new(ConsoleKey.O, "Add order modifier", AddOrderModifier),
-		new(ConsoleKey.F, "Finalize order", () => {}),
+		new(ConsoleKey.F, "Finalize order", FinalizeOrder),
 		new(ConsoleKey.S, "Save order and exit", () => {_savedTransactions.Add(_currentTransaction); _deferredTransition = new SceneTransition.Pop(); }),
 		new(ConsoleKey.A, "Abort transaction", () => {_deferredTransition = new SceneTransition.Pop(); }),
 		]);
@@ -479,4 +479,40 @@ class STransactionMain : IScene
 		Console.WriteLine(sb.ToString().TrimEnd());
 	}
 
+	//Basics of finalize order method
+	void FinalizeOrder()
+	{
+		if (_currentTransaction.AllItems.Length == 0)
+		{
+			Console.WriteLine("You cannot send an empty order!");
+			return;
+		}
+
+		// I don't know if this will be needed but this will check if 
+		// any item is null
+		// could possibly be removed
+		if (_currentTransaction.AllItems.Any(i => i is null))
+		{
+			Console.WriteLine("One of the rows does not contain anything");
+			return;
+		}
+
+		// Note to us: Customer with id 1 should be set as "Anonymous customer", that way we can point to that 
+		// id whenever we insert an order with no set customer
+
+		// Below should be the basics of what we need to use when finalizing order
+
+		int orderId = Data.Orders.CreateOrder(_currentTransaction.Customer?.Id ?? 1, DateTime.Today);
+		foreach (var row in _currentTransaction.AllItems)
+		{
+			row.OrderId = orderId;
+			if (row is RentalRow rr)
+				row.Id = Data.OrderRows.PushRentalRow(rr);
+			else
+				row.Id = Data.OrderRows.PushOrderRow(row);
+			Data.OrderRows.AddOrderRowPriceModifier(row);
+		}
+		Data.Orders.AddOrderPriceModifier(_currentTransaction.AllModifiers, orderId);
+		_deferredTransition = new SceneTransition.Pop();
+	}
 }

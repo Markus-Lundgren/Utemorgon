@@ -4,6 +4,7 @@
 	EG: Orders[] _ = Data.Orders.GettAllOrdersForCustomer(12); // 12 = a customer id. 
 */
 using System;
+using System.Collections.Immutable;
 using Dapper;
 namespace UtemorgonPOS.Core;
 
@@ -104,5 +105,21 @@ public static partial class Data
 			});
 		}
 
+		public static void AddOrderPriceModifier(ImmutableArray<OrderPriceModifier> orderPriceModifiers, int orderId)
+		{
+			using var db = GetConnectionObject();
+
+			string query = "INSERT INTO OrderPriceModifier(OrderId, PriceDelta, Reason) VALUES(@OrderId, @PriceDelta, @Reason)";
+
+			foreach (var modifier in orderPriceModifiers)
+			{
+				db.Execute(query, new
+				{
+					OrderId = orderId,
+					modifier.PriceDelta,
+					modifier.Reason
+				});
+			}
+		}
 	}
 }

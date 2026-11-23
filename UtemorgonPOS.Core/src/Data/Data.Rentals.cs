@@ -39,6 +39,15 @@ public static partial class Data
 		}
 
 		public static RentalProduct[]? GetAllRentalDataForCustomer(int customerId)
-			=> GetAllRentalData($"WHERE o.Id = {customerId}");
+			=> GetAllRentalData($"WHERE c.Id = {customerId}");
+
+		public static RentalProduct[]? GetAllRentalDataFromOrder(int orderId)
+			=> GetAllRentalData($"WHERE o.Id = {orderId}");
+
+		public static RentalProduct[]? GetAllRentalDataForProduct(int productId)
+			=> GetAllRentalData($"WHERE p.Id = {productId}");
+
+		public static RentalProduct[]? GetAllRentalDataFromBarcode(string barcode)
+			=> GetAllRentalData($"WHERE odrr.Barcode = {barcode}");
 	}
 }
