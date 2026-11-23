@@ -45,34 +45,25 @@ public class Transaction : ITransaction
 			SelectedItem = row;
 	}
 
-	public void AddItem(Barcode barcode, bool hasOutstanding)
+	/// <summary>
+	/// 0 = good, 1 = no product, 2 = No customer, 3 = Outstanding payments
+	/// </summary>
+	/// <param name="barcode"></param>
+	/// <param name="hasOutstanding"></param>
+	/// <returns></returns>
+	public int AddItem(Barcode barcode, bool hasOutstanding)
 	{
 		if (barcode.Product is null || barcode.Product.IsArchived)
-			return;
+			return 1;
 
 		bool isRental = barcode.Product.ProductType.ToString().Contains("rental", StringComparison.InvariantCultureIgnoreCase);
 
 		if (isRental)
 		{
-			bool blocked = false;
-
 			if (Customer is null)
-			{
-				Console.WriteLine("Cannot add a rental product when the order has no customer!");
-				blocked = true;
-			}
+				return 2;
 			else if (hasOutstanding)
-			{
-				Console.WriteLine("Cannot add a rental product for a customer with outstanding payments!");
-				blocked = true;
-			}
-
-			if (blocked)
-			{
-				Console.WriteLine("Press any key to continue.");
-				Console.ReadKey(intercept: true);
-				return;
-			}
+				return 3;
 
 		}
 
@@ -100,6 +91,7 @@ public class Transaction : ITransaction
 		}
 
 		SelectedItem = _items[barcode.Product.Id];
+		return 0;
 	}
 
 

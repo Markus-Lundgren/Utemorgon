@@ -447,7 +447,21 @@ class STransactionMain : IScene
 			if (_currentTransaction.Customer is not null)
 				hasOutstanding = Data.Customers.GetOutstandingOrders(_currentTransaction.Customer.Id).Length > 0;
 
-			_currentTransaction.AddItem(barcode, hasOutstanding);
+			var code = _currentTransaction.AddItem(barcode, hasOutstanding);
+			if (code != 0)
+			{
+				if (code == 1)
+					Console.WriteLine("Cannot add a null or archived product!");
+				else if (code == 2)
+					Console.WriteLine("Cannot add a rental product when the order has no customer!");
+				else if (code == 3)
+					Console.WriteLine("Cannot add a rental product for a customer with outstanding payments!");
+				else
+					Console.WriteLine("Error adding rental product to order!");
+
+				Console.WriteLine("Press any key to continue...");
+				Console.ReadKey(intercept: true);
+			}
 		}
 		_forceReRender = true;
 	}
