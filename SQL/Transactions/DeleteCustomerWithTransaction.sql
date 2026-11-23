@@ -19,7 +19,7 @@ BEGIN
 
     START TRANSACTION;
 
-    UPDATE COrder
+    UPDATE `Order`
     SET CustomerId = 1
     WHERE CustomerId = p_Id;
 
