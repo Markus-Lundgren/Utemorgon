@@ -26,5 +26,6 @@ static class SceneRepository
 		public static SNewCustomer NewCustomer = new();
 		public static SDeleteCustomer DeleteCustomer = new();
 		public static SUpdateCustomer UpdateCustomer = new();
+		public static SAllOrders AllOrders = new();
 	}
 }
