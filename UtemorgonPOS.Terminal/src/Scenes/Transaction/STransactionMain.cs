@@ -202,10 +202,10 @@ class STransactionMain : IScene
 		var row = _currentTransaction.SelectedItem;
 		if (row is not RentalRow rr)
 			return;
-
-		string? price = null;
 		decimal dPrice;
 
+
+		string? price;
 		do
 		{
 			Console.Write("\nEnter new price per day: ");
@@ -224,10 +224,10 @@ class STransactionMain : IScene
 		var row = _currentTransaction.SelectedItem;
 		if (row is not RentalRow rr)
 			return;
-
-		string? days = null;
 		int iDays;
 
+
+		string? days;
 		do
 		{
 			Console.Write("\nDays to rent product: ");
@@ -494,15 +494,14 @@ class STransactionMain : IScene
 		if (_currentTransaction.AllItems.Any(i => i is null))
 		{
 			Console.WriteLine("One of the rows does not contain anything");
+			Console.WriteLine("Press any key to continue...");
+			Console.ReadKey(intercept: true);
 			return;
 		}
 
-		// Note to us: Customer with id 1 should be set as "Anonymous customer", that way we can point to that 
-		// id whenever we insert an order with no set customer
 
-		// Below should be the basics of what we need to use when finalizing order
-
-		int orderId = Data.Orders.CreateOrder(_currentTransaction.Customer?.Id ?? 1, DateTime.Today);
+		// If customer id is -1, CreteOrder will automatically set it to null
+		int orderId = Data.Orders.CreateOrder(_currentTransaction.Customer?.Id ?? -1, DateTime.Today);
 		foreach (var row in _currentTransaction.AllItems)
 		{
 			row.OrderId = orderId;

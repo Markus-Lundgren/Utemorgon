@@ -13,7 +13,7 @@ public static partial class Data
 	public static class Orders
 	{
 		// TODO: Add things like GetAllOrdersForCustomer(int customerId)
-		public static int CreateOrder(int customerId, DateTime creationDate)
+		public static int CreateOrder(int? customerId, DateTime creationDate)
 		{
 			using var db = GetConnectionObject();
 			string sql = """
@@ -22,7 +22,7 @@ public static partial class Data
 				RETURNING Id;
 				""";
 			return db.QuerySingle<int>(
-				sql, new { CustomerId = customerId, CreationDate = creationDate }
+				sql, new { CustomerId = customerId == -1 ? null : customerId, CreationDate = creationDate }
 			);
 		}
 		public static Order[] GetAll()
