@@ -132,7 +132,9 @@ public static class Printer
 				PrintSe("Tack för ditt besök!"),
 				PrintSe("Spara kvittot vid eventuell retur."),
 				e.PrintLine(""),
-				e.PrintBarcode(BarcodeType.CODE39, order.Id.ToString(), BarcodeCode.CODE_C),
+				e.SetBarcodeHeightInDots(100),
+				e.SetBarWidth(BarWidth.Default),
+				e.PrintBarcode(BarcodeType.CODE128, order.Id.ToString("D6"), BarcodeCode.CODE_C),
 
 				e.FeedLines(5),
 				e.FullCut()
@@ -143,9 +145,46 @@ public static class Printer
 
 	// TODO: Add real stuff in here...
 
-	public static void PrintBarcode(string? barcode)
+
+	// Full on what the hell mode because the receiptprinter can't handle our barcodes.
+	// Disclaimer: This is an AI generated fix.
+	// It basically combines 2 barcode print-types for the special barcodes 
+	// (barcodes starting with a letter followed by 12 digits)
+	// This makes it more compact and allows the scanner to read it proper
+	public static void PrintSpecialBarcode(string? barcode)
 	{
 		if (string.IsNullOrWhiteSpace(barcode))
 			return;
+
+		var printer = GetPrinter();
+		var e = new EPSON();
+
+		byte[] barcodeData = EncodeSpecialBarcode(barcode);
+		byte[] gsK = [0x1D, 0x6B, 73, (byte)barcodeData.Length, .. barcodeData];
+
+		var receipt = ByteSplicer.Combine(
+			e.Initialize(),
+			[27, 116, 16], // WPC1252
+			e.CenterAlign(),
+			e.SetBarcodeHeightInDots(100),
+			e.SetBarWidth(BarWidth.Thin),
+			gsK,
+			PrintSe(barcode),
+			e.FeedLines(5),
+			e.FullCut()
+		);
+
+		printer?.WriteAsync(receipt).GetAwaiter().GetResult();
 	}
+
+	static byte[] EncodeSpecialBarcode(string barcode)
+	{
+		List<byte> data = [(byte)'{', (byte)'B', (byte)barcode[0], (byte)'{', (byte)'C'];
+
+		for (int i = 1; i < barcode.Length; i += 2)
+			data.Add(byte.Parse(barcode.AsSpan(i, 2)));
+
+		return [.. data];
+	}
+
 }
