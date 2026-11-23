@@ -17,7 +17,11 @@ public class Order
 
 	// This is very allocating, not very memory aware.
 	public decimal TotalCost => PriceModifiers.Sum(pm => pm.PriceDelta) + OrderRows.Sum(odr => odr.GetTotalPrice());
+	public decimal TotalDiscount =>
+		PriceModifiers.Where(pm => pm.PriceDelta < 0).Sum(pm => pm.PriceDelta)
+		+ OrderRows.SelectMany(r => r.PriceModifiers).Where(pm => pm.PriceDelta < 0).Sum(pm => pm.PriceDelta);
 	public decimal TotalPaid => Payments.Sum(p => p.Amount);
+	public decimal OutstandingAmount => TotalCost - TotalPaid;
 	public bool IsOutstanding => TotalPaid < TotalCost;
 
 

@@ -258,7 +258,7 @@ class SProductInfo : IScene
 	void AttachRentalBarcode()
 	{
 		string? barcode = Data.Barcodes.AddBarcodeToRental(_selectedProduct!.Id);
-		Printer.PrintBarcode(barcode);
+		Printer.PrintSpecialBarcode(barcode);
 		Console.WriteLine($"Attached rental barcode {barcode} to {_selectedProduct.Name}.");
 		Pause();
 	}

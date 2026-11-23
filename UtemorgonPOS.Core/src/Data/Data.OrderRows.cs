@@ -175,7 +175,7 @@ public static partial class Data
 			using var db = GetConnectionObject();
 
 			string query = """
-			SELECT r.*
+			SELECT r.*, o.OrderId
 			FROM RentalRow r
 			JOIN OrderRow o ON r.OrderRowId = o.Id
 			WHERE o.Barcode = @Code AND r.ReturnedDate IS NULL

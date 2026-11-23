@@ -548,12 +548,15 @@ class STransactionMain : IScene
 			return;
 		}
 
-		var response = Data.Orders.FinalizeOrder(_currentTransaction);
+		var order = Data.Orders.FinalizeOrder(_currentTransaction);
 
-		if (response.Code == 0)
+		if (order is not null)
+		{
 			Console.WriteLine("Order added to database without issues!");
+			Printer.PrintOrder(order);
+		}
 		else
-			Console.WriteLine($"\nERROR: {response.Message}");
+			Console.WriteLine($"An error occured when saving the order.");
 
 		Console.WriteLine("Press any key to continue...");
 		Console.ReadKey(intercept: true);

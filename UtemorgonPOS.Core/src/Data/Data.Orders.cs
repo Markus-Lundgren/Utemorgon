@@ -18,7 +18,7 @@ public static partial class Data
 
 		// Thanks to: https://www.learndapper.com/misc/transaction
 		// Big up! 
-		public static Response FinalizeOrder(ITransaction transaction)
+		public static Order? FinalizeOrder(ITransaction transaction)
 		{
 			using var db = GetConnectionObject();
 			db.Open();
@@ -27,7 +27,7 @@ public static partial class Data
 			try
 			{
 				// If customer id is -1, CreteOrder will automatically set it to null
-				int orderId = CreateOrder(transaction.Customer?.Id ?? -1, DateTime.Today);
+				int orderId = CreateOrder(transaction.Customer?.Id ?? -1, transaction.CreationDate);
 				foreach (var row in transaction.AllItems)
 				{
 					row.OrderId = orderId;
@@ -42,12 +42,20 @@ public static partial class Data
 				AddOrderPayments(transaction.AllPayments, orderId);
 				sqlTrans.Commit();
 
-				return new(0, null);
+				return new Order
+				{
+					Id = orderId,
+					CustomerId = transaction.Customer?.Id ?? 0,
+					CreationDate = transaction.CreationDate,
+					OrderRows = [.. transaction.AllItems],
+					PriceModifiers = [.. transaction.AllModifiers],
+					Payments = [.. transaction.AllPayments]
+				};
 			}
 			catch (Exception e)
 			{
 				sqlTrans.Rollback();
-				return new(1, e.Message);
+				return null;
 			}
 		}
 
@@ -124,6 +132,66 @@ public static partial class Data
 			splitOn: "Id").AsList();
 
 			return [.. ordersDict.Values];
+		}
+
+		public static Order? GetFromId(int orderId)
+		{
+			using var db = GetConnectionObject();
+
+			string query = """
+				SELECT o.*, opm.*, odrr.*, odrrpm.*, rr.*, pto.*
+				FROM `Order` o 
+				LEFT JOIN OrderPriceModifier opm ON opm.OrderId = o.Id 
+				LEFT JOIN OrderRow odrr ON odrr.OrderId = o.Id 
+				LEFT JOIN OrderRowPriceModifier odrrpm ON odrrpm.OrderRowId = odrr.Id
+				LEFT JOIN RentalRow rr ON rr.OrderRowId = odrr.Id
+				LEFT JOIN PaymentToOrder pto ON pto.OrderId = o.Id
+				WHERE o.Id = @orderId;
+			""";
+
+			Order? currentOrder = null;
+			Dictionary<int, OrderRow> rowsDict = [];
+
+			db.Query<Order, OrderPriceModifier, OrderRow, RowPriceModifier, RentalRow, Payment, Order>(query,
+			(order, orderPriceModifier, row, rowPriceModifier, rentalRow, payment) =>
+			{
+				currentOrder ??= order;
+
+				OrderRow? currentRow = null;
+				if (row is not null && !rowsDict.TryGetValue(row.Id, out currentRow))
+				{
+					if (rentalRow is not null)
+					{
+						rentalRow.RentalRowId = rentalRow.Id;
+						rentalRow.Id = row.Id;
+						rentalRow.OrderId = row.OrderId;
+						rentalRow.Barcode = row.Barcode;
+						rentalRow.Name = row.Name;
+						rentalRow.Price = row.Price;
+						currentRow = rentalRow;
+					}
+					else
+						currentRow = row;
+
+					rowsDict.Add(row.Id, currentRow);
+					currentOrder.OrderRows.Add(currentRow);
+				}
+
+				if (payment is not null && !currentOrder.Payments.Any(p => p.Id == payment.Id))
+					currentOrder.Payments.Add(payment);
+
+				if (orderPriceModifier is not null && !currentOrder.PriceModifiers.Any(pm => pm.Id == orderPriceModifier.Id))
+					currentOrder.PriceModifiers.Add(orderPriceModifier);
+
+				if (rowPriceModifier is not null && currentRow is not null && !currentRow.PriceModifiers.Any(x => x.Id == rowPriceModifier.Id))
+					currentRow.PriceModifiers.Add(rowPriceModifier);
+
+				return currentOrder;
+			},
+			new { orderId },
+			splitOn: "Id");
+
+			return currentOrder;
 		}
 
 		// This sucks. We should do this in the query, not in RAM. Crunchtime...
@@ -250,16 +318,16 @@ public static partial class Data
 			using var db = GetConnectionObject();
 			string query =
 			"""
-				INSERT INTO PaymentToOrder(OrderId, Amount, PaymentMethod, ReceivedDate)
+				INSERT INTO PaymentToOrder(OrderId, Amount, PaymentMethodId, ReceivedDate)
 				VALUES(@orderId, @amount, @PaymentMethod, @receivedDate)
-				RETURNING
+				RETURNING Id;
 			""";
 
 			return db.QuerySingle<int>(query, new
 			{
 				orderId,
 				amount,
-				PaymentMethod = paymentMethod.ToString(),
+				PaymentMethod = (int)paymentMethod,
 				receivedDate
 			});
 		}
