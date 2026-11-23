@@ -499,19 +499,16 @@ class STransactionMain : IScene
 			return;
 		}
 
+		var response = Data.Orders.FinalizeOrder(_currentTransaction);
 
-		// If customer id is -1, CreteOrder will automatically set it to null
-		int orderId = Data.Orders.CreateOrder(_currentTransaction.Customer?.Id ?? -1, DateTime.Today);
-		foreach (var row in _currentTransaction.AllItems)
-		{
-			row.OrderId = orderId;
-			if (row is RentalRow rr)
-				row.Id = Data.OrderRows.PushRentalRow(rr);
-			else
-				row.Id = Data.OrderRows.PushOrderRow(row);
-			Data.OrderRows.AddOrderRowPriceModifier(row);
-		}
-		Data.Orders.AddOrderPriceModifier(_currentTransaction.AllModifiers, orderId);
+		if (response.Code == 0)
+			Console.WriteLine("Order added to database without issues!");
+		else
+			Console.WriteLine($"\nERROR: {response.Message}");
+
+		Console.WriteLine("Press any key to continue...");
+		Console.ReadKey(intercept: true);
+
 		_deferredTransition = new SceneTransition.Pop();
 	}
 }

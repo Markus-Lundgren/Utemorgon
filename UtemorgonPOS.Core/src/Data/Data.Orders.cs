@@ -12,6 +12,37 @@ public static partial class Data
 {
 	public static class Orders
 	{
+
+		public static Response FinalizeOrder(ITransaction transaction)
+		{
+			using var db = GetConnectionObject();
+			using var sqlTrans = db.BeginTransaction();
+			try
+			{
+				// If customer id is -1, CreteOrder will automatically set it to null
+				int orderId = CreateOrder(transaction.Customer?.Id ?? -1, DateTime.Today);
+				foreach (var row in transaction.AllItems)
+				{
+					row.OrderId = orderId;
+					if (row is RentalRow rr)
+						row.Id = OrderRows.PushRentalRow(rr);
+					else
+						row.Id = OrderRows.PushOrderRow(row);
+					OrderRows.AddOrderRowPriceModifier(row);
+				}
+
+				AddOrderPriceModifier(transaction.AllModifiers, orderId);
+				sqlTrans.Commit();
+
+				return new(0, null);
+			}
+			catch (Exception e)
+			{
+				sqlTrans.Rollback();
+				return new(1, e.Message);
+			}
+		}
+
 		// TODO: Add things like GetAllOrdersForCustomer(int customerId)
 		public static int CreateOrder(int? customerId, DateTime creationDate)
 		{
