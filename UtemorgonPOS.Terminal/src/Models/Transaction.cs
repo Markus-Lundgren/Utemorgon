@@ -21,6 +21,8 @@ public class Transaction : ITransaction
 	public ImmutableArray<OrderPriceModifier> AllModifiers => _priceModifiers.ToImmutableArray();
 	public ImmutableArray<Payment> AllPayments => _payments.ToImmutableArray();
 
+	public DateTime CreationDate => Timestamp;
+
 	Dictionary<int, OrderRow> _items = [];
 	List<OrderPriceModifier> _priceModifiers = [];
 	List<Payment> _payments = [];

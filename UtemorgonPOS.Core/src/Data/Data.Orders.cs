@@ -18,7 +18,7 @@ public static partial class Data
 
 		// Thanks to: https://www.learndapper.com/misc/transaction
 		// Big up! 
-		public static Response FinalizeOrder(ITransaction transaction)
+		public static Order? FinalizeOrder(ITransaction transaction)
 		{
 			using var db = GetConnectionObject();
 			db.Open();
@@ -42,12 +42,20 @@ public static partial class Data
 				AddOrderPayments(transaction.AllPayments, orderId);
 				sqlTrans.Commit();
 
-				return new(0, null);
+				return new Order
+				{
+					Id = orderId,
+					CustomerId = transaction.Customer?.Id ?? 0,
+					CreationDate = transaction.CreationDate,
+					OrderRows = [.. transaction.AllItems],
+					PriceModifiers = [.. transaction.AllModifiers],
+					Payments = [.. transaction.AllPayments]
+				};
 			}
 			catch (Exception e)
 			{
 				sqlTrans.Rollback();
-				return new(1, e.Message);
+				return null;
 			}
 		}
 

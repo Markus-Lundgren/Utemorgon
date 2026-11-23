@@ -1,7 +1,150 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using ESCPOS_NET;
+using ESCPOS_NET.Emitters;
+using ESCPOS_NET.Utilities;
+using UtemorgonPOS.Core;
 
 public static class Printer
 {
+
+	// TODO: Move into env vars
+	const string PRINTER_ADDRESS = "192.168.10.119:9100";
+
+	static NetworkPrinter? GetPrinter()
+	{
+		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+		return new NetworkPrinter(settings: new() { ConnectionString = PRINTER_ADDRESS });
+	}
+
+	// Use correct byte translation for Swedish text
+	static byte[] PrintSe(string text)
+		=> Encoding.GetEncoding(1252).GetBytes(text + "\n");
+
+	static byte[] AddItem(string label, double price)
+		=> ItemRow(label, $"{price:F2} SEK");
+
+
+	static byte[] ItemRow(string itemName, string price, int width = 42)
+	{
+		// Truncate item name if it's incredibly long to avoid breaking the row
+		if (itemName.Length > width - price.Length - 1)
+			itemName = itemName.Substring(0, width - price.Length - 1);
+
+		string row = itemName.PadRight(width - price.Length) + price;
+		return PrintSe(row);
+	}
+
+	static byte[] AggregateOrderRows(Order order)
+	{
+		List<byte[]> bytes = [];
+		foreach (var row in order.OrderRows)
+		{
+			string rname = row.Quantity == 1 ? row.Name : $"{row.Name} x{row.Quantity}";
+			bytes.Add(ItemRow(rname, row.GetTotalPrice().ToString()));
+			if (row is RentalRow rr)
+			{
+				bytes.Add(PrintSe($"Returneras senast: {rr.ExpectedReturnDate.Date}"));
+				if (rr.ReturnedDate is not null)
+					bytes.Add(PrintSe($"Returnerad: {rr.ReturnedDate}"));
+			}
+
+			foreach (var pm in row.PriceModifiers)
+				bytes.Add(ItemRow($"{pm.Reason}", $"{pm.PriceDelta}  "));
+		}
+
+		return [.. bytes.SelectMany(b => b)];
+	}
+
+	static byte[] AggregateOrderModifiers(Order order)
+	{
+		List<byte[]> bytes = [];
+		foreach (var pm in order.PriceModifiers)
+			bytes.Add(ItemRow($"{pm.Reason}", $"{pm.PriceDelta}"));
+
+		return [.. bytes.SelectMany(b => b)];
+	}
+
+	static byte[] AggregatePayments(Order order)
+	{
+		List<byte[]> bytes = [];
+		foreach (var payment in order.Payments)
+			bytes.Add(ItemRow(payment.Method.ToString(), payment.Amount.ToString()));
+
+		return [.. bytes.SelectMany(b => b)];
+	}
+
+	public static void PrintOrder(Order order)
+	{
+		using var printer = GetPrinter();
+		var e = new EPSON();
+
+		var receipt = ByteSplicer.Combine(
+				e.Initialize(),
+				[27, 116, 16], // Switch to WPC1252
+
+				// HEADER
+				e.CenterAlign(),
+				e.SetStyles(PrintStyle.DoubleWidth | PrintStyle.DoubleHeight | PrintStyle.Bold),
+				PrintSe("UTEMORGON"),
+				e.SetStyles(PrintStyle.None),
+				PrintSe("Bryggaregatan 12, 503 38 Borås"),
+				PrintSe("Org.nr 202100-3138"),
+				PrintSe(""),
+
+				// METADATA
+				e.LeftAlign(),
+				PrintSe($"Datum: {order.CreationDate:yyyy-MM-dd HH:mm}    Kassa: 1"),
+				PrintSe($"Kvittonr: #{order.Id}"),
+				PrintSe($"Kund: {(order.CustomerId != -1 ? $"#{order.CustomerId}" : "Anonym")}"),
+				PrintSe(new string('-', 42)), // Horizontal line
+
+				// ITEMS
+				AggregateOrderRows(order),
+				PrintSe(""),
+
+				// Modifiers
+				PrintSe(new string('-', 42)), // Horizontal line
+				AggregateOrderModifiers(order),
+				PrintSe(""),
+				PrintSe(""),
+
+				// TOTALS
+				e.RightAlign(),
+				e.SetStyles(PrintStyle.DoubleWidth | PrintStyle.DoubleHeight),
+				PrintSe($"TOTALT: {order.TotalCost:F2}"),
+				e.SetStyles(PrintStyle.None),
+				PrintSe($"Varav moms (25%): {order.TotalCost * 0.25m:F2}"),
+				PrintSe(""),
+
+				// PAYMENTS
+				PrintSe(new string('-', 42)), // Horizontal line
+				e.LeftAlign(),
+				PrintSe("BETALNINGAR"),
+				AggregatePayments(order),
+				PrintSe(new string('-', 42)), // Horizontal line
+
+				// FOOTER & BARCODE
+				e.CenterAlign(),
+				PrintSe("Tack för ditt besök!"),
+				PrintSe("Spara kvittot vid eventuell retur."),
+				e.PrintLine(""),
+				e.PrintBarcode(BarcodeType.CODE39, order.Id.ToString(), BarcodeCode.CODE_C),
+
+				e.FeedLines(5),
+				e.FullCut()
+			);
+
+		// Hacky way to just keep the app alive whilst sending data.
+		if (printer is not null)
+		{
+			printer.Write(receipt);
+			// Thread.Sleep(6000);
+		}
+	}
 
 	// TODO: Add real stuff in here...
 
