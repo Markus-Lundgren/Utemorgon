@@ -10,8 +10,8 @@ public class Order
 	public int CustomerId { get; set; }
 	public DateTime CreationDate { get; set; }
 
-	public List<OrderPriceModifier> PriceModifiers;
-	public List<OrderRow> OrderRows;
+	public List<OrderPriceModifier> PriceModifiers = [];
+	public List<OrderRow> OrderRows = [];
 
 	public decimal TotalCost => PriceModifiers.Sum(pm => pm.PriceDelta) + OrderRows.Sum(odr => odr.GetTotalPrice());
 
