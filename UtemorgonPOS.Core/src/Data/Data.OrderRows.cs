@@ -143,11 +143,8 @@ public static partial class Data
 
 				return orderRowId;
 			}
-			catch (Exception e)
+			catch
 			{
-				Console.WriteLine(e.Message);
-				Console.WriteLine("Press any key to continue.");
-				Console.ReadKey();
 				return -1;
 			}
 
