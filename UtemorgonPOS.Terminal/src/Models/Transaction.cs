@@ -52,14 +52,26 @@ public class Transaction : ITransaction
 
 		if (isRental)
 		{
-			if (Customer is null)
-				Console.WriteLine("Cannot add a rental product when the order has no customer!");
-			else if (hasOutstanding)
-				Console.WriteLine("Cannot add a rental product for a customer with outstanding payments!");
+			bool blocked = false;
 
-			Console.WriteLine("Press any key to continue.");
-			Console.ReadKey(intercept: true);
-			return;
+			if (Customer is null)
+			{
+				Console.WriteLine("Cannot add a rental product when the order has no customer!");
+				blocked = true;
+			}
+			else if (hasOutstanding)
+			{
+				Console.WriteLine("Cannot add a rental product for a customer with outstanding payments!");
+				blocked = true;
+			}
+
+			if (blocked)
+			{
+				Console.WriteLine("Press any key to continue.");
+				Console.ReadKey(intercept: true);
+				return;
+			}
+
 		}
 
 
