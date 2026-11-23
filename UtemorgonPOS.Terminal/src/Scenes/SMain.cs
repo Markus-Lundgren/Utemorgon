@@ -9,6 +9,7 @@ class SMain : IScene
 		new(ConsoleKey.T, "Enter transaction", () => { _deferredTransition = new SceneTransition.Push(SceneRepository.Transaction.Main); }),
 		new(ConsoleKey.C, "Customers", () => {_deferredTransition = new SceneTransition.Push(SceneRepository.Customers.Main); }),
 		new(ConsoleKey.P, "Products", () => { _deferredTransition = new SceneTransition.Push(SceneRepository.Products.Main); }),
+		new(ConsoleKey.R, "Return rentals", () => { _deferredTransition = new SceneTransition.Push(SceneRepository.Products.ReturnRentals); }),
 		new(ConsoleKey.E, "Exit program", () => { _deferredTransition = new SceneTransition.Pop(); }),
 	]);
 

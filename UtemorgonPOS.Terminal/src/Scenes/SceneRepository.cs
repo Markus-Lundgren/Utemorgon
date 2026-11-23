@@ -7,6 +7,7 @@ static class SceneRepository
 		public static SNewProduct New = new();
 		public static SProductInfo Info = new();
 		public static SProductCategory Category = new();
+		public static SProductReturnRentals ReturnRentals = new();
 	}
 
 	public static class Transaction
