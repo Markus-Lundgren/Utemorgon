@@ -74,6 +74,11 @@ public static class Printer
 		foreach (var payment in order.Payments)
 			bytes.Add(ItemRow(payment.Method.ToString(), payment.Amount.ToString()));
 
+		bytes.Add(PrintSe(""));
+
+		bytes.Add(ItemRow("Inkommet", order.TotalPaid.ToString()));
+		bytes.Add(ItemRow("Kvarstående", order.OutstandingAmount.ToString()));
+
 		return [.. bytes.SelectMany(b => b)];
 	}
 
@@ -118,6 +123,7 @@ public static class Printer
 				PrintSe($"TOTALT: {order.TotalCost:F2}"),
 				e.SetStyles(PrintStyle.None),
 				PrintSe($"Varav moms (25%): {order.TotalCost * 0.25m:F2}"),
+				PrintSe($"Rabatt {-Math.Abs(order.TotalDiscount):F2}"),
 				PrintSe(""),
 
 				// PAYMENTS
