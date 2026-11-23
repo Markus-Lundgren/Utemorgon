@@ -513,7 +513,6 @@ class STransactionMain : IScene
 			Data.OrderRows.AddOrderRowPriceModifier(row);
 		}
 		Data.Orders.AddOrderPriceModifier(_currentTransaction.AllModifiers, orderId);
-		Console.WriteLine("ORDER FINISHED");
 		_deferredTransition = new SceneTransition.Pop();
 	}
 }
