@@ -502,9 +502,10 @@ class STransactionMain : IScene
 
 		// Below should be the basics of what we need to use when finalizing order
 
-		Data.Orders.CreateOrder(_currentTransaction.Customer?.Id ?? 1, DateTime.Today);
+		int orderId = Data.Orders.CreateOrder(_currentTransaction.Customer?.Id ?? 1, DateTime.Today);
 		foreach (var row in _currentTransaction.AllItems)
 		{
+			row.OrderId = orderId;
 			if (row is RentalRow rr)
 				Data.OrderRows.PushRentalRow(rr);
 			else
