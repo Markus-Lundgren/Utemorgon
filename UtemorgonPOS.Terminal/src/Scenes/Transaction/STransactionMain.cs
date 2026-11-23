@@ -507,11 +507,13 @@ class STransactionMain : IScene
 		{
 			row.OrderId = orderId;
 			if (row is RentalRow rr)
-				Data.OrderRows.PushRentalRow(rr);
+				row.Id = Data.OrderRows.PushRentalRow(rr);
 			else
-				Data.OrderRows.PushOrderRow(row);
+				row.Id = Data.OrderRows.PushOrderRow(row);
 			Data.OrderRows.AddOrderRowPriceModifier(row);
 		}
-		Data.Orders.AddOrderPriceModifier(_currentTransaction.AllModifiers);
+		Data.Orders.AddOrderPriceModifier(_currentTransaction.AllModifiers, orderId);
+		Console.WriteLine("ORDER FINISHED");
+		_deferredTransition = new SceneTransition.Pop();
 	}
 }
