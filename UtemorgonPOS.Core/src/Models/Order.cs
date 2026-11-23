@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace UtemorgonPOS.Core;
 
@@ -8,7 +9,7 @@ public class Order
 	public int CustomerId { get; set; }
 	public DateTime CreationDate { get; set; }
 
-	public OrderPriceModifier[] PriceModifiers;
+	public List<OrderPriceModifier> PriceModifiers;
 	public OrderRow OrderRow;
 
 }
