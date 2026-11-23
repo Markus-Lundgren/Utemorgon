@@ -320,7 +320,7 @@ public static partial class Data
 			"""
 				INSERT INTO PaymentToOrder(OrderId, Amount, PaymentMethod, ReceivedDate)
 				VALUES(@orderId, @amount, @PaymentMethod, @receivedDate)
-				RETURNING
+				RETURNING Id;
 			""";
 
 			return db.QuerySingle<int>(query, new
