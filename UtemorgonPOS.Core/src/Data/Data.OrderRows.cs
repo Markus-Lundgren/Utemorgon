@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dapper;
 
 namespace UtemorgonPOS.Core;
@@ -169,6 +170,20 @@ public static partial class Data
 			db.Execute(query, new { Code = barcode });
 
 			return new(0, null);
+		}
+
+		public static RentalRow? GetLastRentalRowFromBarcode(string barcode)
+		{
+			using var db = GetConnectionObject();
+
+			string query = """
+			SELECT r.*
+			FROM RentalRow r
+			JOIN OrderRow o ON r.OrderRowId = o.Id
+			WHERE o.Barcode = @Code AND r.ReturnedDate IS NULL
+			""";
+
+			return db.Query<RentalRow>(query, new { Code = barcode }).LastOrDefault();
 		}
 
 		public static RentalRow[] GetRentedRentalsBetweenDates(DateOnly startDate, DateOnly endDate)

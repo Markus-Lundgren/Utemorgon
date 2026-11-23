@@ -432,6 +432,17 @@ class STransactionMain : IScene
 	{
 		if (barcode is not null)
 		{
+			var rr = Data.OrderRows.GetLastRentalRowFromBarcode(barcode.BarCode);
+
+			if (rr is not null && rr.ReturnedDate is null)
+			{
+				Console.WriteLine("Cannot rent a product that has not been returned!");
+				Console.WriteLine("Press any key to continue...");
+				Console.ReadKey(intercept: true);
+				_forceReRender = true;
+				return;
+			}
+
 			bool hasOutstanding = false;
 			if (_currentTransaction.Customer is not null)
 				hasOutstanding = Data.Customers.GetOutstandingOrders(_currentTransaction.Customer.Id).Length > 0;
