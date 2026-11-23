@@ -6,5 +6,4 @@ public class RentalProduct
 	public Order Order;
 	public Customer Customer;
 	public RentalRow RentalRow;
-	public OrderRow OrderRow;
 }
