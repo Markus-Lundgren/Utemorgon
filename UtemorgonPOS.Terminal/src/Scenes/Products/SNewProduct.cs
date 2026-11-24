@@ -116,13 +116,13 @@ class SNewProduct : IScene
 				{
 					var bc = Data.Barcodes.AddBarcodeToRental(p.Id);
 					if (bc is not null)
-						Printer.PrintSpecialBarcode(bc);
+						Printer.PrintSpecialBarcode(bc, $"{p.Name} ({p.ProductType})");
 				}
 				if (p.ProductType.ToString().StartsWith("Service_", StringComparison.InvariantCultureIgnoreCase))
 				{
 					var bc = Data.Barcodes.AddBarcodeToService(p.Id);
 					if (bc is not null)
-						Printer.PrintSpecialBarcode(bc);
+						Printer.PrintSpecialBarcode(bc, $"{p.Name} ({p.ProductType})");
 				}
 			}
 		}

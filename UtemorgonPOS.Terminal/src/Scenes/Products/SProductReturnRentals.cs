@@ -21,11 +21,22 @@ class SProductReturnRentals : IScene
 
 		var rental = Data.OrderRows.GetLastRentalRowFromBarcode(barcode);
 		bool returned = rental is not null && Data.OrderRows.ReturnRental(barcode) > 0;
+		int lateDays = rental?.LateDays ?? 0;
 
-		if (returned)
+		if (returned && rental is not null)
 		{
 			Console.WriteLine("Rental product returned!");
-			var order = Data.Orders.GetFromId(rental!.OrderId);
+
+			if (lateDays > 0)
+			{
+				decimal lateFee = lateDays * rental.DailyFee;
+				rental.Id = rental.OrderRowId;
+				rental.AddPriceModifier($"Förseningsavgift ({lateDays} dygn)", lateFee);
+				Data.OrderRows.AddOrderRowPriceModifier(rental);
+				Console.WriteLine($"Late return ({lateDays} days)! Added fee: {lateFee:N2} SEK");
+			}
+
+			var order = Data.Orders.GetFromId(rental.OrderId);
 			if (order is not null)
 				Printer.PrintOrder(order);
 			else

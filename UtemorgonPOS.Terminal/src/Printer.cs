@@ -44,14 +44,15 @@ public static class Printer
 		List<byte[]> bytes = [];
 		foreach (var row in order.OrderRows)
 		{
-			string rname = row.Quantity == 1 ? row.Name : $"{row.Name} x{row.Quantity}";
-			bytes.Add(ItemRow(rname, row.GetTotalPrice().ToString()));
 			if (row is RentalRow rr)
 			{
+				bytes.Add(ItemRow($"{rr.Name} ({rr.GetReturnDaysDelta(order.CreationDate.Date)} dygn)", rr.Price.ToString()));
 				bytes.Add(PrintSe($"  Returneras senast: {rr.ExpectedReturnDate:yyyy-MM-dd}"));
 				if (rr.ReturnedDate is not null)
 					bytes.Add(PrintSe($"  Returnerad: {rr.ReturnedDate:yyyy-MM-dd}"));
 			}
+			else
+				bytes.Add(ItemRow($"{row.Name} x{row.Quantity}", (row.Price * row.Quantity).ToString("F2")));
 
 			foreach (var pm in row.PriceModifiers)
 				bytes.Add(ItemRow($"{pm.Reason}", $"{pm.PriceDelta}", indent: 2));
@@ -158,7 +159,7 @@ public static class Printer
 	// It basically combines 2 barcode print-types for the special barcodes 
 	// (barcodes starting with a letter followed by 12 digits)
 	// This makes it more compact and allows the scanner to read it proper
-	public static void PrintSpecialBarcode(string? barcode)
+	public static void PrintSpecialBarcode(string? barcode, string? label = null)
 	{
 		if (string.IsNullOrWhiteSpace(barcode))
 			return;
@@ -173,6 +174,7 @@ public static class Printer
 			e.Initialize(),
 			[27, 116, 16], // WPC1252
 			e.CenterAlign(),
+			string.IsNullOrWhiteSpace(label) ? [] : PrintSe(label),
 			e.SetBarcodeHeightInDots(100),
 			e.SetBarWidth(BarWidth.Thin),
 			gsK,
