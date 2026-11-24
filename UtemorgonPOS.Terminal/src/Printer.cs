@@ -158,7 +158,7 @@ public static class Printer
 	// It basically combines 2 barcode print-types for the special barcodes 
 	// (barcodes starting with a letter followed by 12 digits)
 	// This makes it more compact and allows the scanner to read it proper
-	public static void PrintSpecialBarcode(string? barcode)
+	public static void PrintSpecialBarcode(string? barcode, string? label = null)
 	{
 		if (string.IsNullOrWhiteSpace(barcode))
 			return;
@@ -173,6 +173,7 @@ public static class Printer
 			e.Initialize(),
 			[27, 116, 16], // WPC1252
 			e.CenterAlign(),
+			string.IsNullOrWhiteSpace(label) ? [] : PrintSe(label),
 			e.SetBarcodeHeightInDots(100),
 			e.SetBarWidth(BarWidth.Thin),
 			gsK,
