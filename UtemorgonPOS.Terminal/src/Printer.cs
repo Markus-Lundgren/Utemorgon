@@ -44,14 +44,15 @@ public static class Printer
 		List<byte[]> bytes = [];
 		foreach (var row in order.OrderRows)
 		{
-			string rname = row.Quantity == 1 ? row.Name : $"{row.Name} x{row.Quantity}";
-			bytes.Add(ItemRow(rname, row.GetTotalPrice().ToString()));
 			if (row is RentalRow rr)
 			{
+				bytes.Add(ItemRow($"{rr.Name} ({rr.GetReturnDaysDelta(order.CreationDate)} dygn)", rr.Price.ToString()));
 				bytes.Add(PrintSe($"  Returneras senast: {rr.ExpectedReturnDate:yyyy-MM-dd}"));
 				if (rr.ReturnedDate is not null)
 					bytes.Add(PrintSe($"  Returnerad: {rr.ReturnedDate:yyyy-MM-dd}"));
 			}
+			else
+				bytes.Add(ItemRow($"{row.Name} x{row.Quantity}", (row.Price * row.Quantity).ToString("F2")));
 
 			foreach (var pm in row.PriceModifiers)
 				bytes.Add(ItemRow($"{pm.Reason}", $"{pm.PriceDelta}", indent: 2));
