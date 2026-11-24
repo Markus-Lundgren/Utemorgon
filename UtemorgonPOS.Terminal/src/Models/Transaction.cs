@@ -46,12 +46,12 @@ public class Transaction : ITransaction
 	}
 
 	/// <summary>
-	/// 0 = good, 1 = no product, 2 = No customer, 3 = Outstanding payments
+	/// 0 = good, 1 = no product, 2 = No customer, 3 = Outstanding payments, 4 = Late rentals
 	/// </summary>
 	/// <param name="barcode"></param>
 	/// <param name="hasOutstanding"></param>
 	/// <returns></returns>
-	public int AddItem(Barcode barcode, bool hasOutstanding)
+	public int AddItem(Barcode barcode, bool hasOutstanding, bool hasLates)
 	{
 		if (barcode.Product is null || barcode.Product.IsArchived)
 			return 1;
@@ -64,6 +64,8 @@ public class Transaction : ITransaction
 				return 2;
 			else if (hasOutstanding)
 				return 3;
+			else if (hasLates)
+				return 4;
 
 		}
 

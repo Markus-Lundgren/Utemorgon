@@ -444,10 +444,16 @@ class STransactionMain : IScene
 			}
 
 			bool hasOutstanding = false;
+			bool hasLates = false;
 			if (_currentTransaction.Customer is not null)
-				hasOutstanding = Data.Customers.GetOutstandingOrders(_currentTransaction.Customer.Id).Length > 0;
+			{
 
-			var code = _currentTransaction.AddItem(barcode, hasOutstanding);
+				hasOutstanding = Data.Customers.GetOutstandingOrders(_currentTransaction.Customer.Id).Length > 0;
+				var rentals = Data.Rentals.GetAllRentalDataForCustomer(_currentTransaction.Customer.Id) ?? [];
+				hasLates = rentals.Any(r => r.RentalRow.LateDays > 0);
+			}
+
+			var code = _currentTransaction.AddItem(barcode, hasOutstanding, hasLates);
 			if (code != 0)
 			{
 				if (code == 1)
@@ -456,6 +462,8 @@ class STransactionMain : IScene
 					Console.WriteLine("Cannot add a rental product when the order has no customer!");
 				else if (code == 3)
 					Console.WriteLine("Cannot add a rental product for a customer with outstanding payments!");
+				else if (code == 4)
+					Console.WriteLine("Cannot add a rental product for a customer with late rentals!");
 				else
 					Console.WriteLine("Error adding rental product to order!");
 
