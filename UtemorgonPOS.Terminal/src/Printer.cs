@@ -46,7 +46,7 @@ public static class Printer
 		{
 			if (row is RentalRow rr)
 			{
-				bytes.Add(ItemRow($"{rr.Name} ({rr.GetReturnDaysDelta(order.CreationDate)} dygn)", rr.Price.ToString()));
+				bytes.Add(ItemRow($"{rr.Name} ({rr.GetReturnDaysDelta(order.CreationDate.Date)} dygn)", rr.Price.ToString()));
 				bytes.Add(PrintSe($"  Returneras senast: {rr.ExpectedReturnDate:yyyy-MM-dd}"));
 				if (rr.ReturnedDate is not null)
 					bytes.Add(PrintSe($"  Returnerad: {rr.ReturnedDate:yyyy-MM-dd}"));
